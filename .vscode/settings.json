@@ -2,5 +2,8 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always"
-    }
+    },
+	"files.associations": {
+		"*.css": "tailwindcss"
+	}
 }

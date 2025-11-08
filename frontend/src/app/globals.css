@@ -1,1 +1,35 @@
 @import 'tailwindcss';
+@plugin "daisyui/theme" {
+	name: 'bumblebee';
+	default: true;
+	prefersdark: false;
+	color-scheme: 'light';
+	--color-base-100: #ffffff;
+	--color-base-200: #fffbf6;
+	--color-base-300: #fef7ec;
+	--color-base-content: #341c0a;
+	--color-primary: #341c0a;
+	--color-primary-content: #fef7ec;
+	--color-secondary: #fb783a;
+	--color-secondary-content: #fef7ec;
+	--color-accent: #5f8525;
+	--color-accent-content: #fed34a;
+	--color-neutral: #fb783a;
+	--color-neutral-content: #fef7ec;
+	--color-info: #341c0a;
+	--color-info-content: #fef7ec;
+	--color-success: #5f8525;
+	--color-success-content: #fef7ec;
+	--color-warning: #fed34a;
+	--color-warning-content: #341c0a;
+	--color-error: #b54615;
+	--color-error-content: #fef7ec;
+	--radius-selector: 2rem;
+	--radius-field: 2rem;
+	--radius-box: 1rem;
+	--size-selector: 0.25rem;
+	--size-field: 0.25rem;
+	--border: 1px;
+	--depth: 1;
+	--noise: 0;
+}
