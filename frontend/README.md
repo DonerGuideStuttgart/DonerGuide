@@ -9,9 +9,6 @@ For development, you will only need Node.js installed on your environement.
 ## Getting Started
 
 ```bash
-npm i
-npm run dev
-# or
 pnpm i
 pnpm dev
 ```
