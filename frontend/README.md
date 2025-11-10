@@ -25,8 +25,8 @@ npm run build
 
 ### Typescript
 
-- [nextjs](https://nextjs.org/) is used as frontend libary.
-- [fontawesome](https://fontawesome.com/) is used as Icon Libary.
+- [nextjs](https://nextjs.org/) is used as frontend library.
+- [fontawesome](https://fontawesome.com/) is used as Icon Library.
 - [formik](https://formik.org/) is used to handle forms in react.
 - [yup](https://www.npmjs.com/package/yup) is used to handle form validation in react.
 - [jest](https://jestjs.io/) is used for unit and component testing.
