@@ -21,7 +21,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en">
+		<html lang="de">
 			<body className={`${rubikSans.className} antialiased`}>{children}</body>
 		</html>
 	)
