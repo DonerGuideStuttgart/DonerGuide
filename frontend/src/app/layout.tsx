@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 		template: '%s | Dönerguide Stuttgart',
 		default: 'Dönerguide Stuttgart',
 	},
-	description: 'A web app where you can find the best kebab in Stuttgart.',
+	description: 'Eine Web-App, um den besten Döner in Stuttgart zu finden.',
 }
 
 export default function RootLayout({
