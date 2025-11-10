@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${rubikSans.variable} antialiased`}>{children}</body>
+			<body className={`${rubikSans.className} antialiased`}>{children}</body>
 		</html>
 	)
 }
