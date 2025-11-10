@@ -4,7 +4,7 @@ https://xd.adobe.com/view/9d5f86d7-c409-40a8-a81b-755a7d0d657b-c80c/
 
 ## Requirements
 
-For development, you will only need Node.js installed on your environement.
+For development, you will only need Node.js installed on your environment.
 
 ## Getting Started
 
@@ -26,8 +26,8 @@ pnpm serve # to preview production build
 
 ### Typescript
 
-- [nextjs](https://nextjs.org/) is used as frontend libary.
-- [fontawesome](https://fontawesome.com/) is used as Icon Libary.
+- [nextjs](https://nextjs.org/) is used as frontend library.
+- [fontawesome](https://fontawesome.com/) is used as Icon Library.
 - [formik](https://formik.org/) is used to handle forms in react.
 - [yup](https://www.npmjs.com/package/yup) is used to handle form validation in react.
 - [jest](https://jestjs.io/) is used for unit and component testing.
