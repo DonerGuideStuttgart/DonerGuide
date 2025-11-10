@@ -4,7 +4,7 @@ https://xd.adobe.com/view/9d5f86d7-c409-40a8-a81b-755a7d0d657b-c80c/
 
 ## Requirements
 
-For development, you will only need Node.js installed on your environement.
+For development, you will only need Node.js installed on your environment.
 
 ## Getting Started
 
