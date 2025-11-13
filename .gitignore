@@ -1,0 +1,19 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build-Ordner
+/build/
+/out/
+/target/
+
+# Logs
+*.log
+
+# Node / npm
+node_modules/
+
+# System
+.DS_Store
+
