@@ -1,0 +1,24 @@
+{
+  "name": "doenerguide-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure Functions Monorepo with shared TypeScript package and multiple function apps.",
+  "type": "commonjs",
+  "workspaces": [
+    "shared",
+    "place-search",
+    "image-classifier",
+    "llm-analyzer",
+    "data-persistence"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "jest": "^30.2.0",
+    "@types/jest": "^30.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
