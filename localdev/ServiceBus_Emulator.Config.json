@@ -1,0 +1,24 @@
+{
+    "UserConfig": {
+        "Namespaces": [
+            {
+                "Name": "sbemulatorns",
+                "Queues": [
+                    {
+                        "Name": "places-found"
+                    },
+                    {
+                        "Name": "images-classified"
+                    },
+                    {
+                        "Name": "reviews-generated"
+                    }
+                ],
+                "Topics": []
+            }
+        ],
+        "Logging": {
+            "Type": "Console"
+        }
+    }
+}
