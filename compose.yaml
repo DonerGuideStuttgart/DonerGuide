@@ -1,7 +1,7 @@
 services:
 
   place-search:
-    image: node:18
+    image: node:22
     container_name: "place-search"
     working_dir: /app
     volumes:
@@ -10,13 +10,32 @@ services:
     command: sh -c "npm install && npm run dev"
     depends_on:
       - servicebus-emulator
+      - cosmosdb-emulator
     environment:
       PLACE_SEARCH_CRON: "*/10 * * * * *"
       PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
-  
-  service-bus-reader:
-    image: node:18
-    container_name: "service-bus-reader"
+      PLACE_SEARCH_SERVICEBUS_QUEUE_NAME: "places"
+      PLACE_SEARCH_COSMOSDB_CONNECTION_STRING: "AccountEndpoint=http://host.docker.internal:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      PLACE_SEARCH_COSMOSDB_DATABASE_NAME: "DoenerGuideDB"
+      PLACE_SEARCH_COSMOSDB_CONTAINER_NAME: "Places"
+
+  image-classifier:
+    image: node:22
+    container_name: "image-classifier"
+    working_dir: /app
+    volumes:
+      - ./backend/functions/image-classifier:/app
+      - node_modules_image-classifier:/app/node_modules
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - servicebus-emulator
+      - cosmosdb-emulator
+    environment:
+      TODO: "Set necessary environment variables"
+
+  places-reader:
+    image: node:22
+    container_name: "places-reader"
     working_dir: /app
     volumes:
       - ./backend/helper/service-bus-reader:/app
@@ -46,6 +65,7 @@ services:
     container_name: "cosmosdb-emulator"
     hostname: cosmosdb-emulator
     restart: always
+    command: ["--gateway-endpoint", "cosmosdb-emulator"]
     ports:
       - "8081:8081"
       - "1234:1234"
