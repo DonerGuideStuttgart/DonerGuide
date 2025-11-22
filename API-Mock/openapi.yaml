@@ -1,0 +1,374 @@
+openapi: 3.0.3
+info:
+  title: DonerGuide API Mock
+  description: RESTful mock API for DonerGuide — overview and detail endpoints for Döner places.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local mock server
+paths:
+  /places:
+    get:
+      summary: Liste von Döner-Lokalen (Übersichtsseite)
+      description: |
+        Unterstützt Pagination, Sortierung und umfangreiche Filter.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Seitenindex (1-basiert)
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 20
+          description: Anzahl Items pro Seite
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [ai_score, price, size]
+            default: ai_score
+          description: Feld nach dem sortiert werden soll
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sortierrichtung
+        - name: min_score
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Minimale KI-Bewertung (1-100)
+        - name: max_score
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximale KI-Bewertung (1-100)
+        - name: min_price
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          description: Minimale Preissumme (Durchschnitt in EUR)
+        - name: max_price
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          description: Maximale Preissumme (Durchschnitt in EUR)
+        - name: district
+          in: query
+          description: Stuttgart-Stadtbezirk (mehrfach erlaubt)
+          schema:
+            type: string
+            enum: [Mitte, Nord, Ost, Süd, West, Bad_Cannstatt, Vaihingen, Möhringen, Degerloch, Feuerbach, Zuffenhausen, Untertürkheim, Wangen, Plieningen, Stammheim, Weilimdorf]
+          style: form
+          explode: true
+        - name: open_now
+          in: query
+          schema:
+            type: boolean
+          description: Nur aktuell geöffnete Lokalitäten
+        - name: open_this_evening
+          in: query
+          schema:
+            type: boolean
+          description: Öffnet heute Abend
+        - name: open_late
+          in: query
+          schema:
+            type: boolean
+          description: Späte Öffnungszeiten (z. B. nach 22:00)
+        - name: servesVegetarianFood
+          in: query
+          schema:
+            type: boolean
+          description: Liefert vegetarische Optionen
+        - name: meat_ratio_min
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Minimales Fleisch/Gemüse-Verhältnis (1-100)
+        - name: meat_ratio_max
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximales Fleisch/Gemüse-Verhältnis (1-100)
+        - name: sauce_amount_min
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Minimale Soßenmenge (1-100)
+        - name: sauce_amount_max
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximale Soßenmenge (1-100)
+        - name: size_min
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Minimale Größe (1-100)
+        - name: size_max
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximale Größe (1-100)
+        - name: waiting_time
+          in: query
+          description: Wartezeitkategorie (mehrfach erlaubt)
+          schema:
+            type: string
+            enum: [FAST, AVERAGE, SLOW]
+          style: form
+          explode: true
+        - name: payment_methods
+          in: query
+          description: Akzeptierte Zahlungsmethoden (mehrfach erlaubt)
+          schema:
+            type: string
+            enum: [CASH, CREDIT_CARD, DEBIT_CARD, NFC]
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paged list of places
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlaceOverview'
+                  meta:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      totalItems:
+                        type: integer
+                      totalPages:
+                        type: integer
+                required: [items, meta]
+  /places/{id}:
+    get:
+      summary: Detailseite eines Döner-Lokals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Place details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        '404':
+          description: Place not found
+components:
+  schemas:
+    Photo:
+      type: object
+      properties:
+        id:
+          type: string
+        photoUrl:
+          type: string
+          format: uri
+      required: [id, photoUrl]
+    WaitingTime:
+      type: string
+      enum: [FAST, AVERAGE, SLOW]
+    PaymentMethods:
+      type: string
+      enum: [CASH, CREDIT_CARD, DEBIT_CARD, NFC]
+    StoreAnalysis:
+      type: object
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 100
+        meat_ratio:
+          type: integer
+          minimum: 1
+          maximum: 100
+        sauce_amount:
+          type: integer
+          minimum: 1
+          maximum: 100
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        waiting_time:
+          $ref: '#/components/schemas/WaitingTime'
+        image_URL:
+          type: string
+          format: uri
+        text:
+          type: string
+      required: [score, meat_ratio, sauce_amount, size, waiting_time, image_URL, text]
+    OpeningHours:
+      type: object
+      description: Minuten seit Mitternacht als Tupel [open, close]
+      properties:
+        Mo:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 1440
+          minItems: 2
+          maxItems: 2
+        Tu:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+        We:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+        Th:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+        Fr:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+        Sa:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+        Su:
+          $ref: '#/components/schemas/OpeningHours/properties/Mo'
+    Address:
+      type: object
+      properties:
+        postalCode:
+          type: string
+        locality:
+          type: string
+        sublocality:
+          type: string
+        streetAddress:
+          type: string
+    PhotosCollection:
+      type: object
+      properties:
+        uncategorized:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        food:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+    Place:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        doner_guide_version:
+          type: integer
+        internationalPhoneNumber:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        openingHours:
+          $ref: '#/components/schemas/OpeningHours'
+        address:
+          $ref: '#/components/schemas/Address'
+        photos:
+          $ref: '#/components/schemas/PhotosCollection'
+        ai_analysis:
+          $ref: '#/components/schemas/StoreAnalysis'
+        paymentMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethods'
+        takeout:
+          type: boolean
+        delivery:
+          type: boolean
+        dineIn:
+          type: boolean
+        servesVegetarianFood:
+          type: boolean
+      required: [id, name, doner_guide_version, latitude, longitude, openingHours, address, photos]
+    PlaceOverview:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ai_score:
+          type: integer
+          minimum: 1
+          maximum: 100
+        closesTodayAt:
+          type: string
+          description: Closing time for today in HH:MM or null
+        image:
+          type: string
+          format: uri
+        servesVegetarianFood:
+          type: boolean
+        meat_ratio:
+          type: integer
+          minimum: 1
+          maximum: 100
+        waiting_time:
+          $ref: '#/components/schemas/WaitingTime'
+        price:
+          type: number
+          format: float
+        paymentMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethods'
+      required: [id, name, ai_score, image, servesVegetarianFood, meat_ratio, waiting_time]
+    District:
+      type: string
+      enum: [Mitte, Nord, Ost, Süd, West, Bad_Cannstatt, Vaihingen, Möhringen, Degerloch, Feuerbach, Zuffenhausen, Untertürkheim, Wangen, Plieningen, Stammheim, Weilimdorf]
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]

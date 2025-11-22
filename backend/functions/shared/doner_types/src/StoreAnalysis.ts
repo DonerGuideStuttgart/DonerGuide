@@ -7,5 +7,6 @@ export interface StoreAnalysis {
     size: number; // 1 to 100
     waiting_time: WaitingTime;
     image_URL: string;
+    price: number;
     text: string;
 }

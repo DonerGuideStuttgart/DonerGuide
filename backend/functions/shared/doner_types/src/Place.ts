@@ -5,6 +5,7 @@ import { StoreAnalysis } from "./StoreAnalysis";
 
 export interface Place {
     id: string;
+    name: string;
     doner_guide_version: number;
     internationalPhoneNumber?: string;
     latitude: number;

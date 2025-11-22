@@ -5,7 +5,7 @@ services:
     container_name: "place-search"
     working_dir: /app/place-search
     volumes:
-      - ./backend/functions:/app
+      - ./functions:/app
       - node_modules_place-search:/app/place-search/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
     command: >-
@@ -29,7 +29,7 @@ services:
     container_name: "image-classifier"
     working_dir: /app/image-classifier
     volumes:
-      - ./backend/functions:/app
+      - ./functions:/app
       - node_modules_image-classifier:/app/image-classifier/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
     command: >-
@@ -54,7 +54,7 @@ services:
     container_name: "llm-analyzer"
     working_dir: /app/llm-analyzer
     volumes:
-      - ./backend/functions:/app
+      - ./functions:/app
       - node_modules_llm-analyzer:/app/llm-analyzer/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
     command: >-
@@ -78,7 +78,7 @@ services:
     working_dir: /app
     restart: always
     volumes:
-      - ./backend/helper/service-bus-reader:/app
+      - ./helper/service-bus-reader:/app
       - node_modules_service-bus-reader:/app/node_modules
     command: sh -c "npm install && npm start"
     depends_on:
@@ -94,7 +94,7 @@ services:
     working_dir: /app
     restart: always
     volumes:
-      - ./backend/helper/service-bus-reader:/app
+      - ./helper/service-bus-reader:/app
       - node_modules_service-bus-reader:/app/node_modules
     command: sh -c "npm install && npm start"
     depends_on:

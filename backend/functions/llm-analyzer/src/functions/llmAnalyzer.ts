@@ -36,6 +36,7 @@ export async function llmAnalyzer(storeId: string, context: InvocationContext): 
                     size: 75,
                     waiting_time: "AVERAGE",
                     image_URL: "https://example.com/analyzed_image.jpg",
+                    price: 8.50,
                     text: "The doner is well-balanced with a good amount of meat and sauce. The portion size is satisfying, and the waiting time is average."
                 }
             }

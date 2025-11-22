@@ -37,6 +37,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     
     const place: Place = {
         id: "place_12345",
+        name: "Sample Doner Kebab",
         doner_guide_version: 1,
         internationalPhoneNumber: "+49 123 4567890",
         latitude: 48.1351,
