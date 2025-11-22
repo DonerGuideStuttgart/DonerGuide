@@ -9,12 +9,6 @@ const COSMOSDB_DATABASE_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_DATABASE_N
 const COSMOSDB_CONTAINER_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME"] || "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
-console.log("QUEUE_NAME_INPUT:", QUEUE_NAME_INPUT);
-console.log("QUEUE_NAME_OUTPUT:", QUEUE_NAME_OUTPUT);
-console.log("COSMOSDB_DATABASE_CONNECTION_STRING:", COSMOSDB_DATABASE_CONNECTION_STRING);
-console.log("COSMOSDB_DATABASE_NAME:", COSMOSDB_DATABASE_NAME);
-console.log("COSMOSDB_CONTAINER_NAME:", COSMOSDB_CONTAINER_NAME);
-
 app.serviceBusQueue('imageClassifier', {
     connection: "IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_INPUT",
     queueName: QUEUE_NAME_INPUT,
@@ -35,8 +29,6 @@ export async function imageClassifier(message: NewPhotosMessage, context: Invoca
     })).container;
 
     const item: Item = container.item(message.id, message.id);
-
-    context.log("item content before patch:", (await item.read()).resource);
 
     const patchBody: PatchRequestBody = message.photos.flatMap((photo: Photo) => ([
     {
