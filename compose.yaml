@@ -3,11 +3,16 @@ services:
   place-search:
     image: node:22
     container_name: "place-search"
-    working_dir: /app
+    working_dir: /app/place-search
     volumes:
-      - ./backend/functions/place-search:/app
-      - node_modules_place-search:/app/node_modules
-    command: sh -c "npm install && npm run dev"
+      - ./backend/functions:/app
+      - node_modules_place-search:/app/place-search/node_modules
+      - node_modules_shared:/app/shared/doner_types/node_modules
+    command: >-
+      sh -c "npm install --prefix ../shared/doner_types &&
+      npm run build --prefix ../shared/doner_types &&
+      npm install &&
+      npm run dev"
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
@@ -15,23 +20,34 @@ services:
       PLACE_SEARCH_CRON: "*/10 * * * * *"
       PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       PLACE_SEARCH_SERVICEBUS_QUEUE_NAME: "places"
-      PLACE_SEARCH_COSMOSDB_CONNECTION_STRING: "AccountEndpoint=http://host.docker.internal:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      PLACE_SEARCH_COSMOSDB_CONNECTION_STRING: "AccountEndpoint=http://cosmosdb-emulator:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
       PLACE_SEARCH_COSMOSDB_DATABASE_NAME: "DoenerGuideDB"
       PLACE_SEARCH_COSMOSDB_CONTAINER_NAME: "Places"
 
   image-classifier:
     image: node:22
     container_name: "image-classifier"
-    working_dir: /app
+    working_dir: /app/image-classifier
     volumes:
-      - ./backend/functions/image-classifier:/app
-      - node_modules_image-classifier:/app/node_modules
-    command: sh -c "npm install && npm run dev"
+      - ./backend/functions:/app
+      - node_modules_image-classifier:/app/image-classifier/node_modules
+      - node_modules_shared:/app/shared/doner_types/node_modules
+    command: >-
+      sh -c "npm install --prefix ../shared/doner_types &&
+      npm run build --prefix ../shared/doner_types &&
+      npm install &&
+      npm run dev"
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
     environment:
-      TODO: "Set necessary environment variables"
+      IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_INPUT: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_INPUT: "places"
+      IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_OUTPUT: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT: "images-classified"
+      IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING: "AccountEndpoint=http://cosmosdb-emulator:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      IMAGE_CLASSIFIER_COSMOSDB_DATABASE_NAME: "DoenerGuideDB"
+      IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME: "Places"
 
   places-reader:
     image: node:22
@@ -46,6 +62,21 @@ services:
     environment:
       SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       QUEUE_NAME: "places"
+      BATCH_SIZE: "10"
+  
+  image-classifier-reader:
+    image: node:22
+    container_name: "image-classifier-reader"
+    working_dir: /app
+    volumes:
+      - ./backend/helper/service-bus-reader:/app
+      - node_modules_service-bus-reader:/app/node_modules
+    command: sh -c "npm install && npm start"
+    depends_on:
+      - servicebus-emulator
+    environment:
+      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      QUEUE_NAME: "images-classified"
       BATCH_SIZE: "10"
 
   azurite:
@@ -101,3 +132,4 @@ volumes:
   node_modules_image-classifier:
   node_modules_llm-analyzer:
   node_modules_service-bus-reader:
+  node_modules_shared:
