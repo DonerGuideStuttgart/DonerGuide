@@ -1,0 +1,65 @@
+{
+    "id": "3",
+    "name": "Kebap König",
+    "doner_guide_version": 1,
+    "latitude": 48.789000,
+    "longitude": 9.178000,
+    "openingHours": {
+        "Mo": [
+            600,
+            1380
+        ],
+        "Tu": [
+            600,
+            1380
+        ],
+        "We": [
+            600,
+            1380
+        ],
+        "Th": [
+            600,
+            1380
+        ],
+        "Fr": [
+            600,
+            1440
+        ],
+        "Sa": [
+            660,
+            1440
+        ]
+    },
+    "address": {
+        "postalCode": "70191",
+        "locality": "Stuttgart",
+        "sublocality": "Nord",
+        "streetAddress": "Nordstraße 3"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p3f1",
+                "photoUrl": "https://example.com/photos/kebap_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 65,
+        "meat_ratio": 85,
+        "sauce_amount": 60,
+        "size": 75,
+        "waiting_time": "SLOW",
+        "image_URL": "https://example.com/analysis/kebap.jpg",
+        "text": "Große Portionen, etwas langsam."
+    },
+    "paymentMethods": [
+        "CASH"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": false,
+    "servesVegetarianFood": false
+}

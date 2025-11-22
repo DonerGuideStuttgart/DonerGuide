@@ -1,0 +1,76 @@
+{
+    "id": "4",
+    "name": "Sultan Grill",
+    "doner_guide_version": 1,
+    "latitude": 48.776000,
+    "longitude": 9.188000,
+    "openingHours": {
+        "Mo": [
+            660,
+            1500
+        ],
+        "Tu": [
+            660,
+            1500
+        ],
+        "We": [
+            660,
+            1500
+        ],
+        "Th": [
+            660,
+            1500
+        ],
+        "Fr": [
+            660,
+            1530
+        ],
+        "Sa": [
+            720,
+            1530
+        ],
+        "Su": [
+            720,
+            1320
+        ]
+    },
+    "address": {
+        "postalCode": "70176",
+        "locality": "Stuttgart",
+        "sublocality": "Ost",
+        "streetAddress": "Ostallee 7"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p4f1",
+                "photoUrl": "https://example.com/photos/sultan_food1.jpg"
+            }
+        ],
+        "places": [
+            {
+                "id": "p4pl1",
+                "photoUrl": "https://example.com/photos/sultan_place1.jpg"
+            }
+        ]
+    },
+    "ai_analysis": {
+        "score": 92,
+        "meat_ratio": 60,
+        "sauce_amount": 55,
+        "size": 80,
+        "waiting_time": "FAST",
+        "image_URL": "https://example.com/analysis/sultan.jpg",
+        "text": "Sehr gute Qualität und schneller Service."
+    },
+    "paymentMethods": [
+        "CASH",
+        "CREDIT_CARD",
+        "NFC"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": true,
+    "servesVegetarianFood": true
+}

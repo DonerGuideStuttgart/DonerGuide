@@ -1,0 +1,65 @@
+{
+    "id": "9",
+    "name": "Express Kebap",
+    "doner_guide_version": 1,
+    "latitude": 48.800000,
+    "longitude": 9.160000,
+    "openingHours": {
+        "Mo": [
+            660,
+            1185
+        ],
+        "Tu": [
+            660,
+            1185
+        ],
+        "We": [
+            660,
+            1185
+        ],
+        "Th": [
+            660,
+            1185
+        ],
+        "Fr": [
+            660,
+            1215
+        ],
+        "Sa": [
+            720,
+            1215
+        ]
+    },
+    "address": {
+        "postalCode": "70469",
+        "locality": "Stuttgart",
+        "sublocality": "Feuerbach",
+        "streetAddress": "Feuerbachweg 9"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p9f1",
+                "photoUrl": "https://example.com/photos/express_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 50,
+        "meat_ratio": 90,
+        "sauce_amount": 35,
+        "size": 55,
+        "waiting_time": "FAST",
+        "image_URL": "https://example.com/analysis/express.jpg",
+        "text": "Sehr günstig, kleine Portionen."
+    },
+    "paymentMethods": [
+        "CASH"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": false,
+    "servesVegetarianFood": false
+}
