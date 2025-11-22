@@ -1,5 +1,6 @@
 import { PaymentMethods } from "./PaymentMethods";
 import { Photo } from "./Photo";
+import { StoreAnalysis } from "./StoreAnalysis";
 
 
 export interface Place {
@@ -27,7 +28,8 @@ export interface Place {
         uncategorized?: Photo[];
         food?: Photo[];
         places?: Photo[];
-    }
+    },
+    ai_analysis?: StoreAnalysis;
     paymentMethods?: PaymentMethods[]; // e.g., ["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]
     takeout?: boolean;
     delivery?: boolean;
