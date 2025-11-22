@@ -59,6 +59,8 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
                 { id: "photo1", photoUrl: "https://example.com/photo1.jpg" },
                 { id: "photo2", photoUrl: "https://example.com/photo2.jpg" },
             ],
+            food: [],
+            places: [],
         },
         paymentMethods: [
             PaymentMethods.CASH,
@@ -80,8 +82,9 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
 async function createOrPatchItem(container: Container, itemBody: Place) : Promise<void> {
 
+    // Query for existing item by id
     const querySpec = {
-        query: "SELECT VALUE COUNT(1) FROM c WHERE c.id = @id",
+        query: "SELECT * FROM c WHERE c.id = @id",
         parameters: [
             {
                 name: "@id",
@@ -90,25 +93,46 @@ async function createOrPatchItem(container: Container, itemBody: Place) : Promis
         ]
     };
 
-    const { resources } = await container.items.query(querySpec, {
-        partitionKey: itemBody.id // Single-partition query reduces RU cost
-    }).fetchAll();
+    const { resources: existingItems } = await container.items
+        .query<Place>(querySpec, { partitionKey: itemBody.id })
+        .fetchAll();
 
-    const exists = resources[0].count === 1;
+    if (existingItems.length === 0) {
+        // Item doesn't exist, create it
+        await container.items.upsert(itemBody);
+    } else {
+        const existingItem = existingItems[0];
+        
+        // Merge photos from existing item with new photos
+        const mergedPhotos = {
+            uncategorized: [
+                ...(existingItem.photos?.uncategorized || []),
+                ...(itemBody.photos?.uncategorized || [])
+            ].filter((photo, index, self) => 
+                // Remove duplicates based on photo id
+                index === self.findIndex(p => p.id === photo.id)
+            ),
+            food: [
+                ...(existingItem.photos?.food || []),
+                ...(itemBody.photos?.food || [])
+            ].filter((photo, index, self) => 
+                index === self.findIndex(p => p.id === photo.id)
+            ),
+            places: [
+                ...(existingItem.photos?.places || []),
+                ...(itemBody.photos?.places || [])
+            ].filter((photo, index, self) => 
+                index === self.findIndex(p => p.id === photo.id)
+            )
+        };
 
-    if (!exists) {
-        await container.items.create(itemBody);
-        return;
+        // Update item with merged photos
+        const updatedItem = {
+            ...itemBody,
+            photos: mergedPhotos
+        };
+
+        await container.items.upsert(updatedItem);
     }
 
-
-    const patchBody: any[] = Object.keys(itemBody)
-        .filter(key => key !== 'id')
-        .map((key: string) => ({
-            op: "set",
-            path: `/${key}`,
-            value: itemBody[key]
-        }));
-    
-    await container.item(itemBody.id, itemBody.id).patch({operations: patchBody});
 }
