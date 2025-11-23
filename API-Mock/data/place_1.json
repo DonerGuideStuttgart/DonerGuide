@@ -1,0 +1,76 @@
+{
+    "id": "1",
+    "name": "Hasan's Döner",
+    "doner_guide_version": 1,
+    "internationalPhoneNumber": "+49 711 123456",
+    "latitude": 48.775845,
+    "longitude": 9.182932,
+    "openingHours": {
+        "Mo": [
+            660,
+            1350
+        ],
+        "Tu": [
+            660,
+            1350
+        ],
+        "We": [
+            660,
+            1350
+        ],
+        "Th": [
+            660,
+            1350
+        ],
+        "Fr": [
+            660,
+            1410
+        ],
+        "Sa": [
+            720,
+            1410
+        ],
+        "Su": [
+            720,
+            1320
+        ]
+    },
+    "address": {
+        "postalCode": "70173",
+        "locality": "Stuttgart",
+        "sublocality": "Mitte",
+        "streetAddress": "Marktstraße 1"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p1f1",
+                "photoUrl": "https://example.com/photos/hasan_food1.jpg"
+            }
+        ],
+        "places": [
+            {
+                "id": "p1pl1",
+                "photoUrl": "https://example.com/photos/hasan_place1.jpg"
+            }
+        ]
+    },
+    "ai_analysis": {
+        "score": 87,
+        "meat_ratio": 65,
+        "sauce_amount": 50,
+        "size": 70,
+        "waiting_time": "AVERAGE",
+        "image_URL": "https://example.com/analysis/hasan.jpg",
+        "text": "Gutes Verhältnis, ausreichende Soße."
+    },
+    "paymentMethods": [
+        "CASH",
+        "NFC"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": false,
+    "servesVegetarianFood": true
+}

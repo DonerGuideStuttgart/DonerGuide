@@ -1,0 +1,66 @@
+{
+    "id": "2",
+    "name": "Ali's Imbiss",
+    "doner_guide_version": 1,
+    "latitude": 48.793000,
+    "longitude": 9.185000,
+    "openingHours": {
+        "Mo": [
+            600,
+            1260
+        ],
+        "Tu": [
+            600,
+            1260
+        ],
+        "We": [
+            600,
+            1260
+        ],
+        "Th": [
+            600,
+            1260
+        ],
+        "Fr": [
+            600,
+            1320
+        ],
+        "Sa": [
+            660,
+            1320
+        ]
+    },
+    "address": {
+        "postalCode": "70327",
+        "locality": "Stuttgart",
+        "sublocality": "Bad_Cannstatt",
+        "streetAddress": "Hauptstraße 5"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p2f1",
+                "photoUrl": "https://example.com/photos/ali_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 74,
+        "meat_ratio": 80,
+        "sauce_amount": 40,
+        "size": 60,
+        "waiting_time": "FAST",
+        "image_URL": "https://example.com/analysis/ali.jpg",
+        "text": "Schneller Service, ordentliche Portionen."
+    },
+    "paymentMethods": [
+        "CASH",
+        "DEBIT_CARD"
+    ],
+    "takeout": true,
+    "delivery": true,
+    "dineIn": true,
+    "servesVegetarianFood": false
+}

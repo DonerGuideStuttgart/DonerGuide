@@ -1,0 +1,66 @@
+{
+    "id": "10",
+    "name": "Döner Villa",
+    "doner_guide_version": 1,
+    "latitude": 48.744000,
+    "longitude": 9.184000,
+    "openingHours": {
+        "Mo": [
+            660,
+            1365
+        ],
+        "Tu": [
+            660,
+            1365
+        ],
+        "We": [
+            660,
+            1365
+        ],
+        "Th": [
+            660,
+            1365
+        ],
+        "Fr": [
+            660,
+            1410
+        ],
+        "Sa": [
+            720,
+            1410
+        ]
+    },
+    "address": {
+        "postalCode": "70567",
+        "locality": "Stuttgart",
+        "sublocality": "Degerloch",
+        "streetAddress": "Villaweg 10"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p10f1",
+                "photoUrl": "https://example.com/photos/villa_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 88,
+        "meat_ratio": 62,
+        "sauce_amount": 58,
+        "size": 78,
+        "waiting_time": "AVERAGE",
+        "image_URL": "https://example.com/analysis/villa.jpg",
+        "text": "Sehr guter Döner, ausgewogen."
+    },
+    "paymentMethods": [
+        "CASH",
+        "CREDIT_CARD"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": true,
+    "servesVegetarianFood": true
+}

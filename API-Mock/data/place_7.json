@@ -1,0 +1,65 @@
+{
+    "id": "7",
+    "name": "Bosphorus",
+    "doner_guide_version": 1,
+    "latitude": 48.785000,
+    "longitude": 9.186000,
+    "openingHours": {
+        "Mo": [
+            660,
+            1290
+        ],
+        "Tu": [
+            660,
+            1290
+        ],
+        "We": [
+            660,
+            1290
+        ],
+        "Th": [
+            660,
+            1290
+        ],
+        "Fr": [
+            660,
+            1350
+        ],
+        "Sa": [
+            720,
+            1350
+        ]
+    },
+    "address": {
+        "postalCode": "70327",
+        "locality": "Stuttgart",
+        "sublocality": "Bad_Cannstatt",
+        "streetAddress": "Brunnenstraße 10"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p7f1",
+                "photoUrl": "https://example.com/photos/bosphorus_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 69,
+        "meat_ratio": 75,
+        "sauce_amount": 50,
+        "size": 65,
+        "waiting_time": "FAST",
+        "image_URL": "https://example.com/analysis/bosphorus.jpg",
+        "text": "Beliebter Imbiss, zügiger Service."
+    },
+    "paymentMethods": [
+        "CASH"
+    ],
+    "takeout": true,
+    "delivery": false,
+    "dineIn": false,
+    "servesVegetarianFood": false
+}

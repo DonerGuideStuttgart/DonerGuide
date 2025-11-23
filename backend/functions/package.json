@@ -5,7 +5,7 @@
   "description": "Azure Functions Monorepo with shared TypeScript package and multiple function apps.",
   "type": "commonjs",
   "workspaces": [
-    "shared",
+    "shared/doner_types",
     "place-search",
     "image-classifier",
     "llm-analyzer",

@@ -1,0 +1,71 @@
+{
+    "id": "8",
+    "name": "Tasty Döner",
+    "doner_guide_version": 1,
+    "latitude": 48.758000,
+    "longitude": 9.170000,
+    "openingHours": {
+        "Mo": [
+            660,
+            1410
+        ],
+        "Tu": [
+            660,
+            1410
+        ],
+        "We": [
+            660,
+            1410
+        ],
+        "Th": [
+            660,
+            1410
+        ],
+        "Fr": [
+            660,
+            1440
+        ],
+        "Sa": [
+            720,
+            1440
+        ],
+        "Su": [
+            720,
+            1320
+        ]
+    },
+    "address": {
+        "postalCode": "70565",
+        "locality": "Stuttgart",
+        "sublocality": "Möhringen",
+        "streetAddress": "Möhringstraße 8"
+    },
+    "photos": {
+        "uncategorized": [],
+        "food": [
+            {
+                "id": "p8f1",
+                "photoUrl": "https://example.com/photos/tasty_food1.jpg"
+            }
+        ],
+        "places": []
+    },
+    "ai_analysis": {
+        "score": 80,
+        "meat_ratio": 55,
+        "sauce_amount": 65,
+        "size": 72,
+        "waiting_time": "AVERAGE",
+        "image_URL": "https://example.com/analysis/tasty.jpg",
+        "text": "Saftiger Döner, gute Soßenmenge."
+    },
+    "paymentMethods": [
+        "CASH",
+        "DEBIT_CARD",
+        "NFC"
+    ],
+    "takeout": true,
+    "delivery": true,
+    "dineIn": false,
+    "servesVegetarianFood": true
+}
