@@ -20,8 +20,15 @@ function readJson(file) {
 
 app.get('/places', (req, res) => {
   // For this simple mock we ignore query params and return a pre-built list
-  const list = readJson('data/places_list.json') || { items: [], meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } };
-  res.json(list);
+  try {
+    const list = readJson('places_list.json'); // dataDir already points to /data
+    if (!list) {
+      return res.status(500).json({ message: 'Failed to load places list' });
+    }
+    return res.json(list);
+  } catch (err) {
+    return res.status(500).json({ message: 'Unexpected error' });
+  }
 });
 
 app.get('/places/:id', (req, res) => {
@@ -32,6 +39,13 @@ app.get('/places/:id', (req, res) => {
     return res.status(404).json({ message: 'Place not found' });
   }
   res.json(place);
+});
+
+/**
+ * Serve the OpenAPI specification for easy inspection.
+ */
+app.get('/openapi.yaml', (req, res) => {
+  res.sendFile(path.join(__dirname, 'openapi.yaml'));
 });
 
 const port = process.env.PORT || 3000;
