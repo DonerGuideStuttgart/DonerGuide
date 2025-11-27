@@ -9,17 +9,17 @@ export function buildStoreQuery(filters: Record<string, any>, sort?: string) {
     return params.toString();
 }
 
-export async function fetchStores(query: string) {
+export async function fetchPlaces(query: string) {
     const base = process.env.NEXT_PUBLIC_API_URL || "/api"; // default to local proxy
-    const url = `${base}/stores${query ? `?${query}` : ""}`;
+    const url = `${base}/places${query ? `?${query}` : ""}`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error("Failed to fetch stores");
+    if (!res.ok) throw new Error("Failed to fetch places");
     return await res.json();
 }
 
-export async function fetchStoreById(id: string) {
+export async function fetchPlaceById(id: string) {
     const base = process.env.NEXT_PUBLIC_API_URL || "/api";
-    const res = await fetch(`${base}/stores/${id}`);
-    if (!res.ok) throw new Error("Failed to fetch store");
+    const res = await fetch(`${base}/places/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch place");
     return await res.json();
 }

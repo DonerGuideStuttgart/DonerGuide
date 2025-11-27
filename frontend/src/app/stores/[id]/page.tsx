@@ -1,13 +1,12 @@
-import { fetchStoreById } from "@/lib/api";
+import { fetchPlaceById } from "@/helpers/api";
 
 type Props = { params: { id: string } };
 
 export default async function StoreDetail({ params }: Props) {
     const id = params.id;
-    // Server-side fetch (fetchStoreById uses fetch but in server component fallback is client fetch)
     let store: any | null = null;
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/api"}/stores/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/api"}/places/${id}`);
         if (res.ok) store = await res.json();
     } catch (e) {
         // ignore

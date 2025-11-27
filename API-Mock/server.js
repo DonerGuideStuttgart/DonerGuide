@@ -20,7 +20,7 @@ function readJson(file) {
 
 app.get('/places', (req, res) => {
   // For this simple mock we ignore query params and return a pre-built list
-  const list = readJson('places_list.json') || { items: [], meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } };
+  const list = readJson('data/places_list.json') || { items: [], meta: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } };
   res.json(list);
 });
 

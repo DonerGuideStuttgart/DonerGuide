@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import FilterPanel, { Filters } from "@/components/FilterPanel";
 import SortControl from "@/components/SortControl";
 import DonerCard from "@/components/DonerCard";
-import { buildStoreQuery, fetchStores } from "@/helpers/api";
+import { buildStoreQuery, fetchPlaces } from "@/helpers/api";
 
 export default function StoresPage() {
     const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 });
@@ -21,13 +21,10 @@ export default function StoresPage() {
             try {
                 const q = buildStoreQuery(filters as any, sort);
                 console.debug("[StoresPage] fetch query:", q);
-                const payload = await fetchStores(q);
-                const items = Array.isArray(payload.data.default)
-                    ? payload.data.default
-                    : payload.data
-                        ? Object.values(payload.data)
-                        : [];
+                const payload = await fetchPlaces(q);
                 console.debug("[StoresPage] fetch payload:", payload);
+                const items = Array.isArray(payload.items)
+                    ? payload.items : [];
                 if (!mounted) return;
                 setStores(items);
                 console.debug("[StoresPage] normalized items:", items);
