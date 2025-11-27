@@ -20,10 +20,19 @@ export default function StoresPage() {
             setError(null);
             try {
                 const q = buildStoreQuery(filters as any, sort);
+                console.debug("[StoresPage] fetch query:", q);
                 const payload = await fetchStores(q);
+                const items = Array.isArray(payload.data.default)
+                    ? payload.data.default
+                    : payload.data
+                        ? Object.values(payload.data)
+                        : [];
+                console.debug("[StoresPage] fetch payload:", payload);
                 if (!mounted) return;
-                setStores(payload.data || []);
+                setStores(items);
+                console.debug("[StoresPage] normalized items:", items);
             } catch (e: any) {
+                console.error("[StoresPage] fetch error:", e);
                 setError(e.message);
             } finally {
                 if (mounted) setLoading(false);
