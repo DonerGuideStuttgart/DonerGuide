@@ -32,9 +32,6 @@ resource "azurerm_cosmosdb_sql_container" "places_container" {
   database_name         = azurerm_cosmosdb_sql_database.database.name
   partition_key_paths   = ["/id"]
   partition_key_version = "2"
-  unique_key {
-    paths = ["/id"]
-  }
 }
 
 /*

@@ -25,6 +25,10 @@ provider "azurerm" {
   features {}
 }
 
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "rg" {

@@ -1,5 +1,10 @@
 variable "prefix" {
   description = "Prefix for all resources"
   type        = string
-  default     = "doner-guide"
+  default     = "donerguide"
+}
+
+variable "cloudflare_api_token" {
+  description = "API token for Cloudflare provider"
+  type        = string
 }

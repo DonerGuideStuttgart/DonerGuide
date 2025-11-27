@@ -13,149 +13,273 @@ paths:
       description: |
         Unterstützt Pagination, Sortierung und umfangreiche Filter.
       parameters:
-        - name: page
+        # Neue Pagination und Sortierung (vom Mock unterstützt)
+        - name: limit
           in: query
           schema:
             type: integer
             minimum: 1
+            default: 20
+          description: Anzahl Items pro Seite. Wird vom Mock ausgewertet. Standard 20.
+          example: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Offset (0-basiert). Seite wird berechnet als floor(offset/limit)+1. Wird vom Mock ausgewertet.
+          example: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [rating_desc, rating_asc, price_asc, price_desc]
+          description: Sortiermodus. Für "rating" wird, falls vorhanden, das Feld "rating" genutzt, sonst "ai_score". Wenn weggelassen, bleibt die ursprüngliche Datensatzreihenfolge erhalten.
+          examples:
+            rating_desc:
+              value: rating_desc
+            price_asc:
+              value: price_asc
+      
+        # Filter (vom Mock unterstützt)
+        - name: district
+          in: query
+          description: |
+            Stuttgart-Stadtbezirk Filter. Unterstützt Mehrfachwerte als Wiederholungen (?district=West&district=Mitte) und CSV (?district=West,Mitte).
+            Abgleich erfolgt als fallunabhängiger Teilstring-Vergleich.
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/District'
+              - type: array
+                items:
+                  $ref: '#/components/schemas/District'
+          style: form
+          explode: true
+          examples:
+            repeated:
+              summary: Wiederholte Parameter
+              value:
+                - West
+                - Mitte
+            csv:
+              summary: CSV-Form
+              value: West,Mitte
+        - name: rating
+          in: query
+          schema:
+            type: number
+            minimum: 1
+            maximum: 5
+          description: |
+            Minimale Bewertung (1–5). Falls das Feld "rating" im Datensatz fehlt, wird stattdessen "ai_score ≥ rating*20" genutzt (z. B. 4 → 80).
+          example: 4
+        - name: price_min
+          in: query
+          schema:
+            type: number
+            format: float
+          description: Untere Preisgrenze (inklusive).
+          example: 4
+        - name: price_max
+          in: query
+          schema:
+            type: number
+            format: float
+          description: Obere Preisgrenze (inklusive).
+          example: 6
+        - name: vegetarian
+          in: query
+          schema:
+            type: string
+          description: |
+            Boolean-ähnlicher Filter (true, false, 1, 0, yes, no; ohne Beachtung der Groß-/Kleinschreibung).
+            Mappt auf exakte Übereinstimmung mit "servesVegetarianFood".
+          examples:
+            yes:
+              value: yes
+            no:
+              value: no
+        - name: halal
+          in: query
+          schema:
+            type: string
+          description: |
+            Boolean-ähnlicher Filter (true, false, 1, 0, yes, no).
+            Wird nur angewendet, wenn der Datensatz ein "halal"-Feld enthält; ansonsten wird er ignoriert.
+          example: true
+        - name: waiting_time
+          in: query
+          description: |
+            Wartezeitkategorie (mehrfach erlaubt). Exakte Übereinstimmung einer der übergebenen Kategorien.
+            Unterstützt Wiederholungen und CSV (?waiting_time=FAST,AVERAGE).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/WaitingTime'
+          style: form
+          explode: true
+          examples:
+            csv:
+              value:
+                - FAST
+                - AVERAGE
+        - name: payment_methods
+          in: query
+          description: |
+            Akzeptierte Zahlungsmethoden (mehrfach erlaubt). ANY-Match (logisches ODER).
+            Unterstützt Wiederholungen und CSV (?payment_methods=CASH,NFC).
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PaymentMethods'
+          style: form
+          explode: true
+          examples:
+            repeated:
+              value:
+                - CASH
+                - NFC
+      
+        # Legacy-/Kompatibilitäts-Parameter (derzeit nicht vom Mock ausgewertet)
+        - name: page
+          in: query
+          deprecated: true
+          schema:
+            type: integer
+            minimum: 1
             default: 1
-          description: Seitenindex (1-basiert)
+          description: |
+            Legacy-Parameter (nicht vom Mock ausgewertet). Die Seitennummer in der Antwort wird aus "offset" und "limit" berechnet.
         - name: pageSize
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 200
             default: 20
-          description: Anzahl Items pro Seite
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "limit" verwenden.
         - name: sort_by
           in: query
+          deprecated: true
           schema:
             type: string
             enum: [ai_score, price, size]
             default: ai_score
-          description: Feld nach dem sortiert werden soll
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "sort" verwenden.
         - name: order
           in: query
+          deprecated: true
           schema:
             type: string
             enum: [asc, desc]
             default: desc
-          description: Sortierrichtung
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "sort" verwenden.
         - name: min_score
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Minimale KI-Bewertung (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Entspricht grob "rating"×20.
         - name: max_score
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Maximale KI-Bewertung (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: min_price
           in: query
+          deprecated: true
           schema:
             type: number
             format: float
             minimum: 0
-          description: Minimale Preissumme (Durchschnitt in EUR)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "price_min" verwenden.
         - name: max_price
           in: query
+          deprecated: true
           schema:
             type: number
             format: float
             minimum: 0
-          description: Maximale Preissumme (Durchschnitt in EUR)
-        - name: district
-          in: query
-          description: Stuttgart-Stadtbezirk (mehrfach erlaubt)
-          schema:
-            type: string
-            enum: [Mitte, Nord, Ost, Süd, West, Bad_Cannstatt, Vaihingen, Möhringen, Degerloch, Feuerbach, Zuffenhausen, Untertürkheim, Wangen, Plieningen, Stammheim, Weilimdorf]
-          style: form
-          explode: true
-        - name: open_now
-          in: query
-          schema:
-            type: boolean
-          description: Nur aktuell geöffnete Lokalitäten
-        - name: open_this_evening
-          in: query
-          schema:
-            type: boolean
-          description: Öffnet heute Abend
-        - name: open_late
-          in: query
-          schema:
-            type: boolean
-          description: Späte Öffnungszeiten (z. B. nach 22:00)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "price_max" verwenden.
         - name: servesVegetarianFood
           in: query
+          deprecated: true
           schema:
             type: boolean
-          description: Liefert vegetarische Optionen
+          description: Legacy-Parameter (nicht vom Mock ausgewertet). Bitte "vegetarian" verwenden.
+        - name: open_now
+          in: query
+          deprecated: true
+          schema:
+            type: boolean
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
+        - name: open_this_evening
+          in: query
+          deprecated: true
+          schema:
+            type: boolean
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
+        - name: open_late
+          in: query
+          deprecated: true
+          schema:
+            type: boolean
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: meat_ratio_min
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Minimales Fleisch/Gemüse-Verhältnis (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: meat_ratio_max
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Maximales Fleisch/Gemüse-Verhältnis (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: sauce_amount_min
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Minimale Soßenmenge (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: sauce_amount_max
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Maximale Soßenmenge (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: size_min
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Minimale Größe (1-100)
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
         - name: size_max
           in: query
+          deprecated: true
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          description: Maximale Größe (1-100)
-        - name: waiting_time
-          in: query
-          description: Wartezeitkategorie (mehrfach erlaubt)
-          schema:
-            type: string
-            enum: [FAST, AVERAGE, SLOW]
-          style: form
-          explode: true
-        - name: payment_methods
-          in: query
-          description: Akzeptierte Zahlungsmethoden (mehrfach erlaubt)
-          schema:
-            type: string
-            enum: [CASH, CREDIT_CARD, DEBIT_CARD, NFC]
-          style: form
-          explode: true
+          description: Legacy-Parameter (nicht vom Mock ausgewertet).
       responses:
         '200':
           description: Paged list of places
@@ -173,13 +297,135 @@ paths:
                     properties:
                       page:
                         type: integer
+                        description: 1-basiert; abgeleitet aus offset/limit.
                       pageSize:
                         type: integer
+                        description: Entspricht dem "limit".
                       totalItems:
                         type: integer
                       totalPages:
                         type: integer
                 required: [items, meta]
+              examples:
+                EmptyResultDueToRatingThreshold:
+                  summary: rating=4 → ai_score ≥ 80; im Stadtbezirk "West" keine Treffer
+                  description: GET /places?district=West&rating=4&price_min=4&price_max=6&limit=10&offset=0&sort=rating_desc
+                  value:
+                    items: []
+                    meta:
+                      page: 1
+                      pageSize: 10
+                      totalItems: 0
+                      totalPages: 0
+                WaitingTimeAndPaymentMethods:
+                  summary: FAST oder AVERAGE und Zahlungsmethode CASH/NFC, nach Preis aufsteigend
+                  description: GET /places?waiting_time=FAST,AVERAGE&payment_methods=CASH&payment_methods=NFC&sort=price_asc
+                  value:
+                    items:
+                      - id: "9"
+                        name: "Express Kebap"
+                        ai_score: 50
+                        closesTodayAt: "19:45"
+                        image: "https://example.com/images/express.jpg"
+                        servesVegetarianFood: false
+                        meat_ratio: 90
+                        waiting_time: FAST
+                        price: 3.5
+                        paymentMethods: [CASH]
+                        district: Feuerbach
+                      - id: "2"
+                        name: "Ali's Imbiss"
+                        ai_score: 74
+                        closesTodayAt: "21:00"
+                        image: "https://example.com/images/ali.jpg"
+                        servesVegetarianFood: false
+                        meat_ratio: 80
+                        waiting_time: FAST
+                        price: 3.9
+                        paymentMethods: [CASH, DEBIT_CARD]
+                        district: Bad_Cannstatt
+                      - id: "7"
+                        name: "Bosphorus"
+                        ai_score: 69
+                        closesTodayAt: "21:30"
+                        image: "https://example.com/images/bosphorus.jpg"
+                        servesVegetarianFood: false
+                        meat_ratio: 75
+                        waiting_time: FAST
+                        price: 4.0
+                        paymentMethods: [CASH]
+                        district: Bad_Cannstatt
+                      - id: "5"
+                        name: "Murat's"
+                        ai_score: 55
+                        closesTodayAt: "20:00"
+                        image: "https://example.com/images/murats.jpg"
+                        servesVegetarianFood: true
+                        meat_ratio: 50
+                        waiting_time: AVERAGE
+                        price: 4.2
+                        paymentMethods: [CASH, DEBIT_CARD]
+                        district: Vaihingen
+                      - id: "1"
+                        name: "Hasan's Döner"
+                        ai_score: 87
+                        closesTodayAt: "22:30"
+                        image: "https://example.com/images/hasan.jpg"
+                        servesVegetarianFood: true
+                        meat_ratio: 65
+                        waiting_time: AVERAGE
+                        price: 4.5
+                        paymentMethods: [CASH, NFC]
+                        district: Mitte
+                      - id: "8"
+                        name: "Tasty Döner"
+                        ai_score: 80
+                        closesTodayAt: "23:30"
+                        image: "https://example.com/images/tasty.jpg"
+                        servesVegetarianFood: true
+                        meat_ratio: 55
+                        waiting_time: AVERAGE
+                        price: 4.8
+                        paymentMethods: [CASH, DEBIT_CARD, NFC]
+                        district: Möhringen
+                      - id: "10"
+                        name: "Döner Villa"
+                        ai_score: 88
+                        closesTodayAt: "22:45"
+                        image: "https://example.com/images/villa.jpg"
+                        servesVegetarianFood: true
+                        meat_ratio: 62
+                        waiting_time: AVERAGE
+                        price: 5.2
+                        paymentMethods: [CASH, CREDIT_CARD]
+                        district: Degerloch
+                      - id: "6"
+                        name: "Orient Express"
+                        ai_score: 77
+                        closesTodayAt: "22:00"
+                        image: "https://example.com/images/orient_express.jpg"
+                        servesVegetarianFood: false
+                        meat_ratio: 70
+                        waiting_time: AVERAGE
+                        price: 5.5
+                        paymentMethods: [CASH, CREDIT_CARD]
+                        district: West
+                      - id: "4"
+                        name: "Sultan Grill"
+                        ai_score: 92
+                        closesTodayAt: "00:30"
+                        image: "https://example.com/images/sultan.jpg"
+                        servesVegetarianFood: true
+                        meat_ratio: 60
+                        waiting_time: FAST
+                        price: 6.0
+                        paymentMethods: [CASH, CREDIT_CARD, NFC]
+                        district: Ost
+                    meta:
+                      page: 1
+                      pageSize: 20
+                      totalItems: 9
+                      totalPages: 1
   /places/{id}:
     get:
       summary: Detailseite eines Döner-Lokals
@@ -362,6 +608,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentMethods'
+        district:
+          type: string
+          description: Stadtbezirk des Ortes.
       required: [id, name, ai_score, image, servesVegetarianFood, meat_ratio, waiting_time]
     District:
       type: string

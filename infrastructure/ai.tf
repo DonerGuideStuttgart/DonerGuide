@@ -11,7 +11,7 @@ resource "azurerm_cognitive_account" "vision_paid" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "ComputerVision"
-  sku_name            = "S0"
+  sku_name            = "S1"
 }
 
 resource "azurerm_cognitive_account" "account_llm" {

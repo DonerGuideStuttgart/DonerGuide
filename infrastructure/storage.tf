@@ -1,44 +1,38 @@
 resource "azurerm_storage_account" "storage_account_classified_images" {
-  name                            = "${var.prefix}-storage-classified-images"
-  resource_group_name             = azurerm_resource_group.rg.name
-  location                        = azurerm_resource_group.rg.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  shared_access_key_enabled       = false
-  default_to_oauth_authentication = true
-  local_user_enabled              = false
+  name                     = "storageclassifiedimages"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  local_user_enabled       = false
 }
 
 resource "azurerm_storage_container" "sc_classified_images" {
-  name                  = "${var.prefix}-classified-images"
-  storage_account_id    = azurerm_storage_account.storage_account.id
+  name                  = "classifiedimages"
+  storage_account_id    = azurerm_storage_account.storage_account_classified_images.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_account" "storage_account_generated_images" {
-  name                            = "${var.prefix}-storage-generated-images"
-  resource_group_name             = azurerm_resource_group.rg.name
-  location                        = azurerm_resource_group.rg.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  shared_access_key_enabled       = false
-  default_to_oauth_authentication = true
-  local_user_enabled              = false
+  name                     = "storagegeneratedimages"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  local_user_enabled       = false
 }
 
 resource "azurerm_storage_container" "sc_generated_images" {
-  name                  = "${var.prefix}-generated-images"
-  storage_account_id    = azurerm_storage_account.storage_account.id
+  name                  = "generatedimages"
+  storage_account_id    = azurerm_storage_account.storage_account_generated_images.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_account" "storage_account_functions" {
-  name                            = "${var.prefix}-storage-functions"
-  resource_group_name             = azurerm_resource_group.rg.name
-  location                        = azurerm_resource_group.rg.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  shared_access_key_enabled       = false
-  default_to_oauth_authentication = true
-  local_user_enabled              = false
+  name                     = "donerfunctionsstorage"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  local_user_enabled       = false
 }

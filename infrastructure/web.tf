@@ -12,7 +12,7 @@ resource "azurerm_static_web_app_custom_domain" "frontend_domain" {
 }
 
 resource "cloudflare_dns_record" "frontend_cname" {
-  zone_id = "T53eeIZvRvXSdhrfIhKAcopLgH4ritfT7BTx555T"
+  zone_id = "b2a8a9947bfdebca46980e4684d1762e"
   name    = "@"
   type    = "CNAME"
   ttl     = 1
@@ -20,7 +20,7 @@ resource "cloudflare_dns_record" "frontend_cname" {
 }
 
 resource "cloudflare_dns_record" "frontend_verification" {
-  zone_id = "T53eeIZvRvXSdhrfIhKAcopLgH4ritfT7BTx555T"
+  zone_id = "b2a8a9947bfdebca46980e4684d1762e"
   name    = "@"
   type    = "TXT"
   ttl     = 1
