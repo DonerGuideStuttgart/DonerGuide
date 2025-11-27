@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { Rubik } from 'next/font/google'
 import './globals.css'
 
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 const rubikSans = Rubik({
 	variable: '--font-rubik-sans',
 	subsets: ['latin'],
@@ -22,7 +25,11 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="de">
-			<body className={`${rubikSans.className} antialiased`}>{children}</body>
+			<body className={`${rubikSans.className} antialiased`}>
+				{/* <Navbar /> */}
+				{children}
+				<Footer />
+			</body>
 		</html>
 	)
 }
