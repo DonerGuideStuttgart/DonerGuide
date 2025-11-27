@@ -1,0 +1,28 @@
+resource "azurerm_static_web_app" "frontend_app" {
+  name                         = "${var.prefix}-static-web-app"
+  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = azurerm_resource_group.rg.name
+  preview_environments_enabled = false
+}
+
+resource "azurerm_static_web_app_custom_domain" "frontend_domain" {
+  domain_name       = "doenerguide-stuttgart.de"
+  static_web_app_id = azurerm_static_web_app.frontend_app.id
+  validation_type   = "dns-txt-token"
+}
+
+resource "cloudflare_dns_record" "frontend_cname" {
+  zone_id = "T53eeIZvRvXSdhrfIhKAcopLgH4ritfT7BTx555T"
+  name    = "@"
+  type    = "CNAME"
+  ttl     = 1
+  content = azurerm_static_web_app.frontend_app.default_host_name
+}
+
+resource "cloudflare_dns_record" "frontend_verification" {
+  zone_id = "T53eeIZvRvXSdhrfIhKAcopLgH4ritfT7BTx555T"
+  name    = "@"
+  type    = "TXT"
+  ttl     = 1
+  content = azurerm_static_web_app_custom_domain.frontend_domain.validation_token
+}
