@@ -12,172 +12,158 @@
             "price": 4.5,
             "paymentMethods": [
                 "CASH",
-                "NFC"{
-                    "items": [
-                        {
-                            "id": "1",
-                            "name": "Hasan's Döner",
-                            "ai_score": 87,
-                            "closesTodayAt": "22:30",
-                            "image": "https://example.com/images/hasan.jpg",
-                            "servesVegetarianFood": true,
-                            "meat_ratio": 65,
-                            "waiting_time": "AVERAGE",
-                            "price": 4.5,
-                            "paymentMethods": [
-                                "CASH",
-                                "NFC"
-                            ],
-                            "district": "Mitte"
-                        },
-                        {
-                            "id": "2",
-                            "name": "Ali's Imbiss",
-                            "ai_score": 74,
-                            "closesTodayAt": "21:00",
-                            "image": "https://example.com/images/ali.jpg",
-                            "servesVegetarianFood": false,
-                            "meat_ratio": 80,
-                            "waiting_time": "FAST",
-                            "price": 3.9,
-                            "paymentMethods": [
-                                "CASH",
-                                "DEBIT_CARD"
-                            ],
-                            "district": "Bad_Cannstatt"
-                        },
-                        {
-                            "id": "3",
-                            "name": "Kebap König",
-                            "ai_score": 65,
-                            "closesTodayAt": "23:00",
-                            "image": "https://example.com/images/kebap-koenig.jpg",
-                            "servesVegetarianFood": false,
-                            "meat_ratio": 85,
-                            "waiting_time": "SLOW",
-                            "price": 5.0,
-                            "paymentMethods": [
-                                "CASH"
-                            ],
-                            "district": "Nord"
-                        },
-                        {
-                            "id": "4",
-                            "name": "Sultan Grill",
-                            "ai_score": 92,
-                            "closesTodayAt": "00:30",
-                            "image": "https://example.com/images/sultan.jpg",
-                            "servesVegetarianFood": true,
-                            "meat_ratio": 60,
-                            "waiting_time": "FAST",
-                            "price": 6.0,
-                            "paymentMethods": [
-                                "CASH",
-                                "CREDIT_CARD",
-                                "NFC"
-                            ],
-                            "district": "Ost"
-                        },
-                        {
-                            "id": "5",
-                            "name": "Murat's",
-                            "ai_score": 55,
-                            "closesTodayAt": "20:00",
-                            "image": "https://example.com/images/murats.jpg",
-                            "servesVegetarianFood": true,
-                            "meat_ratio": 50,
-                            "waiting_time": "AVERAGE",
-                            "price": 4.2,
-                            "paymentMethods": [
-                                "CASH",
-                                "DEBIT_CARD"
-                            ],
-                            "district": "Vaihingen"
-                        },
-                        {
-                            "id": "6",
-                            "name": "Orient Express",
-                            "ai_score": 77,
-                            "closesTodayAt": "22:00",
-                            "image": "https://example.com/images/orient_express.jpg",
-                            "servesVegetarianFood": false,
-                            "meat_ratio": 70,
-                            "waiting_time": "AVERAGE",
-                            "price": 5.5,
-                            "paymentMethods": [
-                                "CASH",
-                                "CREDIT_CARD"
-                            ],
-                            "district": "West"
-                        },
-                        {
-                            "id": "7",
-                            "name": "Bosphorus",
-                            "ai_score": 69,
-                            "closesTodayAt": "21:30",
-                            "image": "https://example.com/images/bosphorus.jpg",
-                            "servesVegetarianFood": false,
-                            "meat_ratio": 75,
-                            "waiting_time": "FAST",
-                            "price": 4.0,
-                            "paymentMethods": [
-                                "CASH"
-                            ],
-                            "district": "Bad_Cannstatt"
-                        },
-                        {
-                            "id": "8",
-                            "name": "Tasty Döner",
-                            "ai_score": 80,
-                            "closesTodayAt": "23:30",
-                            "image": "https://example.com/images/tasty.jpg",
-                            "servesVegetarianFood": true,
-                            "meat_ratio": 55,
-                            "waiting_time": "AVERAGE",
-                            "price": 4.8,
-                            "paymentMethods": [
-                                "CASH",
-                                "DEBIT_CARD",
-                                "NFC"
-                            ],
-                            "district": "Möhringen"
-                        },
-                        {
-                            "id": "9",
-                            "name": "Express Kebap",
-                            "ai_score": 50,
-                            "closesTodayAt": "19:45",
-                            "image": "https://example.com/images/express.jpg",
-                            "servesVegetarianFood": false,
-                            "meat_ratio": 90,
-                            "waiting_time": "FAST",
-                            "price": 3.5,
-                            "paymentMethods": [
-                                "CASH"
-                            ],
-                            "district": "Feuerbach"
-                        },
-                        {
-                            "id": "10",
-                            "name": "Döner Villa",
-                            "ai_score": 88,
-                            "closesTodayAt": "22:45",
-                            "image": "https://example.com/images/villa.jpg",
-                            "servesVegetarianFood": true,
-                            "meat_ratio": 62,
-                            "waiting_time": "AVERAGE",
-                            "price": 5.2,
-                            "paymentMethods": [
-                                "CASH",
-                                "CREDIT_CARD"
-                            ],
-                            "district": "Degerloch"
-                        }
-                    ],
-                    "meta": {
-                        "page": 1,
-                        "pageSize": 20,
-                        "totalItems": 10,
-                        "totalPages": 1
-                    }
-                }
+                "NFC"
+            ],
+            "district": "Mitte"
+        },
+        {
+            "id": "2",
+            "name": "Ali's Imbiss",
+            "ai_score": 74,
+            "closesTodayAt": "21:00",
+            "image": "https://example.com/images/ali.jpg",
+            "servesVegetarianFood": false,
+            "meat_ratio": 80,
+            "waiting_time": "FAST",
+            "price": 3.9,
+            "paymentMethods": [
+                "CASH",
+                "DEBIT_CARD"
+            ],
+            "district": "Bad_Cannstatt"
+        },
+        {
+            "id": "3",
+            "name": "Kebap König",
+            "ai_score": 65,
+            "closesTodayAt": "23:00",
+            "image": "https://example.com/images/kebap-koenig.jpg",
+            "servesVegetarianFood": false,
+            "meat_ratio": 85,
+            "waiting_time": "SLOW",
+            "price": 5.0,
+            "paymentMethods": [
+                "CASH"
+            ],
+            "district": "Nord"
+        },
+        {
+            "id": "4",
+            "name": "Sultan Grill",
+            "ai_score": 92,
+            "closesTodayAt": "00:30",
+            "image": "https://example.com/images/sultan.jpg",
+            "servesVegetarianFood": true,
+            "meat_ratio": 60,
+            "waiting_time": "FAST",
+            "price": 6.0,
+            "paymentMethods": [
+                "CASH",
+                "CREDIT_CARD",
+                "NFC"
+            ],
+            "district": "Ost"
+        },
+        {
+            "id": "5",
+            "name": "Murat's",
+            "ai_score": 55,
+            "closesTodayAt": "20:00",
+            "image": "https://example.com/images/murats.jpg",
+            "servesVegetarianFood": true,
+            "meat_ratio": 50,
+            "waiting_time": "AVERAGE",
+            "price": 4.2,
+            "paymentMethods": [
+                "CASH",
+                "DEBIT_CARD"
+            ],
+            "district": "Vaihingen"
+        },
+        {
+            "id": "6",
+            "name": "Orient Express",
+            "ai_score": 77,
+            "closesTodayAt": "22:00",
+            "image": "https://example.com/images/orient_express.jpg",
+            "servesVegetarianFood": false,
+            "meat_ratio": 70,
+            "waiting_time": "AVERAGE",
+            "price": 5.5,
+            "paymentMethods": [
+                "CASH",
+                "CREDIT_CARD"
+            ],
+            "district": "West"
+        },
+        {
+            "id": "7",
+            "name": "Bosphorus",
+            "ai_score": 69,
+            "closesTodayAt": "21:30",
+            "image": "https://example.com/images/bosphorus.jpg",
+            "servesVegetarianFood": false,
+            "meat_ratio": 75,
+            "waiting_time": "FAST",
+            "price": 4.0,
+            "paymentMethods": [
+                "CASH"
+            ],
+            "district": "Bad_Cannstatt"
+        },
+        {
+            "id": "8",
+            "name": "Tasty Döner",
+            "ai_score": 80,
+            "closesTodayAt": "23:30",
+            "image": "https://example.com/images/tasty.jpg",
+            "servesVegetarianFood": true,
+            "meat_ratio": 55,
+            "waiting_time": "AVERAGE",
+            "price": 4.8,
+            "paymentMethods": [
+                "CASH",
+                "DEBIT_CARD",
+                "NFC"
+            ],
+            "district": "Möhringen"
+        },
+        {
+            "id": "9",
+            "name": "Express Kebap",
+            "ai_score": 50,
+            "closesTodayAt": "19:45",
+            "image": "https://example.com/images/express.jpg",
+            "servesVegetarianFood": false,
+            "meat_ratio": 90,
+            "waiting_time": "FAST",
+            "price": 3.5,
+            "paymentMethods": [
+                "CASH"
+            ],
+            "district": "Feuerbach"
+        },
+        {
+            "id": "10",
+            "name": "Döner Villa",
+            "ai_score": 88,
+            "closesTodayAt": "22:45",
+            "image": "https://example.com/images/villa.jpg",
+            "servesVegetarianFood": true,
+            "meat_ratio": 62,
+            "waiting_time": "AVERAGE",
+            "price": 5.2,
+            "paymentMethods": [
+                "CASH",
+                "CREDIT_CARD"
+            ],
+            "district": "Degerloch"
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "pageSize": 20,
+        "totalItems": 10,
+        "totalPages": 1
+    }
+}
