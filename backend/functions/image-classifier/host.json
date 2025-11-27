@@ -11,5 +11,14 @@
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
     "version": "[4.*, 5.0.0)"
+  },
+  "extensions": {
+    "serviceBus": {
+      "clientRetryOptions": {
+        "mode": "exponential",
+        "delay": "00:00:02.00",
+        "maxRetries": 4
+      }
+    }
   }
 }
