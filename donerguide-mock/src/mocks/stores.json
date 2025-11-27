@@ -4,10 +4,7 @@
         "name": "Dönerhaus West",
         "district": "Stuttgart-West",
         "location": {
-            "coordinates": {
-                "lat": 48.7761,
-                "lng": 9.1653
-            },
+            "coordinates": { "lat": 48.7761, "lng": 9.1653 },
             "google_place_id": "ChIJd0ener01",
             "address": "Rotebühlstraße 25, 70178 Stuttgart, Germany",
             "plus_code": "Q5VH+2G Stuttgart, Germany",
@@ -15,15 +12,10 @@
         },
         "rating": 4.6,
         "price": 5.5,
-        "vegetarian": [
-            "vegetarian"
-        ],
+        "vegetarian": ["vegetarian"],
         "halal": "halal",
         "waiting_time": "fast",
-        "payment": [
-            "cash",
-            "card"
-        ],
+        "payment": ["cash", "card"],
         "open_hours": "open",
         "distance_from_me": 820,
         "ai_summary": "Dönerhaus West offers fresh ingredients, flavorful chicken döner, and excellent vegetarian options. Customers praise the quick service and friendly staff.",
@@ -58,10 +50,7 @@
         "name": "Döner Kebab Stuttgart",
         "district": "Stuttgart-Mitte",
         "location": {
-            "coordinates": {
-                "lat": 48.7753,
-                "lng": 9.1829
-            },
+            "coordinates": { "lat": 48.7753, "lng": 9.1829 },
             "google_place_id": "ChIJd0ener02",
             "address": "Königstraße 45, 70173 Stuttgart, Germany",
             "plus_code": "Q5VH+3H Stuttgart, Germany",
@@ -69,15 +58,10 @@
         },
         "rating": 4.2,
         "price": 6.0,
-        "vegetarian": [
-            "vegetarian"
-        ],
+        "vegetarian": ["vegetarian"],
         "halal": "halal",
         "waiting_time": "normal",
-        "payment": [
-            "cash",
-            "card"
-        ],
+        "payment": ["cash", "card"],
         "open_hours": "open",
         "distance_from_me": 500,
         "ai_summary": "Döner Kebab Stuttgart is known for its generous portions and tasty sauces. A favorite among locals for a quick bite.",
@@ -112,10 +96,7 @@
         "name": "Kebap Haus",
         "district": "Stuttgart-Nord",
         "location": {
-            "coordinates": {
-                "lat": 48.7865,
-                "lng": 9.1773
-            },
+            "coordinates": { "lat": 48.7865, "lng": 9.1773 },
             "google_place_id": "ChIJd0ener03",
             "address": "Friedrichstraße 12, 70174 Stuttgart, Germany",
             "plus_code": "Q5VH+4J Stuttgart, Germany",
@@ -123,15 +104,10 @@
         },
         "rating": 4.0,
         "price": 4.5,
-        "vegetarian": [
-            "vegetarian",
-            "vegan"
-        ],
+        "vegetarian": ["vegetarian", "vegan"],
         "halal": "not_halal",
         "waiting_time": "slow",
-        "payment": [
-            "cash"
-        ],
+        "payment": ["cash"],
         "open_hours": "not_open",
         "distance_from_me": 1200,
         "ai_summary": "Kebap Haus offers a variety of döner options, but the service can be slow during peak hours.",
