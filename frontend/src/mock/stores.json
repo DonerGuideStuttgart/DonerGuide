@@ -1,0 +1,164 @@
+[
+    {
+        "id": "place_001",
+        "name": "Dönerhaus West",
+        "district": "Stuttgart-West",
+        "location": {
+            "coordinates": {
+                "lat": 48.7761,
+                "lng": 9.1653
+            },
+            "google_place_id": "ChIJd0ener01",
+            "address": "Rotebühlstraße 25, 70178 Stuttgart, Germany",
+            "plus_code": "Q5VH+2G Stuttgart, Germany",
+            "maps_url": "https://www.google.com/maps/place/?q=place_id:ChIJd0ener01"
+        },
+        "rating": 4.6,
+        "price": 5.5,
+        "vegetarian": [
+            "vegetarian"
+        ],
+        "halal": "halal",
+        "waiting_time": "fast",
+        "payment": [
+            "cash",
+            "card"
+        ],
+        "open_hours": "open",
+        "distance_from_me": 820,
+        "ai_summary": "Dönerhaus West offers fresh ingredients, flavorful chicken döner, and excellent vegetarian options. Customers praise the quick service and friendly staff.",
+        "opening_hours": {
+            "monday": "10:00–22:00",
+            "tuesday": "10:00–22:00",
+            "wednesday": "10:00–22:00",
+            "thursday": "10:00–23:00",
+            "friday": "10:00–23:00",
+            "saturday": "11:00–23:00",
+            "sunday": "11:00–21:00"
+        },
+        "ai_reviews": [
+            {
+                "id": "rev_101",
+                "user": "Max Mustermann",
+                "date": "2025-11-10",
+                "rating": 5,
+                "text": "Best döner in Stuttgart! Fast service and very clean."
+            },
+            {
+                "id": "rev_102",
+                "user": "Anna Müller",
+                "date": "2025-11-05",
+                "rating": 4,
+                "text": "Good taste, but sauce was a bit spicy for me."
+            }
+        ]
+    },
+    {
+        "id": "place_002",
+        "name": "Döner Kebab Stuttgart",
+        "district": "Stuttgart-Mitte",
+        "location": {
+            "coordinates": {
+                "lat": 48.7753,
+                "lng": 9.1829
+            },
+            "google_place_id": "ChIJd0ener02",
+            "address": "Königstraße 45, 70173 Stuttgart, Germany",
+            "plus_code": "Q5VH+3H Stuttgart, Germany",
+            "maps_url": "https://www.google.com/maps/place/?q=place_id:ChIJd0ener02"
+        },
+        "rating": 4.2,
+        "price": 6.0,
+        "vegetarian": [
+            "vegetarian"
+        ],
+        "halal": "halal",
+        "waiting_time": "normal",
+        "payment": [
+            "cash",
+            "card"
+        ],
+        "open_hours": "open",
+        "distance_from_me": 500,
+        "ai_summary": "Döner Kebab Stuttgart is known for its generous portions and tasty sauces. A favorite among locals for a quick bite.",
+        "opening_hours": {
+            "monday": "11:00–22:00",
+            "tuesday": "11:00–22:00",
+            "wednesday": "11:00–22:00",
+            "thursday": "11:00–23:00",
+            "friday": "11:00–23:00",
+            "saturday": "12:00–23:00",
+            "sunday": "12:00–21:00"
+        },
+        "ai_reviews": [
+            {
+                "id": "rev_201",
+                "user": "John Doe",
+                "date": "2025-11-12",
+                "rating": 4,
+                "text": "Great döner, but the place can get crowded."
+            },
+            {
+                "id": "rev_202",
+                "user": "Jane Smith",
+                "date": "2025-11-08",
+                "rating": 5,
+                "text": "Absolutely delicious! Will come back for sure."
+            }
+        ]
+    },
+    {
+        "id": "place_003",
+        "name": "Kebap Haus",
+        "district": "Stuttgart-Nord",
+        "location": {
+            "coordinates": {
+                "lat": 48.7865,
+                "lng": 9.1773
+            },
+            "google_place_id": "ChIJd0ener03",
+            "address": "Friedrichstraße 12, 70174 Stuttgart, Germany",
+            "plus_code": "Q5VH+4J Stuttgart, Germany",
+            "maps_url": "https://www.google.com/maps/place/?q=place_id:ChIJd0ener03"
+        },
+        "rating": 4.0,
+        "price": 4.5,
+        "vegetarian": [
+            "vegetarian",
+            "vegan"
+        ],
+        "halal": "not_halal",
+        "waiting_time": "slow",
+        "payment": [
+            "cash"
+        ],
+        "open_hours": "not_open",
+        "distance_from_me": 1200,
+        "ai_summary": "Kebap Haus offers a variety of döner options, but the service can be slow during peak hours.",
+        "opening_hours": {
+            "monday": "10:00–21:00",
+            "tuesday": "10:00–21:00",
+            "wednesday": "10:00–21:00",
+            "thursday": "10:00–21:00",
+            "friday": "10:00–22:00",
+            "saturday": "11:00–22:00",
+            "sunday": "closed"
+        },
+        "ai_reviews": [
+            {
+                "id": "rev_301",
+                "user": "Alice Johnson",
+                "date": "2025-11-09",
+                "rating": 3,
+                "text": "The döner was okay, but the wait was too long."
+            },
+            {
+                "id": "rev_302",
+                "user": "Bob Brown",
+                "date": "2025-11-06",
+                "rating": 4,
+                "text": "Good flavors, but not the best I've had."
+            }
+        ]
+    }
+]
