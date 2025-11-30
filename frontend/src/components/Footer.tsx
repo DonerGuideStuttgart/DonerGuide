@@ -1,8 +1,20 @@
+import Link from "next/link";
+
 export default function Footer() {
-    return (
-        <footer className="w-full bg-white border-t mt-8">
-            <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-center">
-                © {new Date().getFullYear()} Dönerguide — Prototype
+    return ( <!--TODO: fix mobile layout-->
+        <footer className={"footer lg:footer-vertical footer-center bg-base-300 text-base-content border-base border-t p-4"}>
+            <div>
+                <aside>
+                    <p>Dönerguide © 2025 - Prototype</p>
+
+                </aside>
+            </div>
+            <div>
+                <nav className={"grid grid-flow-col gap-4"}>
+                    <Link href={"/"} className={"link link-hover"}>Impressum</Link>
+                    <Link href={"/"} className={"link link-hover"}>Datenschutz</Link>
+                    <Link href={"/"} className={"link link-hover"}>Kontakt</Link>
+                </nav>
             </div>
         </footer>
     );
