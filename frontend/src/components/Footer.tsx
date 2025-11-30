@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 export default function Footer() {
-    return ( <!--TODO: fix mobile layout-->
-        <footer className={"footer lg:footer-vertical footer-center bg-base-300 text-base-content border-base border-t p-4"}>
+    return ( //TODO: fix mobile view & replace links as soon as pages exist
+        <footer className={"footer lg:footer-vertical footer-center text-base-content border-base border-t p-4"}>
             <div>
                 <aside>
                     <p>Dönerguide © 2025 - Prototype</p>

@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="de">
-        <body className={`${rubikSans.className} antialiased`}>
+        <body className={`${rubikSans.className} antialiased bg-base-300`}>
         <nav className={"pb-16"}><Navbar/></nav>
         {children}
         <Footer/>
