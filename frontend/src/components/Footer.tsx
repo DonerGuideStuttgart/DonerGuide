@@ -1,21 +1,20 @@
 import Link from "next/link";
 
 export default function Footer() {
-    return ( //TODO: fix mobile view & replace links as soon as pages exist
-        <footer className={"footer lg:footer-vertical footer-center text-base-content border-base border-t p-4"}>
-            <div>
-                <aside>
-                    <p>Dönerguide © 2025 - Prototype</p>
+    return ( // TODO: replace links as soon as pages exist
+        <footer
+            className="border-t border-base p-4 text-base-content flex flex-col items-center gap-4
+                lg:flex-row lg:items-center lg:justify-between">
+            <aside className="text-center lg:text-left">
+                <p>Dönerguide © 2025 - Prototype</p>
+            </aside>
 
-                </aside>
-            </div>
-            <div>
-                <nav className={"grid grid-flow-col gap-4"}>
-                    <Link href={"/"} className={"link link-hover"}>Impressum</Link>
-                    <Link href={"/"} className={"link link-hover"}>Datenschutz</Link>
-                    <Link href={"/"} className={"link link-hover"}>Kontakt</Link>
-                </nav>
-            </div>
+            <nav className="flex flex-col items-center gap-2 lg:flex-row lg:gap-4">
+                <Link href="/" className="link link-hover">Impressum</Link>
+                <Link href="/" className="link link-hover">Datenschutz</Link>
+                <Link href="/" className="link link-hover">Kontakt</Link>
+            </nav>
+
         </footer>
     );
 }
