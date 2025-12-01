@@ -1,9 +1,20 @@
+import Link from "next/link";
+
 export default function Footer() {
-    return (
-        <footer className="w-full bg-white border-t mt-8">
-            <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-center">
-                © {new Date().getFullYear()} Dönerguide — Prototype
-            </div>
+    return ( // TODO: replace links as soon as pages exist
+        <footer
+            className="border-t border-base p-4 text-base-content flex flex-col items-center gap-4
+                lg:flex-row lg:items-center lg:justify-between">
+            <aside className="text-center lg:text-left">
+                <p>Dönerguide © 2025 - Prototype</p>
+            </aside>
+
+            <nav className="flex flex-col items-center gap-2 lg:flex-row lg:gap-4">
+                <Link href="/" className="link link-hover">Impressum</Link>
+                <Link href="/" className="link link-hover">Datenschutz</Link>
+                <Link href="/" className="link link-hover">Kontakt</Link>
+            </nav>
+
         </footer>
     );
 }
