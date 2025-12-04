@@ -76,13 +76,6 @@ export default function FilterPanel({
                                 price_max: max
                             });
                         }}
-                        classNames={{
-                            base: "w-full",
-                            track: "bg-gray-200 dark:bg-gray-700 h-1",
-                            filler: "bg-blue-500",
-                            thumb: "w-4 h-4 bg-blue-500 border-2 border-white shadow-md",
-                            value: "text-sm text-gray-600"
-                        }}
                     />
                 </label>
             </div>
