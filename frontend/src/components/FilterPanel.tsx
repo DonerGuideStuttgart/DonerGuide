@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { forwardRef, useImperativeHandle } from 'react';
 import { Slider } from "@heroui/slider";
 
 export type Filters = {
@@ -44,9 +45,12 @@ const DISTRICTS = [
     "Mühlhausen",
     "Weilimdorf"
 ];
-
 const OPEN_HOURS = ["open_now", "open_this_evening", "open_late"]
 const VEGETARIAN = ["meat", "vegetarian", "vegan"]
+
+export interface FilterPanelHandle {
+    removeFilter: (key: keyof Filters, value?: string) => void;
+}
 
 export default function FilterPanel({
     onChange,
@@ -71,6 +75,23 @@ export default function FilterPanel({
         setFilters(next);
         onChange(next);
     }
+
+    function removeFilter(key: keyof Filters, value?: string) {
+        if (value && (key === "district" || key === "open_hours" || key === "vegetarian")) {
+            const current = filters[key]?.split(",") || [];
+            const updated = current.filter(v => v !== value);
+
+            if (key === "district") setSelectedDistricts(updated);
+            if (key === "open_hours") setSelectedOpenHours(updated);
+            if (key === "vegetarian") setSelectedVegetarian(updated);
+
+            update({ [key]: updated.length > 0 ? updated.join(",") : undefined });
+        } else {
+            update({ [key]: undefined });
+        }
+    }
+
+    (FilterPanel as any).removeFilter = removeFilter;
 
     function toggleDistrict(district: string) {
         const newSelection = selectedDistricts.includes(district)
