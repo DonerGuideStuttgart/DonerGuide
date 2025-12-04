@@ -5,9 +5,11 @@ import FilterPanel, { Filters } from "@/components/FilterPanel";
 import SortControl from "@/components/SortControl";
 import DonerCard from "@/components/DonerCard";
 import { buildStoreQuery, fetchPlaces } from "@/helpers/api";
+import ChipsFilterBar from "@/components/ChipsFilterBar";
 
 export default function StoresPage() {
     const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 });
+    const [filterPanelRef, setFilterPanelRef] = useState<any>(null);
     const [sort, setSort] = useState<string>("");
     const [stores, setStores] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -41,6 +43,13 @@ export default function StoresPage() {
         };
     }, [filters, sort]);
 
+    function handleRemoveFilter(key: keyof Filters, value?: string) {
+        if (filterPanelRef) {
+            filterPanelRef.removeFilter(key, value);
+        }
+    }
+
+
     return (
         <main className="max-w-5xl mx-auto p-4">
             <header className="flex items-center justify-between mb-4">
@@ -50,9 +59,10 @@ export default function StoresPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-1">
-                    <FilterPanel onChange={(f) => setFilters(f)} initial={filters} />
+                    <FilterPanel onChange={(f) => setFilters(f)} initial={filters} ref={setFilterPanelRef} />
                 </div>
                 <div className="md:col-span-3 space-y-3">
+                    <ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
                     {loading && <div>Loading…</div>}
                     {error && <div className="text-red-600">{error}</div>}
                     {stores.map((s: any) => (
