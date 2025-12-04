@@ -38,7 +38,7 @@
 
 /* Slider Styles */
 [data-slot="base"] {
-    @apply relative w-full flex flex-col gap-1;
+    @apply relative w-full flex flex-col gap-3;
 }
 
 [data-slot="track"] {
