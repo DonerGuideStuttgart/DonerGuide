@@ -3,6 +3,15 @@ import { useState } from "react";
 import { forwardRef, useImperativeHandle } from 'react';
 import { Slider } from "@heroui/slider";
 
+import {
+    DISTRICT_LABELS,
+    OPEN_HOURS_LABELS,
+    WAITING_TIME_LABELS,
+    HALAL_LABELS,
+    VEGETARIAN_LABELS,
+    PAYMENT_LABELS
+} from "../types/records";
+
 export type Filters = {
     district?: string;
     min_score?: number;
@@ -21,32 +30,6 @@ export type Filters = {
     limit?: number;
     offset?: number;
 };
-
-const DISTRICTS = [
-    "Mitte",
-    "Nord",
-    "Süd",
-    "Ost",
-    "West",
-    "Bad_Cannstatt",
-    "Feuerbach",
-    "Zuffenhausen",
-    "Vaihingen",
-    "Möhringen",
-    "Degerloch",
-    "Plieningen",
-    "Sillenbuch",
-    "Hedelfingen",
-    "Wangen",
-    "Botnang",
-    "Birkach",
-    "Untertürkheim",
-    "Obertürkheim",
-    "Mühlhausen",
-    "Weilimdorf"
-];
-const OPEN_HOURS = ["open_now", "open_this_evening", "open_late"]
-const VEGETARIAN = ["meat", "vegetarian", "vegan"]
 
 export interface FilterPanelHandle {
     removeFilter: (key: keyof Filters, value?: string) => void;
@@ -176,7 +159,7 @@ export default function FilterPanel({
                     />
                     <div className="h-[200px] overflow-y-auto border rounded-md p-2 bg-base-100">
                         <div className="flex flex-col gap-1">
-                            {DISTRICTS.map((district) => (
+                            {Object.keys(DISTRICT_LABELS).map((district) => (
                                 <label
                                     key={district}
                                     className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
@@ -187,7 +170,7 @@ export default function FilterPanel({
                                         checked={selectedDistricts.includes(district)}
                                         onChange={() => toggleDistrict(district)}
                                     />
-                                    <span className="text-sm">{district}</span>
+                                    <span className="text-sm">{DISTRICT_LABELS[district]}</span>
                                 </label>
                             ))}
                         </div>
@@ -197,7 +180,7 @@ export default function FilterPanel({
                     <label className="text-sm font-medium">Öffnungszeiten</label>
                     <div className="overflow-y-auto border rounded-md p-2 bg-base-100">
                         <div className="flex flex-col gap-1">
-                            {OPEN_HOURS.map((hour) => (
+                            {Object.keys(OPEN_HOURS_LABELS).map((hour) => (
                                 <label
                                     key={hour}
                                     className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
@@ -208,7 +191,7 @@ export default function FilterPanel({
                                         checked={selectedOpenHours.includes(hour)}
                                         onChange={() => toggleOpenHour(hour)}
                                     />
-                                    <span className="text-sm">{hour}</span>
+                                    <span className="text-sm">{OPEN_HOURS_LABELS[hour]}</span>
                                 </label>
                             ))}
                         </div>
@@ -218,7 +201,7 @@ export default function FilterPanel({
                     <label className="text-sm font-medium">Vegetarisch/Vegan</label>
                     <div className="overflow-y-auto border rounded-md p-2 bg-base-100">
                         <div className="flex flex-col gap-1">
-                            {VEGETARIAN.map((vegetarian) => (
+                            {Object.keys(VEGETARIAN_LABELS).map((vegetarian) => (
                                 <label
                                     key={vegetarian}
                                     className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
@@ -229,7 +212,7 @@ export default function FilterPanel({
                                         checked={selectedVegetarian.includes(vegetarian)}
                                         onChange={() => toggleVegetarian(vegetarian)}
                                     />
-                                    <span className="text-sm">{vegetarian}</span>
+                                    <span className="text-sm">{VEGETARIAN_LABELS[vegetarian]}</span>
                                 </label>
                             ))}
                         </div>

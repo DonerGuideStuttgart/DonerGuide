@@ -1,56 +1,13 @@
 "use client";
 import { Filters } from "./FilterPanel";
-
-const DISTRICT_LABELS: Record<string, string> = {
-    Mitte: "Mitte",
-    Nord: "Nord",
-    Süd: "Süd",
-    Ost: "Ost",
-    West: "West",
-    Bad_Cannstatt: "Bad Cannstatt",
-    Feuerbach: "Feuerbach",
-    Zuffenhausen: "Zuffenhausen",
-    Vaihingen: "Vaihingen",
-    Möhringen: "Möhringen",
-    Degerloch: "Degerloch",
-    Plieningen: "Plieningen",
-    Sillenbuch: "Sillenbuch",
-    Hedelfingen: "Hedelfingen",
-    Wangen: "Wangen",
-    Botnang: "Botnang",
-    Birkach: "Birkach",
-    Untertürkheim: "Untertürkheim",
-    Obertürkheim: "Obertürkheim",
-    Mühlhausen: "Mühlhausen",
-    Weilimdorf: "Weilimdorf"
-};
-
-const OPEN_HOURS_LABELS: Record<string, string> = {
-    open_now: "Jetzt geöffnet",
-    open_this_evening: "Heute Abend",
-    open_late: "Spät geöffnet"
-};
-
-const VEGETARIAN_LABELS: Record<string, string> = {
-    meat: "Fleisch",
-    vegetarian: "Vegetarisch",
-    vegan: "Vegan"
-};
-
-const HALAL_LABELS: Record<string, string> = {
-    halal: "Halal",
-    not_halal: "Nicht Halal"
-};
-
-const WAITING_TIME_LABELS: Record<string, string> = {
-    FAST: "Schnell",
-    AVERAGE: "Normal"
-};
-
-const PAYMENT_LABELS: Record<string, string> = {
-    NFC: "Kartenzahlung",
-    CASH: "Nur Cash"
-};
+import {
+    DISTRICT_LABELS,
+    OPEN_HOURS_LABELS,
+    WAITING_TIME_LABELS,
+    HALAL_LABELS,
+    VEGETARIAN_LABELS,
+    PAYMENT_LABELS
+} from "../types/records";
 
 interface ChipsFilterBarProps {
     filters: Filters;
@@ -60,7 +17,6 @@ interface ChipsFilterBarProps {
 export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProps) {
     const chips: { label: string; onRemove: () => void }[] = [];
 
-    // Score range
     if (filters.min_score !== undefined || filters.max_score !== undefined) {
         const min = filters.min_score ?? 0;
         const max = filters.max_score ?? 100;
@@ -73,7 +29,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Price range
     if (filters.price_min !== undefined || filters.price_max !== undefined) {
         const min = filters.price_min ?? 0;
         const max = filters.price_max ?? 30;
@@ -86,7 +41,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Districts
     if (filters.district) {
         filters.district.split(",").forEach((district) => {
             chips.push({
@@ -96,7 +50,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Open hours
     if (filters.open_hours) {
         filters.open_hours.split(",").forEach((hour) => {
             chips.push({
@@ -106,7 +59,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Vegetarian
     if (filters.vegetarian) {
         filters.vegetarian.split(",").forEach((veg) => {
             chips.push({
@@ -116,7 +68,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Halal
     if (filters.halal) {
         chips.push({
             label: HALAL_LABELS[filters.halal] || filters.halal,
@@ -124,7 +75,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Sauce amount
     if (filters.sauce_amount_min !== undefined || filters.sauce_amount_max !== undefined) {
         const min = filters.sauce_amount_min ?? 0;
         const max = filters.sauce_amount_max ?? 100;
@@ -137,7 +87,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Meat ratio
     if (filters.meat_ratio_min !== undefined || filters.meat_ratio_max !== undefined) {
         const min = filters.meat_ratio_min ?? 0;
         const max = filters.meat_ratio_max ?? 100;
@@ -150,7 +99,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Waiting time
     if (filters.waiting_time) {
         chips.push({
             label: WAITING_TIME_LABELS[filters.waiting_time] || filters.waiting_time,
@@ -158,7 +106,6 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         });
     }
 
-    // Payment methods
     if (filters.payment_methods) {
         chips.push({
             label: PAYMENT_LABELS[filters.payment_methods] || filters.payment_methods,
