@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Slider } from "@heroui/slider";
 
 export type Filters = {
     district?: string;
@@ -55,23 +56,33 @@ export default function FilterPanel({
                         ))}
                     </select>
                 </label>
-
-                <label className="flex flex-col">
-                    Price min €
-                    <input
-                        type="number"
-                        className="input input-sm"
-                        value={filters.price_min ?? ""}
-                        onChange={(e) => update({ price_min: e.target.value ? Number(e.target.value) : undefined })}
-                    />
-                </label>
-                <label className="flex flex-col">
-                    Price max €
-                    <input
-                        type="number"
-                        className="input input-sm"
-                        value={filters.price_max ?? ""}
-                        onChange={(e) => update({ price_max: e.target.value ? Number(e.target.value) : undefined })}
+                <label className="flex flex-col col-span-2">
+                    <Slider
+                        className="max-w-md"
+                        defaultValue={[
+                            filters.price_min ?? 0,
+                            filters.price_max ?? 30
+                        ]}
+                        formatOptions={{ style: "currency", currency: "EUR" }}
+                        label="Price Range"
+                        maxValue={30}
+                        minValue={0}
+                        step={1}
+                        onChange={(e) => {
+                            console.log(e);
+                            const [min, max] = e as [number, number];
+                            update({
+                                price_min: min,
+                                price_max: max
+                            });
+                        }}
+                        classNames={{
+                            base: "w-full",
+                            track: "bg-gray-200 dark:bg-gray-700 h-1",
+                            filler: "bg-blue-500",
+                            thumb: "w-4 h-4 bg-blue-500 border-2 border-white shadow-md",
+                            value: "text-sm text-gray-600"
+                        }}
                     />
                 </label>
             </div>
