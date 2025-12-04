@@ -10,9 +10,9 @@ export default function Footer() {
             </aside>
 
             <nav className="flex flex-col items-center gap-2 lg:flex-row lg:gap-4">
-                <Link href="/" className="link link-hover">Impressum</Link>
-                <Link href="/" className="link link-hover">Datenschutz</Link>
-                <Link href="/" className="link link-hover">Kontakt</Link>
+                <Link href="/impressum" className="link link-hover">Impressum</Link>
+                <Link href="/datenschutz" className="link link-hover">Datenschutz</Link>
+                <Link href="/kontakt" className="link link-hover">Kontakt</Link>
             </nav>
 
         </footer>
