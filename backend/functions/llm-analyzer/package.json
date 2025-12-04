@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "llm-analyzer",
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/functions/*.js",
@@ -16,7 +16,7 @@
     "doner_types": "file:../shared/doner_types"
   },
   "devDependencies": {
-    "@types/node": "18.x",
+    "@types/node": "^22.0.0",
     "azure-functions-core-tools": "^4.x",
     "concurrently": "^9.2.1",
     "rimraf": "^5.0.0",
