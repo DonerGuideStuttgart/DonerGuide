@@ -32,16 +32,13 @@ export type Filters = {
 };
 
 export interface FilterPanelHandle {
-    removeFilter: (key: keyof Filters, value?: string) => void;
+    removeFilter: (key: keyof Filters | (keyof Filters)[], value?: string) => void;
 }
 
-export default function FilterPanel({
-    onChange,
-    initial = {},
-}: {
+const FilterPanel = forwardRef<FilterPanelHandle, {
     onChange: (f: Filters) => void;
     initial?: Filters;
-}) {
+}>(function FilterPanel({ onChange, initial = {} }, ref) {
     const [filters, setFilters] = useState<Filters>(initial);
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>(
         filters.district ? filters.district.split(",") : []
@@ -59,7 +56,18 @@ export default function FilterPanel({
         onChange(next);
     }
 
-    function removeFilter(key: keyof Filters, value?: string) {
+    function removeFilter(key: keyof Filters | (keyof Filters)[], value?: string) {
+        // Handle array of keys for batch removal
+        if (Array.isArray(key)) {
+            const updates: Partial<Filters> = {};
+            key.forEach(k => {
+                updates[k] = undefined;
+            });
+            update(updates);
+            return;
+        }
+
+        // Handle single key removal
         if (value && (key === "district" || key === "open_hours" || key === "vegetarian")) {
             const current = filters[key]?.split(",") || [];
             const updated = current.filter(v => v !== value);
@@ -74,7 +82,9 @@ export default function FilterPanel({
         }
     }
 
-    (FilterPanel as any).removeFilter = removeFilter;
+    useImperativeHandle(ref, () => ({
+        removeFilter
+    }));
 
     function toggleDistrict(district: string) {
         const newSelection = selectedDistricts.includes(district)
@@ -358,4 +368,6 @@ export default function FilterPanel({
             </div>
         </section>
     );
-}
+});
+
+export default FilterPanel;

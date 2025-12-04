@@ -11,7 +11,7 @@ import {
 
 interface ChipsFilterBarProps {
     filters: Filters;
-    onRemove: (key: keyof Filters, value?: string) => void;
+    onRemove: (key: keyof Filters | (keyof Filters)[], value?: string) => void;
 }
 
 export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProps) {
@@ -23,8 +23,7 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         chips.push({
             label: `${min}-${max}⭐`,
             onRemove: () => {
-                onRemove("min_score");
-                onRemove("max_score");
+                onRemove(["min_score", "max_score"]);
             }
         });
     }
@@ -35,8 +34,7 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         chips.push({
             label: `${min}-${max}€`,
             onRemove: () => {
-                onRemove("price_min");
-                onRemove("price_max");
+                onRemove(["price_min", "price_max"]);
             }
         });
     }
@@ -81,8 +79,7 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         chips.push({
             label: `Soße ${min}-${max}`,
             onRemove: () => {
-                onRemove("sauce_amount_min");
-                onRemove("sauce_amount_max");
+                onRemove(["sauce_amount_min", "sauce_amount_max"]);
             }
         });
     }
@@ -93,8 +90,7 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
         chips.push({
             label: `Fleisch ${min}-${max}`,
             onRemove: () => {
-                onRemove("meat_ratio_min");
-                onRemove("meat_ratio_max");
+                onRemove(["meat_ratio_min", "meat_ratio_max"]);
             }
         });
     }
@@ -116,7 +112,7 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
     if (chips.length === 0) return null;
 
     return (
-        <div className="flex flex-wrap gap-2 p-4 bg-base-200 rounded-md">
+        <div className="flex flex-wrap gap-2 p-4 bg-base-300 rounded-md">
             {chips.map((chip, index) => (
                 <div
                     key={index}
@@ -124,11 +120,8 @@ export default function ChipsFilterBar({ filters, onRemove }: ChipsFilterBarProp
                 >
                     <span>{chip.label}</span>
                     <button
-                        onClick={(e) => {
-                            console.log("Remove filter clicked:", chip.label);
-                            chip.onRemove();
-                        }}
-                        className="hover:bg-secondary-focus rounded-full w-4 h-4 flex items-center justify-center"
+                        onClick={(e) => { chip.onRemove(); }}
+                        className="hover:bg-accent-content rounded-full w-4 h-4 flex items-center justify-center"
                         aria-label="Remove filter"
                     >
                         ×

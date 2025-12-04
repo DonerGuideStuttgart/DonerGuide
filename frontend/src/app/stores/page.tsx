@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-import FilterPanel, { Filters } from "@/components/FilterPanel";
+import FilterPanel, { Filters, FilterPanelHandle } from "@/components/FilterPanel";
 import SortControl from "@/components/SortControl";
 import DonerCard from "@/components/DonerCard";
 import { buildStoreQuery, fetchPlaces } from "@/helpers/api";
@@ -9,7 +9,7 @@ import ChipsFilterBar from "@/components/ChipsFilterBar";
 
 export default function StoresPage() {
     const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 });
-    const [filterPanelRef, setFilterPanelRef] = useState<any>(null);
+    const filterPanelRef = useRef<FilterPanelHandle>(null);
     const [sort, setSort] = useState<string>("");
     const [stores, setStores] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -43,9 +43,9 @@ export default function StoresPage() {
         };
     }, [filters, sort]);
 
-    function handleRemoveFilter(key: keyof Filters, value?: string) {
-        if (filterPanelRef) {
-            filterPanelRef.removeFilter(key, value);
+    function handleRemoveFilter(key: keyof Filters | (keyof Filters)[], value?: string) {
+        if (filterPanelRef.current) {
+            filterPanelRef.current.removeFilter(key, value);
         }
     }
 
@@ -59,7 +59,7 @@ export default function StoresPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-1">
-                    <FilterPanel onChange={(f) => setFilters(f)} initial={filters} ref={setFilterPanelRef} />
+                    <FilterPanel onChange={(f) => setFilters(f)} initial={filters} ref={filterPanelRef} />
                 </div>
                 <div className="md:col-span-3 space-y-3">
                     <ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
