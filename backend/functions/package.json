@@ -13,9 +13,9 @@
   ],
   "scripts": {},
   "devDependencies": {
-    "typescript": "^5.3.0",
+    "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
-    "@types/jest": "^30.0.0"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22"
