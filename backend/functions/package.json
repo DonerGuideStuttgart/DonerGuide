@@ -9,7 +9,7 @@
     "place-search",
     "image-classifier",
     "llm-analyzer",
-    "data-persistence"
+    "shops"
   ],
   "scripts": {},
   "devDependencies": {
