@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "types:check": "tsc --noEmit"
   },
   "files": [
     "dist"
