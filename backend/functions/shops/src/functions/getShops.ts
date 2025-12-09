@@ -1,6 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-export async function getShops(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export function getShops(request: HttpRequest, context: InvocationContext): HttpResponseInit {
     context.log("HTTP request received for getShops");
 
     return {
