@@ -7,9 +7,12 @@
 		"build": "next build",
 		"start": "next start",
 		"serve": "pnpx serve ./out",
-		"lint": "eslint --cache",
+		"lint": "eslint . --cache",
+		"lint:fix": "eslint . --fix --cache",
+		"format": "prettier --write . --cache",
 		"format:check": "prettier --check . --cache",
 		"types:check": "tsc --noEmit",
+		"check": "npm run lint && npm run format:check && npm run types:check",
 		"test": "jest"
 	},
 	"dependencies": {
