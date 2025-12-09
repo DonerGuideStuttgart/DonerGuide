@@ -1,0 +1,84 @@
+# Lefthook configuration for DonerGuide monorepo
+# https://github.com/evilmartians/lefthook
+
+min_version: 2.0.0
+
+pre-commit:
+  # Backend and Frontend run in parallel
+  # Priority ensures format runs before lint
+  parallel: true
+
+  commands:
+    # Backend: Prettier formatting
+    backend-format:
+      priority: 1
+      root: "backend/functions/"
+      glob: "**/*.{ts,js,json,md}"
+      exclude: "node_modules/|dist/|build/|coverage/"
+      run: npm exec -- prettier --write --cache {staged_files}
+      stage_fixed: true
+      fail_text: |
+        Prettier formatting failed in backend!
+        Run: cd backend/functions && npm run format
+        To skip: LEFTHOOK=0 git commit -m "message"
+
+    # Backend: ESLint linting
+    backend-lint:
+      priority: 2
+      root: "backend/functions/"
+      glob: "**/*.{ts,js}"
+      exclude: "node_modules/|dist/|build/|coverage/"
+      run: npm exec -- eslint --fix --cache {staged_files}
+      stage_fixed: true
+      fail_text: |
+        ESLint found errors in backend!
+        Run: cd backend/functions && npm run lint
+        To skip: LEFTHOOK=0 git commit -m "message"
+
+    # Frontend: Prettier formatting
+    frontend-format:
+      priority: 1
+      root: "frontend/"
+      glob: "**/*.{ts,tsx,js,jsx,json,md,css}"
+      exclude: "node_modules/|.next/|out/|build/|coverage/"
+      run: pnpm exec prettier --write --cache {staged_files}
+      stage_fixed: true
+      fail_text: |
+        Prettier formatting failed in frontend!
+        Run: cd frontend && pnpm run format
+        To skip: LEFTHOOK=0 git commit -m "message"
+
+    # Frontend: ESLint linting
+    frontend-lint:
+      priority: 2
+      root: "frontend/"
+      glob: "**/*.{ts,tsx,js,jsx}"
+      exclude: "node_modules/|.next/|out/|build/|coverage/"
+      run: pnpm exec eslint --fix --cache {staged_files}
+      stage_fixed: true
+      fail_text: |
+        ESLint found errors in frontend!
+        Run: cd frontend && pnpm run lint
+        To skip: LEFTHOOK=0 git commit -m "message"
+
+pre-push:
+  parallel: true
+
+  commands:
+    backend-types:
+      root: "backend/functions/"
+      glob: "**/*.{ts,js}"
+      run: npm run types:check
+      fail_text: |
+        TypeScript type errors found in backend!
+        Run: cd backend/functions && npm run types:check
+        To skip this push: git push --no-verify
+
+    frontend-types:
+      root: "frontend/"
+      glob: "**/*.{ts,tsx,js,jsx}"
+      run: pnpm run types:check
+      fail_text: |
+        TypeScript type errors found in frontend!
+        Run: cd frontend && pnpm run types:check
+        To skip this push: git push --no-verify
