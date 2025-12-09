@@ -1,9 +1,26 @@
 {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "never"
+        "source.organizeImports": "never",
+        "source.fixAll.eslint": "explicit"
     },
     "files.associations": {
         "*.css": "tailwindcss"
+    },
+    "eslint.enable": true,
+    "eslint.workingDirectories": [
+        {
+            "pattern": "./backend/functions/*"
+        }
+    ],
+    "eslint.experimental.useFlatConfig": true,
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }
