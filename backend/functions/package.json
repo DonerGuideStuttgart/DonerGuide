@@ -14,9 +14,10 @@
   "scripts": {
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --fix --cache",
-    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
-    "check": "npm run lint && npm run format:check"
+    "format": "prettier --write \"**/*.{ts,js,json,md}\" --cache",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\" --cache",
+    "types:check": "npm run -ws types:check",
+    "check": "npm run lint && npm run format:check && npm run types:check"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
