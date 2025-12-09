@@ -1,5 +1,3 @@
-import { fetchPlaceById } from '@/helpers/api'
-
 type Props = { params: { id: string } }
 
 export default async function StoreDetail({ params }: Props) {
@@ -10,6 +8,7 @@ export default async function StoreDetail({ params }: Props) {
 			`${process.env.NEXT_PUBLIC_API_URL ?? '/api'}/places/${id}`,
 		)
 		if (res.ok) store = await res.json()
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (e) {
 		// ignore
 	}

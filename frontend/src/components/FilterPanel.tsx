@@ -6,10 +6,7 @@ import { Slider } from '@heroui/slider'
 import {
 	DISTRICT_LABELS,
 	OPEN_HOURS_LABELS,
-	WAITING_TIME_LABELS,
-	HALAL_LABELS,
 	VEGETARIAN_LABELS,
-	PAYMENT_LABELS,
 } from '../types/records'
 
 export type Filters = {

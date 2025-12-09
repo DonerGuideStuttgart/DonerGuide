@@ -129,9 +129,7 @@ export default function ChipsFilterBar({
 				>
 					<span>{chip.label}</span>
 					<button
-						onClick={(e) => {
-							chip.onRemove()
-						}}
+						onClick={chip.onRemove}
 						className="hover:bg-accent-content rounded-full w-4 h-4 flex items-center justify-center"
 						aria-label="Remove filter"
 					>
