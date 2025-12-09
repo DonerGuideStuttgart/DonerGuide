@@ -1,18 +1,18 @@
 {
-    "name": "doner_types",
-    "version": "1.0.0",
-    "description": "Shared interfaces and enums for DonerGuide Azure Functions.",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "tsc --build",
-        "clean": "rimraf dist"
-    },
-    "files": [
-        "dist"
-    ],
-    "devDependencies": {
-        "rimraf": "^6.1.2",
-        "typescript": "^5.9.3"
-    }
+  "name": "doner_types",
+  "version": "1.0.0",
+  "description": "Shared interfaces and enums for DonerGuide Azure Functions.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3"
+  }
 }
