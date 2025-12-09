@@ -13,7 +13,8 @@
 		"format:check": "prettier --check . --cache",
 		"types:check": "tsc --noEmit",
 		"check": "npm run lint && npm run format:check && npm run types:check",
-		"test": "jest"
+		"test": "jest",
+		"postinstall": "lefthook install"
 	},
 	"dependencies": {
 		"@heroui/slider": "^2.4.24",
