@@ -2,11 +2,11 @@ import { CosmosClient, Item, PatchRequestBody } from '@azure/cosmos';
 import { app, InvocationContext, output } from '@azure/functions';
 import type { NewPhotosMessage, Photo } from 'doner_types';
 
-const QUEUE_NAME_INPUT = process.env['IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_INPUT'] || 'places';
-const QUEUE_NAME_OUTPUT = process.env['IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT'] || 'classified-images';
-const COSMOSDB_DATABASE_CONNECTION_STRING = process.env["IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING"] || "";
-const COSMOSDB_DATABASE_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_DATABASE_NAME"] || "DoenerGuideDB";
-const COSMOSDB_CONTAINER_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME"] || "Places";
+const QUEUE_NAME_INPUT = process.env['IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_INPUT'] ?? 'places';
+const QUEUE_NAME_OUTPUT = process.env['IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT'] ?? 'classified-images';
+const COSMOSDB_DATABASE_CONNECTION_STRING = process.env["IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING"] ?? "";
+const COSMOSDB_DATABASE_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_DATABASE_NAME"] ?? "DoenerGuideDB";
+const COSMOSDB_CONTAINER_NAME = process.env["IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME"] ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
 app.serviceBusQueue('imageClassifier', {
