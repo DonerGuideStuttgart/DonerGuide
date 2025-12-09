@@ -1,10 +1,10 @@
 import { CosmosClient, Item } from '@azure/cosmos';
 import { app, InvocationContext } from '@azure/functions';
 
-const QUEUE_NAME_INPUT = process.env['LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT'] ?? 'classified-images';
-const COSMOSDB_DATABASE_CONNECTION_STRING = process.env["LLM_ANALYZER_COSMOSDB_CONNECTION_STRING"] ?? "";
-const COSMOSDB_DATABASE_NAME = process.env["LLM_ANALYZER_COSMOSDB_DATABASE_NAME"] ?? "DoenerGuideDB";
-const COSMOSDB_CONTAINER_NAME = process.env["LLM_ANALYZER_COSMOSDB_CONTAINER_NAME"] ?? "Places";
+const QUEUE_NAME_INPUT = process.env.LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT ?? 'classified-images';
+const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.LLM_ANALYZER_COSMOSDB_CONNECTION_STRING ?? "";
+const COSMOSDB_DATABASE_NAME = process.env.LLM_ANALYZER_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
+const COSMOSDB_CONTAINER_NAME = process.env.LLM_ANALYZER_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
 app.serviceBusQueue('imageClassifier', {
