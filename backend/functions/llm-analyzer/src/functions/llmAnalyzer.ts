@@ -24,7 +24,7 @@ export async function llmAnalyzer(storeId: string, context: InvocationContext): 
 
     const item: Item = container.item(storeId, storeId);
 
-    item.patch({
+    await item.patch({
         operations: [
             {
                 op: "add",
