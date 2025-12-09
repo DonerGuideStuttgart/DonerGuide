@@ -107,21 +107,21 @@ async function createOrPatchItem(container: Container, itemBody: Place) : Promis
         // Merge photos from existing item with new photos
         const mergedPhotos = {
             uncategorized: [
-                ...(existingItem.photos?.uncategorized ?? []),
-                ...(itemBody.photos?.uncategorized ?? [])
+                ...(existingItem.photos.uncategorized ?? []),
+                ...(itemBody.photos.uncategorized ?? [])
             ].filter((photo, index, self) => 
                 // Remove duplicates based on photo id
                 index === self.findIndex(p => p.id === photo.id)
             ),
             food: [
-                ...(existingItem.photos?.food ?? []),
-                ...(itemBody.photos?.food ?? [])
+                ...(existingItem.photos.food ?? []),
+                ...(itemBody.photos.food ?? [])
             ].filter((photo, index, self) => 
                 index === self.findIndex(p => p.id === photo.id)
             ),
             places: [
-                ...(existingItem.photos?.places ?? []),
-                ...(itemBody.photos?.places ?? [])
+                ...(existingItem.photos.places ?? []),
+                ...(itemBody.photos.places ?? [])
             ].filter((photo, index, self) => 
                 index === self.findIndex(p => p.id === photo.id)
             )
