@@ -1,4 +1,7 @@
-export function buildStoreQuery(filters: Record<string, any>, sort?: string) {
+export function buildStoreQuery(
+	filters: Record<string, unknown>,
+	sort?: string,
+) {
 	const params = new URLSearchParams()
 	for (const k of Object.keys(filters)) {
 		const v = filters[k]

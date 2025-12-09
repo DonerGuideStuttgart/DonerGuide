@@ -6,7 +6,7 @@ import FilterPanel, {
 	FilterPanelHandle,
 } from '@/components/FilterPanel'
 import SortControl from '@/components/SortControl'
-import DonerCard from '@/components/DonerCard'
+import DonerCard, { StoreSummary } from '@/components/DonerCard'
 import { buildStoreQuery, fetchPlaces } from '@/helpers/api'
 import ChipsFilterBar from '@/components/ChipsFilterBar'
 
@@ -14,7 +14,7 @@ export default function StoresPage() {
 	const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 })
 	const filterPanelRef = useRef<FilterPanelHandle>(null)
 	const [sort, setSort] = useState<string>('')
-	const [stores, setStores] = useState<any[]>([])
+	const [stores, setStores] = useState<StoreSummary[]>([])
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
@@ -24,7 +24,7 @@ export default function StoresPage() {
 			setLoading(true)
 			setError(null)
 			try {
-				const q = buildStoreQuery(filters as any, sort)
+				const q = buildStoreQuery(filters, sort)
 				console.debug('[StoresPage] fetch query:', q)
 				const payload = await fetchPlaces(q)
 				console.debug('[StoresPage] fetch payload:', payload)
@@ -32,9 +32,9 @@ export default function StoresPage() {
 				if (!mounted) return
 				setStores(items)
 				console.debug('[StoresPage] normalized items:', items)
-			} catch (e: any) {
+			} catch (e) {
 				console.error('[StoresPage] fetch error:', e)
-				setError(e.message)
+				setError(e instanceof Error ? e.message : 'Unknown error')
 			} finally {
 				if (mounted) setLoading(false)
 			}
@@ -73,7 +73,7 @@ export default function StoresPage() {
 					<ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
 					{loading && <div>Loading…</div>}
 					{error && <div className="text-red-600">{error}</div>}
-					{stores.map((s: any) => (
+					{stores.map((s) => (
 						<DonerCard key={s.id} store={s} />
 					))}
 				</div>

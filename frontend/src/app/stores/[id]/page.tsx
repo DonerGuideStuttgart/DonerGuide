@@ -1,8 +1,10 @@
+import { Store } from '@/types/store'
+
 type Props = { params: { id: string } }
 
 export default async function StoreDetail({ params }: Props) {
 	const id = params.id
-	let store: any | null = null
+	let store: Store | null = null
 	try {
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL ?? '/api'}/places/${id}`,
