@@ -1,0 +1,19 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+out
+bin
+obj
+
+# Azure Functions artifacts
+__blobstorage__
+__queuestorage__
+__azurite_db*__.json
+
+# Logs
+*.log
+
+# Lock files (don't format)
+package-lock.json

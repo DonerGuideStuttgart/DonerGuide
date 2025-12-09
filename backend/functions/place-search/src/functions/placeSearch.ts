@@ -8,14 +8,14 @@ import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Place } from "doner_types";
 import { PaymentMethods } from "doner_types";
 
-const COSMOSDB_DATABASE_CONNECTION_STRING = process.env["PLACE_SEARCH_COSMOSDB_CONNECTION_STRING"] || "";
-const COSMOSDB_DATABASE_NAME = process.env["PLACE_SEARCH_COSMOSDB_DATABASE_NAME"] || "DoenerGuideDB";
-const COSMOSDB_CONTAINER_NAME = process.env["PLACE_SEARCH_COSMOSDB_CONTAINER_NAME"] || "Places";
+const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.PLACE_SEARCH_COSMOSDB_CONNECTION_STRING ?? "";
+const COSMOSDB_DATABASE_NAME = process.env.PLACE_SEARCH_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
+const COSMOSDB_CONTAINER_NAME = process.env.PLACE_SEARCH_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
 
 app.timer('placeSearch', {
-    schedule: process.env["PLACE_SEARCH_CRON"] || "0 */15 * * * *",
+    schedule: process.env.PLACE_SEARCH_CRON ?? "0 */15 * * * *",
     handler: placeSearch,
     return: output.serviceBusQueue({
         queueName: "places",
@@ -107,21 +107,21 @@ async function createOrPatchItem(container: Container, itemBody: Place) : Promis
         // Merge photos from existing item with new photos
         const mergedPhotos = {
             uncategorized: [
-                ...(existingItem.photos?.uncategorized || []),
-                ...(itemBody.photos?.uncategorized || [])
+                ...(existingItem.photos.uncategorized ?? []),
+                ...(itemBody.photos.uncategorized ?? [])
             ].filter((photo, index, self) => 
                 // Remove duplicates based on photo id
                 index === self.findIndex(p => p.id === photo.id)
             ),
             food: [
-                ...(existingItem.photos?.food || []),
-                ...(itemBody.photos?.food || [])
+                ...(existingItem.photos.food ?? []),
+                ...(itemBody.photos.food ?? [])
             ].filter((photo, index, self) => 
                 index === self.findIndex(p => p.id === photo.id)
             ),
             places: [
-                ...(existingItem.photos?.places || []),
-                ...(itemBody.photos?.places || [])
+                ...(existingItem.photos.places ?? []),
+                ...(itemBody.photos.places ?? [])
             ].filter((photo, index, self) => 
                 index === self.findIndex(p => p.id === photo.id)
             )

@@ -1,6 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-export async function getShopById(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export function getShopById(request: HttpRequest, context: InvocationContext): HttpResponseInit {
     const id = request.params.id;
     context.log(`Get shop by ID: ${id}`);
 
