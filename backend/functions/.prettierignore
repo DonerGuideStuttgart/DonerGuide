@@ -17,3 +17,5 @@ __azurite_db*__.json
 
 # Lock files (don't format)
 package-lock.json
+pnpm-lock.yaml
+yarn.lock

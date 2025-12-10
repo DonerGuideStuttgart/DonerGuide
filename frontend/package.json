@@ -1,39 +1,49 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "serve": "pnpx serve ./out",
-    "lint": "eslint",
-    "test": "jest"
-  },
-  "dependencies": {
-    "@heroui/slider": "^2.4.24",
-    "next": "^16.0.7",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "daisyui": "^5.4.7",
-    "eslint": "^9",
-    "eslint-config-next": "^16.0.7",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
-    "prettier": "3.6.2",
-    "tailwindcss": "^4",
-    "ts-node": "^10.9.2",
-    "typescript": "^5"
-  },
-  "browserslist": "> 1%"
+	"name": "frontend",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"serve": "pnpx serve ./out",
+		"lint": "eslint . --cache",
+		"lint:fix": "eslint . --fix --cache",
+		"format": "prettier --write . --cache",
+		"format:check": "prettier --check . --cache",
+		"types:check": "tsc --noEmit",
+		"check": "npm run lint && npm run format:check && npm run types:check",
+		"test": "jest",
+		"postinstall": "lefthook install"
+	},
+	"dependencies": {
+		"@heroui/slider": "^2.4.24",
+		"next": "^16.0.7",
+		"react": "^19.2.1",
+		"react-dom": "^19.2.1"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.0",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"daisyui": "^5.4.7",
+		"eslint": "^9",
+		"eslint-config-next": "^16.0.7",
+		"jest": "^30.2.0",
+		"jest-environment-jsdom": "^30.2.0",
+		"lefthook": "^2.0.9",
+		"prettier": "3.6.2",
+		"tailwindcss": "^4",
+		"ts-node": "^10.9.2",
+		"typescript": "^5"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"browserslist": "> 1%"
 }
