@@ -9,17 +9,27 @@ For development, you will only need Node.js installed on your environment.
 ## Getting Started
 
 ```bash
-pnpm i
-pnpm dev
+npm i
+npm dev
 ```
 
+## Build for development
+
+```bash
+npm run dev
+```
+in another command line start the mock API Service
+```bash
+node ..\API-Mock\server.js
+```
 Open [http://localhost:3000](http://localhost:3000) to see dev server.
+
 
 ## Build for production
 
 ```bash
-pnpm build
-pnpm serve # to preview production build
+npm build
+npm serve # to preview production build
 ```
 
 ## Tools
