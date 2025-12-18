@@ -9,6 +9,7 @@ import SortControl from '@/components/SortControl'
 import DonerCard, { StoreSummary } from '@/components/DonerCard'
 import { buildStoreQuery, fetchPlaces } from '@/helpers/api'
 import ChipsFilterBar from '@/components/ChipsFilterBar'
+import Drawer from '@/components/Drawer'
 
 export default function StoresPage() {
 	const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 })
@@ -17,6 +18,7 @@ export default function StoresPage() {
 	const [stores, setStores] = useState<StoreSummary[]>([])
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	useEffect(() => {
 		let mounted = true
@@ -62,22 +64,48 @@ export default function StoresPage() {
 			</header>
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-				<div className="md:col-span-1">
+				<div className="hidden md:block md:col-span-1">
 					<FilterPanel
 						onChange={(f) => setFilters(f)}
 						initial={filters}
 						ref={filterPanelRef}
 					/>
 				</div>
+
 				<div className="md:col-span-3 space-y-3">
-					<ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
+					<div className="flex items-center gap-2 text-secondary-content">
+						<button
+							onClick={() => setIsDrawerOpen(true)}
+							className="md:hidden flex items-center gap-2 px-4 py-2 bg-amber-950 hover:bg-amber-900 rounded-lg transition-colors"
+							aria-label="Open filters"
+						>
+							<span>Filter</span>
+						</button>
+						<div className="flex-1">
+							<ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
+						</div>
+					</div>
+
 					{loading && <div>Loading…</div>}
 					{error && <div className="text-red-600">{error}</div>}
+					{/* Stores */}
 					{stores.map((s) => (
 						<DonerCard key={s.id} store={s} />
 					))}
 				</div>
 			</div>
+
+			<Drawer
+				isOpen={isDrawerOpen}
+				onClose={() => setIsDrawerOpen(false)}
+				title="Filter"
+			>
+				<FilterPanel
+					onChange={(f) => setFilters(f)}
+					initial={filters}
+					ref={filterPanelRef}
+				/>
+			</Drawer>
 		</main>
 	)
 }
