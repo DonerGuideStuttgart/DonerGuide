@@ -17,6 +17,7 @@
 		"postinstall": "lefthook install"
 	},
 	"dependencies": {
+		"@heroui/react": "^2.8.6",
 		"@heroui/slider": "^2.4.24",
 		"next": "^16.0.7",
 		"react": "^19.2.3",
