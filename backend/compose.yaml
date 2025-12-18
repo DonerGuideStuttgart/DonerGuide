@@ -1,5 +1,4 @@
 services:
-
   place-search:
     image: node:22
     container_name: "place-search"
@@ -11,7 +10,7 @@ services:
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
-      npm install &&
+      npm install --ignore-scripts &&
       npm run dev"
     depends_on:
       - servicebus-emulator
@@ -35,7 +34,7 @@ services:
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
-      npm install &&
+      npm install --ignore-scripts &&
       npm run dev"
     depends_on:
       - servicebus-emulator
@@ -60,7 +59,7 @@ services:
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
-      npm install &&
+      npm install --ignore-scripts &&
       npm run dev"
     depends_on:
       - servicebus-emulator
@@ -87,7 +86,7 @@ services:
       SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       QUEUE_NAME: "places"
       BATCH_SIZE: "10"
-  
+
   image-classifier-reader:
     image: node:22
     container_name: "image-classifier-reader"
@@ -115,7 +114,7 @@ services:
       - "10002:10002"
     environment:
       AZURITE_ACCOUNTS: test_account_place_search_timer_trigger:secure_key
-  
+
   cosmosdb-emulator:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
     container_name: "cosmosdb-emulator"
@@ -142,7 +141,7 @@ services:
       ACCEPT_EULA: "Y"
     depends_on:
       - sqledge
-    
+
   sqledge:
     image: "mcr.microsoft.com/azure-sql-edge:latest"
     container_name: "sqledge"
