@@ -10,6 +10,7 @@ import DonerCard, { StoreSummary } from '@/components/DonerCard'
 import { buildStoreQuery, fetchPlaces } from '@/helpers/api'
 import ChipsFilterBar from '@/components/ChipsFilterBar'
 import Drawer from '@/components/Drawer'
+import { FilterMenuIcon } from '@/helpers/icons'
 
 export default function StoresPage() {
 	const [filters, setFilters] = useState<Filters>({ limit: 20, offset: 0 })
@@ -76,10 +77,17 @@ export default function StoresPage() {
 					<div className="flex items-center gap-2 text-secondary-content">
 						<button
 							onClick={() => setIsDrawerOpen(true)}
-							className="md:hidden flex items-center gap-2 px-4 py-2 bg-amber-950 hover:bg-amber-900 rounded-lg transition-colors"
+							className="md:hidden flex items-center gap-2 px-1 py-1 bg-amber-950 hover:bg-amber-900 rounded-lg transition-colors"
 							aria-label="Open filters"
 						>
-							<span>Filter</span>
+							<svg
+								className="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<FilterMenuIcon />
+							</svg>
 						</button>
 						<div className="flex-1">
 							<ChipsFilterBar filters={filters} onRemove={handleRemoveFilter} />
