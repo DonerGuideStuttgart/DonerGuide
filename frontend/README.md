@@ -18,12 +18,14 @@ npm dev
 ```bash
 npm run dev
 ```
+
 in another command line start the mock API Service
+
 ```bash
 node ..\API-Mock\server.js
 ```
-Open [http://localhost:3000](http://localhost:3000) to see dev server.
 
+Open [http://localhost:3000](http://localhost:3000) to see dev server.
 
 ## Build for production
 

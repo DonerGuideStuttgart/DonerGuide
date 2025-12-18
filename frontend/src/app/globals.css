@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @plugin "daisyui" {
-	themes: bumblebee;}
+	themes: bumblebee;
+}
 @plugin "daisyui/theme" {
 	name: 'bumblebee';
 	default: true;
@@ -37,25 +38,25 @@
 }
 
 /* Slider Styles */
-[data-slot="base"] {
-    @apply relative w-full flex flex-col gap-3;
+[data-slot='base'] {
+	@apply relative w-full flex flex-col gap-3;
 }
 
-[data-slot="track"] {
-    @apply relative w-full h-1 rounded-full bg-base-300;
+[data-slot='track'] {
+	@apply relative w-full h-1 rounded-full bg-base-300;
 }
 
-[data-slot="filler"] {
-    @apply absolute h-full rounded-full bg-secondary;
+[data-slot='filler'] {
+	@apply absolute h-full rounded-full bg-secondary;
 }
 
-[data-slot="thumb"] {
-    @apply absolute w-4 h-4 rounded-full bg-secondary border-2 border-base-100 shadow-md cursor-pointer;
-    @apply hover:scale-110 transition-transform;
-    top: 50%;
-    transform: translateY(-50%);
+[data-slot='thumb'] {
+	@apply absolute w-4 h-4 rounded-full bg-secondary border-2 border-base-100 shadow-md cursor-pointer;
+	@apply hover:scale-110 transition-transform;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
-[data-slot="value"] {
-    @apply text-sm text-base-content/70;
+[data-slot='value'] {
+	@apply text-sm text-base-content/70;
 }

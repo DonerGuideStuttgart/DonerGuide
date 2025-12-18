@@ -1,4 +1,4 @@
 export interface Photo {
-    id: string;
-    photoUrl: string;
+  id: string;
+  photoUrl: string;
 }
