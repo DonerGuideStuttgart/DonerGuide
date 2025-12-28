@@ -1,7 +1,8 @@
 packages:
-  - '.'
+  - .
 
 ignoredBuiltDependencies:
+  - '@heroui/shared-utils'
   - lefthook
   - sharp
   - unrs-resolver
