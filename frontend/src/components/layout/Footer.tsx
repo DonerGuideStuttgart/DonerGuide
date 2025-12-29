@@ -1,27 +1,27 @@
 import Link from 'next/link'
 
 export default function Footer() {
-	return (
-		// TODO: replace links as soon as pages exist
-		<footer
-			className="border-t border-base p-4 text-base-content flex flex-col items-center gap-4
-                lg:flex-row lg:items-center lg:justify-between"
-		>
-			<aside className="text-center lg:text-left">
-				<p>Dönerguide © 2025 - Prototype</p>
-			</aside>
+	const links = [
+		{ href: '/impressum', label: 'Impressum' },
+		{ href: '/datenschutz', label: 'Datenschutz' },
+		{ href: '/kontakt', label: 'Kontakt' },
+	]
 
-			<nav className="flex flex-col items-center gap-2 lg:flex-row lg:gap-4">
-				<Link href="/impressum" className="link link-hover">
-					Impressum
-				</Link>
-				<Link href="/datenschutz" className="link link-hover">
-					Datenschutz
-				</Link>
-				<Link href="/kontakt" className="link link-hover">
-					Kontakt
-				</Link>
-			</nav>
+	return (
+		<footer className="border-t border-base py-4">
+			<div className="container flex flex-col md:flex-row items-center justify-between">
+				<aside className="mb-4 md:mb-0">
+					<p>Dönerguide © {new Date().getFullYear()}</p>
+				</aside>
+
+				<nav className="flex flex-col items-center lg:flex-row gap-2 lg:gap-4">
+					{links.map((link) => (
+						<Link key={link.href} href={link.href} className="link link-hover">
+							{link.label}
+						</Link>
+					))}
+				</nav>
+			</div>
 		</footer>
 	)
 }
