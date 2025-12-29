@@ -14,11 +14,11 @@
 	--color-primary: #341c0a;
 	--color-primary-content: #fef7ec;
 	--color-secondary: #fb783a;
-	--color-secondary-content: #fef7ec;
+	--color-secondary-content: #b54615;
 	--color-accent: #5f8525;
 	--color-accent-content: #fed34a;
-	--color-neutral: #fb783a;
-	--color-neutral-content: #fef7ec;
+	--color-neutral: #878380;
+	--color-neutral-content: #878380;
 	--color-info: #341c0a;
 	--color-info-content: #fef7ec;
 	--color-success: #5f8525;
@@ -35,6 +35,10 @@
 	--border: 1px;
 	--depth: 1;
 	--noise: 0;
+}
+
+@utility container {
+	@apply mx-auto lg:max-w-6xl px-4;
 }
 
 /* Slider Styles */
