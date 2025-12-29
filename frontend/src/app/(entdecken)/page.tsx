@@ -57,7 +57,7 @@ export default function StoresPage() {
 	}
 
 	return (
-		<main className="max-w-5xl mx-auto p-4">
+		<main className="container mx-auto p-4">
 			<header className="flex items-center justify-between mb-4">
 				<h1 className="text-2xl font-bold">Dönerläden</h1>
 				<SortControl value={sort} onChange={setSort} />
@@ -73,7 +73,7 @@ export default function StoresPage() {
 				</div>
 
 				<div className="md:col-span-3 space-y-3">
-					<div className="flex items-center gap-2 text-secondary-content">
+					<div className="flex items-center gap-2 text-base-300">
 						<button
 							onClick={() => setIsDrawerOpen(true)}
 							className="md:hidden flex items-center gap-2 px-4 py-2 bg-amber-950 hover:bg-amber-900 rounded-lg transition-colors"

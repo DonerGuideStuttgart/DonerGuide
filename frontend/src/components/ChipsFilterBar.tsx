@@ -125,7 +125,7 @@ export default function ChipsFilterBar({
 			{chips.map((chip, index) => (
 				<div
 					key={index}
-					className="flex items-center gap-1 px-3 py-1 bg-secondary text-secondary-content rounded-full text-sm"
+					className="flex items-center gap-1 px-3 py-1 bg-secondary text-base-300 rounded-full text-sm"
 				>
 					<span>{chip.label}</span>
 					<button
