@@ -2,6 +2,7 @@ import { routes } from '@/helpers/routes'
 import Link from 'next/link'
 import Image from 'next/image'
 import NavLinks from './NavLinks'
+import Menu from '@/assets/icons/menu.svg'
 
 export default function Navbar() {
 	const links = [
@@ -14,14 +15,8 @@ export default function Navbar() {
 			<div className="container navbar-start">
 				{/* Mobile Dropdown */}
 				<div className="lg:hidden dropdown mr-auto">
-					<div tabIndex={0} role="button" className="flex">
-						<Image
-							src="/icons/menu.svg"
-							alt="Menu"
-							preload
-							width={18}
-							height={18}
-						/>
+					<div tabIndex={0} role="button" className="flex cursor-pointer">
+						<Menu className="size-5" />
 					</div>
 					<ul
 						tabIndex={-1}
@@ -40,7 +35,7 @@ export default function Navbar() {
 					<Image
 						src="/logo/logo.svg"
 						alt="Dönerguide Logo"
-						preload
+						priority
 						width={20}
 						height={20}
 					/>
