@@ -1,10 +1,11 @@
+import { routes } from '@/helpers/routes'
 import Link from 'next/link'
 
 export default function Footer() {
 	const links = [
-		{ href: '/impressum', label: 'Impressum' },
-		{ href: '/datenschutz', label: 'Datenschutz' },
-		{ href: '/kontakt', label: 'Kontakt' },
+		{ href: routes.imprint, label: 'Impressum' },
+		{ href: routes.privacy, label: 'Datenschutz' },
+		{ href: routes.contact, label: 'Kontakt' },
 	]
 
 	return (
