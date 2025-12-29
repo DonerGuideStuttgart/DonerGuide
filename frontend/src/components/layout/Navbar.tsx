@@ -20,7 +20,7 @@ export default function Navbar() {
 					</div>
 					<ul
 						tabIndex={-1}
-						className="menu menu-md dropdown-content bg-base-100 border-2 border-primary rounded-box z-10 mt-3 w-56 p-4"
+						className="menu menu-md dropdown-content bg-base-100 border border-primary rounded-box z-10 mt-3 w-56 p-4"
 					>
 						<NavLinks links={links} variant="mobile" />
 					</ul>
