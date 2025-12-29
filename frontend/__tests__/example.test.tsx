@@ -1,4 +1,4 @@
-import Page from '@/app/page'
+import Page from '@/app/(entdecken)/page'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 
