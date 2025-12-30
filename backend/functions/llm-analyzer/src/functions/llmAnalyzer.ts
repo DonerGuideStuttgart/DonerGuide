@@ -7,7 +7,7 @@ const COSMOSDB_DATABASE_NAME = process.env.LLM_ANALYZER_COSMOSDB_DATABASE_NAME ?
 const COSMOSDB_CONTAINER_NAME = process.env.LLM_ANALYZER_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
-app.serviceBusQueue("imageClassifier", {
+app.serviceBusQueue("llmAnalyzer", {
   connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING",
   queueName: QUEUE_NAME_INPUT,
   handler: llmAnalyzer,
