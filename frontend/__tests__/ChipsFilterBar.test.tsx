@@ -1,6 +1,47 @@
-import { render, screen } from '@testing-library/react'
-import ChipsFilterBar from '@/components/ChipsFilterBar'
 import type { FilterParams } from '@/types/store'
+import { render, screen } from '@testing-library/react'
+
+// Mock SVG imports
+jest.mock('@/assets/icons/aistars.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="star-icon" />,
+}))
+
+jest.mock('@/assets/icons/close.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="close-icon" />,
+}))
+
+// Mock useExplore before importing FilterChips
+const mockHandleRemoveFilter = jest.fn()
+const mockHandleFiltersChange = jest.fn()
+const mockHandleSortChange = jest.fn()
+const mockHandleLoadMore = jest.fn()
+const mockHandleResetAllFilters = jest.fn()
+
+const mockUiFilters: FilterParams = {
+	limit: 5,
+	offset: 0,
+}
+
+jest.mock('@/app/(entdecken)/useExplore', () => ({
+	useExplore: jest.fn(() => ({
+		stores: [],
+		error: null,
+		loading: false,
+		uiFilters: mockUiFilters,
+		uiSort: '',
+		handleFiltersChange: mockHandleFiltersChange,
+		handleSortChange: mockHandleSortChange,
+		handleLoadMore: mockHandleLoadMore,
+		handleRemoveFilter: mockHandleRemoveFilter,
+		handleResetAllFilters: mockHandleResetAllFilters,
+	})),
+}))
+
+// Import after mocking
+import { useExplore } from '@/app/(entdecken)/useExplore'
+import FilterChips from '@/components/FilterChips'
 
 const INITIAL_LIMIT = 5
 
@@ -13,18 +54,26 @@ function createFilters(overrides: Partial<FilterParams> = {}): FilterParams {
 }
 
 describe('ChipsFilterBar Component', () => {
-	const mockOnRemove = jest.fn()
+	const mockUseExplore = useExplore as jest.MockedFunction<typeof useExplore>
 
 	beforeEach(() => {
-		mockOnRemove.mockClear()
+		mockHandleRemoveFilter.mockClear()
+		mockUseExplore.mockReturnValue({
+			stores: [],
+			error: null,
+			loading: false,
+			uiFilters: createFilters(),
+			uiSort: '',
+			handleFiltersChange: mockHandleFiltersChange,
+			handleSortChange: mockHandleSortChange,
+			handleLoadMore: mockHandleLoadMore,
+			handleRemoveFilter: mockHandleRemoveFilter,
+			handleResetAllFilters: mockHandleResetAllFilters,
+		})
 	})
 
 	it('returns null when no filters are active', () => {
-		const filters = createFilters()
-
-		const { container } = render(
-			<ChipsFilterBar filters={filters} onRemove={mockOnRemove} />,
-		)
+		const { container } = render(<FilterChips />)
 
 		expect(container.firstChild).toBeNull()
 	})
@@ -35,9 +84,23 @@ describe('ChipsFilterBar Component', () => {
 			max_score: 80,
 		})
 
-		render(<ChipsFilterBar filters={filters} onRemove={mockOnRemove} />)
+		mockUseExplore.mockReturnValue({
+			stores: [],
+			error: null,
+			loading: false,
+			uiFilters: filters,
+			uiSort: '',
+			handleFiltersChange: mockHandleFiltersChange,
+			handleSortChange: mockHandleSortChange,
+			handleLoadMore: mockHandleLoadMore,
+			handleRemoveFilter: mockHandleRemoveFilter,
+			handleResetAllFilters: mockHandleResetAllFilters,
+		})
 
-		expect(screen.getByText('20-80⭐')).toBeInTheDocument()
+		render(<FilterChips />)
+
+		expect(screen.getByText('20', { exact: false })).toBeInTheDocument()
+		expect(screen.getByText('80', { exact: false })).toBeInTheDocument()
 	})
 
 	it('renders chip for price filter', () => {
@@ -46,9 +109,22 @@ describe('ChipsFilterBar Component', () => {
 			price_max: 15,
 		})
 
-		render(<ChipsFilterBar filters={filters} onRemove={mockOnRemove} />)
+		mockUseExplore.mockReturnValue({
+			stores: [],
+			error: null,
+			loading: false,
+			uiFilters: filters,
+			uiSort: '',
+			handleFiltersChange: mockHandleFiltersChange,
+			handleSortChange: mockHandleSortChange,
+			handleLoadMore: mockHandleLoadMore,
+			handleRemoveFilter: mockHandleRemoveFilter,
+			handleResetAllFilters: mockHandleResetAllFilters,
+		})
 
-		expect(screen.getByText('5-15€')).toBeInTheDocument()
+		render(<FilterChips />)
+
+		expect(screen.getByText('5€ - 15€')).toBeInTheDocument()
 	})
 
 	it('renders multiple chips for district filter', () => {
@@ -56,7 +132,20 @@ describe('ChipsFilterBar Component', () => {
 			district: ['Mitte', 'West'],
 		})
 
-		render(<ChipsFilterBar filters={filters} onRemove={mockOnRemove} />)
+		mockUseExplore.mockReturnValue({
+			stores: [],
+			error: null,
+			loading: false,
+			uiFilters: filters,
+			uiSort: '',
+			handleFiltersChange: mockHandleFiltersChange,
+			handleSortChange: mockHandleSortChange,
+			handleLoadMore: mockHandleLoadMore,
+			handleRemoveFilter: mockHandleRemoveFilter,
+			handleResetAllFilters: mockHandleResetAllFilters,
+		})
+
+		render(<FilterChips />)
 
 		// The labels come from DISTRICT_LABELS
 		expect(screen.getByText('Mitte')).toBeInTheDocument()
@@ -68,7 +157,20 @@ describe('ChipsFilterBar Component', () => {
 			halal: 'halal',
 		})
 
-		render(<ChipsFilterBar filters={filters} onRemove={mockOnRemove} />)
+		mockUseExplore.mockReturnValue({
+			stores: [],
+			error: null,
+			loading: false,
+			uiFilters: filters,
+			uiSort: '',
+			handleFiltersChange: mockHandleFiltersChange,
+			handleSortChange: mockHandleSortChange,
+			handleLoadMore: mockHandleLoadMore,
+			handleRemoveFilter: mockHandleRemoveFilter,
+			handleResetAllFilters: mockHandleResetAllFilters,
+		})
+
+		render(<FilterChips />)
 
 		const removeButtons = screen.getAllByRole('button', {
 			name: /remove filter/i,

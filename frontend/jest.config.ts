@@ -7,7 +7,9 @@ const config = {
 	setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 	moduleNameMapper: {
 		'^@/(.*)$': '<rootDir>/src/$1',
+		'\\.svg$': '<rootDir>/__mocks__/svg.tsx',
 	},
+	transformIgnorePatterns: ['node_modules/(?!(nuqs)/)'],
 }
 
 export default createJestConfig(config)
