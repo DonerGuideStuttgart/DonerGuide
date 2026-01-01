@@ -17,15 +17,19 @@ export default function Explore() {
 		error,
 		loading,
 		uiFilters,
-		uiSort,
 		handleFiltersChange,
-		handleSortChange,
 		handleLoadMore,
 		handleRemoveFilter,
 		handleResetAllFilters,
 	} = useExplore()
 
-	const title = `Entdecke ${stores.length == 0 ? 'die' : stores.length === 1 ? 'den' : 'die ' + stores.length} besten Döner in Stuttgart`
+	const title = `Entdecke ${
+		stores.length == 0
+			? 'die'
+			: stores.length === 1
+				? 'den'
+				: 'die ' + stores.length
+	} besten Döner in Stuttgart`
 
 	return (
 		<>
@@ -36,10 +40,11 @@ export default function Explore() {
 
 			{/* Sort */}
 			<section className="flex justify-end mb-2">
-				<Sort value={uiSort} onChange={handleSortChange} />
+				<Sort />
 			</section>
 
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+			<section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+				{/* Filter Desktop */}
 				<div className="hidden md:block md:col-span-1">
 					<section className="flex justify-between text-sm mb-1">
 						<p>{stores.length} Döner</p>
@@ -51,8 +56,10 @@ export default function Explore() {
 
 					<FilterPanel value={uiFilters} onChange={handleFiltersChange} />
 				</div>
+				{/* Filter Desktop End */}
 
 				<div className="md:col-span-3 space-y-3">
+					{/* Filter Mobile */}
 					<div className="flex items-center gap-2 text-base-300">
 						<button
 							onClick={() => setIsDrawerOpen(true)}
@@ -61,17 +68,23 @@ export default function Explore() {
 						>
 							<span>Filter</span>
 						</button>
+						{/* Filter Mobile End */}
 
-						<div className="flex-1">
+						{/* Filter Chips */}
+						<section>
 							<ChipsFilterBar
 								filters={uiFilters}
 								onRemove={handleRemoveFilter}
 							/>
-						</div>
+						</section>
+						{/* Filter Chips */}
 					</div>
 
+					{/* Error Handling */}
 					{error && <div className="text-red-600">{error}</div>}
+					{/* Error Handling End */}
 
+					{/* Kebab Store Cards */}
 					{loading && stores.length === 0 ? (
 						<>
 							{Array.from({ length: INITIAL_LIMIT }).map((_, i) => (
@@ -99,9 +112,11 @@ export default function Explore() {
 							Mehr laden
 						</button>
 					</div>
+					{/* Kebab Store Cards End */}
 				</div>
-			</div>
+			</section>
 
+			{/* Filter Drawer Mobile */}
 			<Drawer
 				isOpen={isDrawerOpen}
 				onClose={() => setIsDrawerOpen(false)}
@@ -109,6 +124,7 @@ export default function Explore() {
 			>
 				<FilterPanel value={uiFilters} onChange={handleFiltersChange} />
 			</Drawer>
+			{/* Filter Drawer Mobile End */}
 		</>
 	)
 }

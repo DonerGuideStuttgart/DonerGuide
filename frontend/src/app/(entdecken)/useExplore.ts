@@ -68,44 +68,48 @@ export function useExplore() {
 
 	// Update URL and fetch (debounced)
 	const updateFiltersDebounced = useCallback(
-		(filters: FilterParams, sort: string) => {
+		async (filters: FilterParams, sort: string) => {
 			if (debounceTimerRef.current !== undefined) {
 				window.clearTimeout(debounceTimerRef.current)
 			}
 
-			debounceTimerRef.current = window.setTimeout(() => {
-				setUrlParams(filtersToUrlParams(filters, sort))
-				void fetchData(filters, sort)
+			debounceTimerRef.current = window.setTimeout(async () => {
+				await setUrlParams(filtersToUrlParams(filters, sort))
 			}, DEBOUNCE_MS)
 		},
-		[setUrlParams, fetchData],
+		[setUrlParams],
 	)
 
 	// Update URL and fetch (immediate)
 	const updateFiltersImmediate = useCallback(
-		(filters: FilterParams, sort: string) => {
+		async (filters: FilterParams, sort: string) => {
 			if (debounceTimerRef.current !== undefined) {
 				window.clearTimeout(debounceTimerRef.current)
 				debounceTimerRef.current = undefined
 			}
-
-			setUrlParams(filtersToUrlParams(filters, sort))
-			void fetchData(filters, sort)
+			await setUrlParams(filtersToUrlParams(filters, sort))
 		},
-		[setUrlParams, fetchData],
+		[setUrlParams],
 	)
 
 	// Initial fetch on mount
+	const isInitialMount = useRef(true)
 	useEffect(() => {
-		void fetchData(urlFilters, urlParams.sort)
+		if (isInitialMount.current) {
+			isInitialMount.current = false
+			void fetchData(urlFilters, urlParams.sort)
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	// Sync UI state when URL changes externally
+	// Sync UI state and fetch when URL changes externally
 	useEffect(() => {
+		if (isInitialMount.current) return
+
 		setUiFilters(urlFilters)
 		setUiSort(urlParams.sort)
-	}, [urlFilters, urlParams.sort])
+		void fetchData(urlFilters, urlParams.sort)
+	}, [urlFilters, urlParams.sort, fetchData])
 
 	// Cleanup debounce timer on unmount
 	useEffect(() => {
@@ -131,9 +135,9 @@ export function useExplore() {
 			setUiSort(newSort)
 			const filtersWithReset = resetPagination(uiFilters, INITIAL_LIMIT)
 			setUiFilters(filtersWithReset)
-			updateFiltersDebounced(filtersWithReset, newSort)
+			updateFiltersImmediate(filtersWithReset, newSort)
 		},
-		[uiFilters, updateFiltersDebounced],
+		[uiFilters, updateFiltersImmediate],
 	)
 
 	const handleLoadMore = useCallback(() => {
