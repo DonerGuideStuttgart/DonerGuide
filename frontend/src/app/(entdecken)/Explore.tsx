@@ -35,12 +35,20 @@ export default function Explore() {
 			</header>
 
 			{/* Sort */}
-			<section className="flex justify-end mb-4">
+			<section className="flex justify-end mb-2">
 				<Sort value={uiSort} onChange={handleSortChange} />
 			</section>
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 				<div className="hidden md:block md:col-span-1">
+					<section className="flex justify-between text-sm mb-1">
+						<p>{stores.length} Döner</p>
+
+						<button className="link link-hover" onClick={handleResetAllFilters}>
+							Filter zurücksetzen
+						</button>
+					</section>
+
 					<FilterPanel value={uiFilters} onChange={handleFiltersChange} />
 				</div>
 

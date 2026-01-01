@@ -154,6 +154,15 @@ export function useExplore() {
 		[uiFilters, handleFiltersChange],
 	)
 
+	const handleResetAllFilters = useCallback(() => {
+		const resetFilters = resetPagination({} as FilterParams, INITIAL_LIMIT)
+		const resetSort = ''
+
+		setUiSort(resetSort)
+		setUiFilters(resetFilters)
+		updateFiltersImmediate(resetFilters, resetSort)
+	}, [updateFiltersImmediate])
+
 	return {
 		// State
 		stores,
@@ -167,5 +176,6 @@ export function useExplore() {
 		handleSortChange,
 		handleLoadMore,
 		handleRemoveFilter,
+		handleResetAllFilters,
 	}
 }
