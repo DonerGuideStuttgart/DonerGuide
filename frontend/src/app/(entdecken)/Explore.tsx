@@ -1,8 +1,8 @@
 'use client'
 
-import ChipsFilterBar from '@/components/ChipsFilterBar'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
+import FilterChips from '@/components/FilterChips'
 import FilterPanel from '@/components/FilterPanel'
 import Sort from '@/components/Sort'
 import { useState } from 'react'
@@ -19,7 +19,6 @@ export default function Explore() {
 		uiFilters,
 		handleFiltersChange,
 		handleLoadMore,
-		handleRemoveFilter,
 		handleResetAllFilters,
 	} = useExplore()
 
@@ -72,10 +71,7 @@ export default function Explore() {
 
 						{/* Filter Chips */}
 						<section>
-							<ChipsFilterBar
-								filters={uiFilters}
-								onRemove={handleRemoveFilter}
-							/>
+							<FilterChips />
 						</section>
 						{/* Filter Chips */}
 					</div>
