@@ -14,15 +14,12 @@ const SORT_OPTIONS: SortOption[] = [
 	{ value: 'price_desc', label: 'Preis (Höchster)' },
 ]
 
-type SortControlProps = {
+type Props = {
 	value?: string
 	onChange: (value: string) => void
 }
 
-export default function SortControl({
-	value = '',
-	onChange,
-}: SortControlProps) {
+export default function Sort({ value = '', onChange }: Props) {
 	const selectedOption = SORT_OPTIONS.find((opt) => opt.value === value)
 	const displayLabel = selectedOption?.label ?? SORT_OPTIONS[0].label
 

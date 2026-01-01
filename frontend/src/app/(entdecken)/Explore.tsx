@@ -4,7 +4,7 @@ import ChipsFilterBar from '@/components/ChipsFilterBar'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
 import FilterPanel from '@/components/FilterPanel'
-import SortControl from '@/components/SortControl'
+import Sort from '@/components/Sort'
 import { useState } from 'react'
 import { INITIAL_LIMIT, LOAD_MORE_COUNT } from './searchParams'
 import { useExplore } from './useExplore'
@@ -22,6 +22,7 @@ export default function Explore() {
 		handleSortChange,
 		handleLoadMore,
 		handleRemoveFilter,
+		handleResetAllFilters,
 	} = useExplore()
 
 	const title = `Entdecke ${stores.length == 0 ? 'die' : stores.length === 1 ? 'den' : 'die ' + stores.length} besten Döner in Stuttgart`
@@ -33,8 +34,9 @@ export default function Explore() {
 				<h1 className="text-2xl font-bold">{title}</h1>
 			</header>
 
+			{/* Sort */}
 			<section className="flex justify-end mb-4">
-				<SortControl value={uiSort} onChange={handleSortChange} />
+				<Sort value={uiSort} onChange={handleSortChange} />
 			</section>
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
