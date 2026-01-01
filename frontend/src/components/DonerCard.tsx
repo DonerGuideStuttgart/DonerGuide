@@ -22,3 +22,20 @@ export default function DonerCard({ store }: { store: StoreSummary }) {
 		</article>
 	)
 }
+
+export function DonerCardSkeleton() {
+	return (
+		<article className="border rounded-lg p-4 shadow-sm animate-pulse">
+			<div className="h-6 bg-base-200 rounded w-3/4 mb-2"></div>
+			<div className="h-4 bg-base-200 rounded w-1/4 mb-4"></div>
+			<div className="flex items-center justify-between mb-4">
+				<div className="h-4 bg-base-200 rounded w-20"></div>
+				<div className="h-4 bg-base-200 rounded w-16"></div>
+			</div>
+			<div className="space-y-2">
+				<div className="h-4 bg-base-200 rounded w-full"></div>
+				<div className="h-4 bg-base-200 rounded w-5/6"></div>
+			</div>
+		</article>
+	)
+}
