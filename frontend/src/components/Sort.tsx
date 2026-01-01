@@ -49,7 +49,7 @@ export default function Sort() {
 									className={
 										option.value === uiSort
 											? 'active bg-secondary text-white'
-											: ''
+											: 'hover:bg-neutral-content/30'
 									}
 									onClick={() => handleSortChange(option.value)}
 								>

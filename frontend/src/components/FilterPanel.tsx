@@ -66,7 +66,7 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 		} = getSliderValues(uiFilters, UI_DEFAULTS)
 
 		return (
-			<section className="p-4 border rounded-md">
+			<section className="bg-base-100 border rounded-md px-5 py-6">
 				<div className="grid gap-6">
 					{/* Bewertung */}
 					<RangeSlider
@@ -102,7 +102,8 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 						labels={DISTRICT_LABELS}
 						selectedItems={uiFilters.district ?? []}
 						onToggle={toggleDistrict}
-						maxHeight="200px"
+						maxHeight="220px"
+						showSearch
 					/>
 
 					{/* Öffnungszeiten */}

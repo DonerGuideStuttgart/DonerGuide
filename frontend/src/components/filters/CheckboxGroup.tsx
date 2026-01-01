@@ -1,3 +1,6 @@
+import Search from '@/assets/icons/search.svg'
+import { useState } from 'react'
+
 type CheckboxGroupProps<T extends string> = {
 	label: string
 	items: T[]
@@ -5,6 +8,7 @@ type CheckboxGroupProps<T extends string> = {
 	selectedItems: T[]
 	onToggle: (item: T) => void
 	maxHeight?: string
+	showSearch?: boolean
 }
 
 export function CheckboxGroup<T extends string>({
@@ -14,23 +18,41 @@ export function CheckboxGroup<T extends string>({
 	selectedItems,
 	onToggle,
 	maxHeight = '200px',
+	showSearch = false,
 }: CheckboxGroupProps<T>) {
+	const [searchTerm, setSearchTerm] = useState('')
+
+	const filteredItems = showSearch
+		? items.filter((item) =>
+				labels[item].toLowerCase().includes(searchTerm.toLowerCase()),
+			)
+		: items
+
 	return (
-		<div className="flex flex-col gap-2 col-span-2">
-			<label className="text-sm font-medium">{label}</label>
-			<div
-				className="overflow-y-auto border rounded-md p-2 bg-base-100"
-				style={{ maxHeight }}
-			>
+		<section className="flex flex-col col-span-2">
+			<label className="text-sm font-medium mb-2">{label}</label>
+			{showSearch && (
+				<label className="input input-sm input-bordered flex items-center gap-2 mb-2 focus-within:outline-none focus-within:border-2 focus-within:border-primary">
+					<Search className="h-4 w-4 opacity-50" />
+					<input
+						type="search"
+						placeholder="Suche nach einem Bezirk..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="grow focus:outline-none"
+					/>
+				</label>
+			)}
+			<div className="overflow-y-auto" style={{ maxHeight }}>
 				<div className="flex flex-col gap-1">
-					{items.map((item) => (
+					{filteredItems.map((item) => (
 						<label
 							key={item}
-							className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
+							className="flex items-center gap-2 p-1 hover:bg-neutral-content/30 cursor-pointer rounded-lg"
 						>
 							<input
 								type="checkbox"
-								className="checkbox checkbox-sm"
+								className="checkbox checkbox-xs"
 								checked={selectedItems.includes(item)}
 								onChange={() => onToggle(item)}
 							/>
@@ -39,6 +61,6 @@ export function CheckboxGroup<T extends string>({
 					))}
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

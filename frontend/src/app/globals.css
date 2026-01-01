@@ -18,7 +18,7 @@
 	--color-accent: #5f8525;
 	--color-accent-content: #fed34a;
 	--color-neutral: #878380;
-	--color-neutral-content: #878380;
+	--color-neutral-content: #cfc1b7;
 	--color-info: #341c0a;
 	--color-info-content: #fef7ec;
 	--color-success: #5f8525;
@@ -27,8 +27,8 @@
 	--color-warning-content: #341c0a;
 	--color-error: #b54615;
 	--color-error-content: #fef7ec;
-	--radius-selector: 2rem;
-	--radius-field: 2rem;
+	--radius-selector: 0.3rem;
+	--radius-field: 1rem;
 	--radius-box: 1rem;
 	--size-selector: 0.25rem;
 	--size-field: 0.25rem;
