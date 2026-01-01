@@ -1,12 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-
 import ChipsFilterBar from '@/components/ChipsFilterBar'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
 import FilterPanel from '@/components/FilterPanel'
 import SortControl from '@/components/SortControl'
+import { useState } from 'react'
 import { INITIAL_LIMIT, LOAD_MORE_COUNT } from './searchParams'
 import { useExplore } from './useExplore'
 
@@ -25,21 +24,18 @@ export default function Explore() {
 		handleRemoveFilter,
 	} = useExplore()
 
+	const title = `Entdecke ${stores.length == 0 ? 'die' : stores.length === 1 ? 'den' : 'die ' + stores.length} besten Döner in Stuttgart`
+
 	return (
 		<>
+			{/* Header with Title */}
 			<header className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold">
-					Entdecke{' '}
-					{stores.length == 0
-						? 'die'
-						: stores.length === 1
-							? 'den'
-							: 'die ' + stores.length}{' '}
-					besten Döner in Stuttgart
-				</h1>
+				<h1 className="text-2xl font-bold">{title}</h1>
 			</header>
 
-			<SortControl value={uiSort} onChange={handleSortChange} />
+			<section className="flex justify-end mb-4">
+				<SortControl value={uiSort} onChange={handleSortChange} />
+			</section>
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 				<div className="hidden md:block md:col-span-1">
