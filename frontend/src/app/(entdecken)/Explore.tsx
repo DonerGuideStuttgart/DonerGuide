@@ -12,15 +12,8 @@ import { useExplore } from './useExplore'
 export default function Explore() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const {
-		stores,
-		error,
-		loading,
-		uiFilters,
-		handleFiltersChange,
-		handleLoadMore,
-		handleResetAllFilters,
-	} = useExplore()
+	const { stores, error, loading, handleLoadMore, handleResetAllFilters } =
+		useExplore()
 
 	const title = `Entdecke ${
 		stores.length == 0
@@ -53,7 +46,7 @@ export default function Explore() {
 						</button>
 					</section>
 
-					<FilterPanel value={uiFilters} onChange={handleFiltersChange} />
+					<FilterPanel />
 				</div>
 				{/* Filter Desktop End */}
 
@@ -118,7 +111,7 @@ export default function Explore() {
 				onClose={() => setIsDrawerOpen(false)}
 				title="Filter"
 			>
-				<FilterPanel value={uiFilters} onChange={handleFiltersChange} />
+				<FilterPanel />
 			</Drawer>
 			{/* Filter Drawer Mobile End */}
 		</>
