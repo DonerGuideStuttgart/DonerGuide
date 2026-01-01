@@ -21,6 +21,7 @@
 		"@heroui/slider": "^2.4.24",
 		"@heroui/theme": "^2.4.25",
 		"next": "^16.0.7",
+		"nuqs": "^2.8.6",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3"
 	},
