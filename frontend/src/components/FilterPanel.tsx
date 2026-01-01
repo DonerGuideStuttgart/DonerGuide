@@ -1,175 +1,219 @@
 'use client'
-import { useState } from 'react'
-import { forwardRef, useImperativeHandle } from 'react'
+
 import { Slider } from '@heroui/slider'
+import { forwardRef, useImperativeHandle } from 'react'
+
+import type {
+	District,
+	FilterParams,
+	Halal,
+	OpenHours,
+	PaymentMethod,
+	Vegetarian,
+	WaitingTime,
+} from '@/types/store'
 
 import {
 	DISTRICT_LABELS,
+	HALAL_LABELS,
 	OPEN_HOURS_LABELS,
+	PAYMENT_LABELS,
 	VEGETARIAN_LABELS,
+	WAITING_TIME_LABELS,
 } from '../types/records'
-
-export type Filters = {
-	district?: string
-	min_score?: number
-	max_score?: number
-	price_min?: number
-	price_max?: number
-	open_hours?: string
-	vegetarian?: string
-	sauce_amount_min?: number
-	sauce_amount_max?: number
-	meat_ratio_min?: number
-	meat_ratio_max?: number
-	halal?: string
-	waiting_time?: string
-	payment_methods?: string
-	limit?: number
-	offset?: number
-}
+import ClientOnly from './ClientOnly'
 
 export interface FilterPanelHandle {
-	removeFilter: (key: keyof Filters | (keyof Filters)[], value?: string) => void
+	removeFilter: (
+		key: keyof FilterParams | (keyof FilterParams)[],
+		value?: string,
+	) => void
 }
 
-const FilterPanel = forwardRef<
-	FilterPanelHandle,
-	{
-		onChange: (f: Filters) => void
-		initial?: Filters
-	}
->(function FilterPanel({ onChange, initial = {} }, ref) {
-	const [filters, setFilters] = useState<Filters>(initial)
-	const [selectedDistricts, setSelectedDistricts] = useState<string[]>(
-		filters.district ? filters.district.split(',') : [],
-	)
-	const [selectedOpenHours, setSelectedOpenHours] = useState<string[]>(
-		filters.open_hours ? filters.open_hours.split(',') : [],
-	)
-	const [selectedVegetarian, setSelectedVegetarian] = useState<string[]>(
-		filters.vegetarian ? filters.vegetarian.split(',') : [],
-	)
+type Props = {
+	value: FilterParams
+	onChange: (next: FilterParams) => void
+}
 
-	function update(partial: Partial<Filters>) {
-		const next = { ...filters, ...partial }
-		setFilters(next)
-		onChange(next)
+const toggleInArray = <T,>(arr: T[], item: T) =>
+	arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]
+
+const UI_DEFAULTS = {
+	min_score: 0,
+	max_score: 100,
+
+	price_min: 0,
+	price_max: 30,
+
+	sauce_amount_min: 0,
+	sauce_amount_max: 100,
+
+	meat_ratio_min: 0,
+	meat_ratio_max: 100,
+}
+
+const FilterPanel = forwardRef<FilterPanelHandle, Props>(function FilterPanel(
+	{ value: filters, onChange },
+	ref,
+) {
+	const districts = filters.district ?? []
+	const openHours = filters.open_hours ?? []
+
+	const update = (partial: Partial<FilterParams>) =>
+		onChange({ ...filters, ...partial })
+
+	function resetKey(
+		k: keyof FilterParams,
+		current: FilterParams,
+	): FilterParams {
+		// Arrays
+		if (k === 'district') return { ...current, district: undefined }
+		if (k === 'open_hours') return { ...current, open_hours: undefined }
+
+		// Radios / single selects -> "nicht gesetzt"
+		if (k === 'vegetarian') return { ...current, vegetarian: undefined }
+		if (k === 'halal') return { ...current, halal: undefined }
+		if (k === 'waiting_time') return { ...current, waiting_time: undefined }
+		if (k === 'payment_methods')
+			return { ...current, payment_methods: undefined }
+
+		// Slider & numbers -> "nicht gesetzt"
+		if (
+			k === 'min_score' ||
+			k === 'max_score' ||
+			k === 'price_min' ||
+			k === 'price_max' ||
+			k === 'sauce_amount_min' ||
+			k === 'sauce_amount_max' ||
+			k === 'meat_ratio_min' ||
+			k === 'meat_ratio_max'
+		) {
+			return { ...current, [k]: undefined } as FilterParams
+		}
+
+		// limit/offset etc. (falls du es je brauchst)
+		return { ...current, [k]: undefined } as FilterParams
 	}
 
 	function removeFilter(
-		key: keyof Filters | (keyof Filters)[],
-		value?: string,
+		key: keyof FilterParams | (keyof FilterParams)[],
+		valueToRemove?: string,
 	) {
-		// Handle array of keys for batch removal
 		if (Array.isArray(key)) {
-			const updates: Partial<Filters> = {}
-			key.forEach((k) => {
-				updates[k] = undefined
-			})
-			update(updates)
+			let next = { ...filters }
+			for (const k of key) next = resetKey(k, next)
+			onChange(next)
 			return
 		}
 
-		// Handle single key removal
-		if (
-			value &&
-			(key === 'district' || key === 'open_hours' || key === 'vegetarian')
-		) {
-			const current = filters[key]?.split(',') || []
-			const updated = current.filter((v) => v !== value)
+		// remove one element from array fields
+		if (valueToRemove && (key === 'district' || key === 'open_hours')) {
+			const currentArr = (filters[key] ?? []) as string[]
+			const nextArr = currentArr.filter((v) => String(v) !== valueToRemove)
 
-			if (key === 'district') setSelectedDistricts(updated)
-			if (key === 'open_hours') setSelectedOpenHours(updated)
-			if (key === 'vegetarian') setSelectedVegetarian(updated)
-
-			update({ [key]: updated.length > 0 ? updated.join(',') : undefined })
-		} else {
-			update({ [key]: undefined })
+			// wenn leer -> undefined (damit buildStoreQuery es nicht sendet)
+			update({
+				[key]: nextArr.length ? nextArr : undefined,
+			} as Partial<FilterParams>)
+			return
 		}
+
+		onChange(resetKey(key, filters))
 	}
 
-	useImperativeHandle(ref, () => ({
-		removeFilter,
-	}))
+	useImperativeHandle(ref, () => ({ removeFilter }))
 
-	function toggleDistrict(district: string) {
-		const newSelection = selectedDistricts.includes(district)
-			? selectedDistricts.filter((d) => d !== district)
-			: [...selectedDistricts, district]
-
-		setSelectedDistricts(newSelection)
-		update({ district: newSelection.join(',') || undefined })
+	// ---- Toggle helpers (arrays) ----
+	const toggleDistrict = (d: District) => {
+		const next = toggleInArray(districts, d)
+		update({ district: next.length ? next : undefined })
 	}
 
-	function toggleOpenHour(hour: string) {
-		const newSelection = selectedDistricts.includes(hour)
-			? selectedDistricts.filter((d) => d !== hour)
-			: [...selectedDistricts, hour]
-
-		setSelectedOpenHours(newSelection)
-		update({ open_hours: newSelection.join(',') || undefined })
+	const toggleOpenHour = (h: OpenHours) => {
+		const next = toggleInArray(openHours, h)
+		update({ open_hours: next.length ? next : undefined })
 	}
 
-	function toggleVegetarian(vegetarian: string) {
-		const newSelection = selectedVegetarian.includes(vegetarian)
-			? selectedVegetarian.filter((d) => d !== vegetarian)
-			: [...selectedVegetarian, vegetarian]
-
-		setSelectedVegetarian(newSelection)
-		update({ vegetarian: newSelection.join(',') || undefined })
+	// ---- Toggle helpers (radios -> abwählbar) ----
+	const toggleRadio = <
+		K extends 'vegetarian' | 'halal' | 'waiting_time' | 'payment_methods',
+	>(
+		key: K,
+		value: NonNullable<FilterParams[K]>,
+	) => {
+		const current = filters[key]
+		update({
+			[key]: current === value ? undefined : value,
+		} as Partial<FilterParams>)
 	}
+
+	// ---- Slider display values (fallback nur für UI) ----
+	const scoreMin = filters.min_score ?? UI_DEFAULTS.min_score
+	const scoreMax = filters.max_score ?? UI_DEFAULTS.max_score
+
+	const priceMin = filters.price_min ?? UI_DEFAULTS.price_min
+	const priceMax = filters.price_max ?? UI_DEFAULTS.price_max
+
+	const sauceMin = filters.sauce_amount_min ?? UI_DEFAULTS.sauce_amount_min
+	const sauceMax = filters.sauce_amount_max ?? UI_DEFAULTS.sauce_amount_max
+
+	const meatMin = filters.meat_ratio_min ?? UI_DEFAULTS.meat_ratio_min
+	const meatMax = filters.meat_ratio_max ?? UI_DEFAULTS.meat_ratio_max
 
 	return (
 		<section className="p-4 border rounded-md">
 			<div className="grid gap-6">
+				{/* Bewertung */}
 				<label className="flex flex-col col-span-2">
-					<Slider
-						className="max-w-md"
-						defaultValue={[filters.min_score ?? 0, filters.max_score ?? 100]}
-						label="Bewertung"
-						maxValue={100}
-						minValue={0}
-						step={1}
-						onChange={(e) => {
-							console.log(e)
-							const [min, max] = e as [number, number]
-							update({
-								min_score: min,
-								max_score: max,
-							})
-						}}
-					/>
+					<ClientOnly
+						fallback={
+							<div className="h-12 animate-pulse bg-base-200 rounded"></div>
+						}
+					>
+						<Slider
+							className="max-w-md"
+							value={[scoreMin, scoreMax]}
+							label="Bewertung"
+							maxValue={100}
+							minValue={0}
+							step={1}
+							onChange={(e) => {
+								const [min, max] = e as [number, number]
+								update({ min_score: min, max_score: max })
+							}}
+						/>
+					</ClientOnly>
 				</label>
+
+				{/* Preis */}
 				<label className="flex flex-col col-span-2">
-					<Slider
-						className="max-w-md"
-						defaultValue={[filters.price_min ?? 0, filters.price_max ?? 30]}
-						formatOptions={{ style: 'currency', currency: 'EUR' }}
-						label="Preis"
-						maxValue={30}
-						minValue={0}
-						step={1}
-						onChange={(e) => {
-							console.log(e)
-							const [min, max] = e as [number, number]
-							update({
-								price_min: min,
-								price_max: max,
-							})
-						}}
-					/>
+					<ClientOnly
+						fallback={
+							<div className="h-12 animate-pulse bg-base-200 rounded"></div>
+						}
+					>
+						<Slider
+							className="max-w-md"
+							value={[priceMin, priceMax]}
+							formatOptions={{ style: 'currency', currency: 'EUR' }}
+							label="Preis"
+							maxValue={30}
+							minValue={0}
+							step={1}
+							onChange={(e) => {
+								const [min, max] = e as [number, number]
+								update({ price_min: min, price_max: max })
+							}}
+						/>
+					</ClientOnly>
 				</label>
+
+				{/* Bezirk */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Bezirk</label>
-					<input
-						className="input input-sm"
-						value={filters.district || ''}
-						onChange={(e) => update({ district: e.target.value })}
-						placeholder="Stuttgart-West"
-					/>
 					<div className="h-[200px] overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							{Object.keys(DISTRICT_LABELS).map((district) => (
+							{(Object.keys(DISTRICT_LABELS) as District[]).map((district) => (
 								<label
 									key={district}
 									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
@@ -177,7 +221,7 @@ const FilterPanel = forwardRef<
 									<input
 										type="checkbox"
 										className="checkbox checkbox-sm"
-										checked={selectedDistricts.includes(district)}
+										checked={districts.includes(district)}
 										onChange={() => toggleDistrict(district)}
 									/>
 									<span className="text-sm">{DISTRICT_LABELS[district]}</span>
@@ -186,11 +230,13 @@ const FilterPanel = forwardRef<
 						</div>
 					</div>
 				</div>
+
+				{/* Öffnungszeiten */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Öffnungszeiten</label>
 					<div className="overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							{Object.keys(OPEN_HOURS_LABELS).map((hour) => (
+							{(Object.keys(OPEN_HOURS_LABELS) as OpenHours[]).map((hour) => (
 								<label
 									key={hour}
 									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
@@ -198,7 +244,7 @@ const FilterPanel = forwardRef<
 									<input
 										type="checkbox"
 										className="checkbox checkbox-sm"
-										checked={selectedOpenHours.includes(hour)}
+										checked={openHours.includes(hour)}
 										onChange={() => toggleOpenHour(hour)}
 									/>
 									<span className="text-sm">{OPEN_HOURS_LABELS[hour]}</span>
@@ -207,174 +253,147 @@ const FilterPanel = forwardRef<
 						</div>
 					</div>
 				</div>
+
+				{/* Vegetarisch/Vegan (abwählbar) */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Vegetarisch/Vegan</label>
 					<div className="overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							{Object.keys(VEGETARIAN_LABELS).map((vegetarian) => (
+							{(Object.keys(VEGETARIAN_LABELS) as Vegetarian[]).map((v) => (
 								<label
-									key={vegetarian}
+									key={v}
 									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
 								>
 									<input
 										type="checkbox"
+										name="vegetarian"
 										className="checkbox checkbox-sm"
-										checked={selectedVegetarian.includes(vegetarian)}
-										onChange={() => toggleVegetarian(vegetarian)}
+										checked={filters.vegetarian === v}
+										onClick={() => toggleRadio('vegetarian', v)}
+										onChange={() => {}}
 									/>
-									<span className="text-sm">
-										{VEGETARIAN_LABELS[vegetarian]}
-									</span>
+									<span className="text-sm">{VEGETARIAN_LABELS[v]}</span>
 								</label>
 							))}
 						</div>
 					</div>
 				</div>
+
+				{/* Halal (abwählbar) */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Halal</label>
 					<div className="overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.halal == 'halal'}
-									onChange={() =>
-										update({
-											halal: filters.halal == 'halal' ? undefined : 'halal',
-										})
-									}
-								/>
-								<span className="text-sm">ja</span>
-							</label>
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.halal == 'not_halal'}
-									onChange={() =>
-										update({
-											halal:
-												filters.halal == 'not_halal' ? undefined : 'not_halal',
-										})
-									}
-								/>
-								<span className="text-sm">nein</span>
-							</label>
+							{(Object.keys(HALAL_LABELS) as Halal[]).map((h) => (
+								<label
+									key={h}
+									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
+								>
+									<input
+										type="radio"
+										name="halal"
+										className="radio radio-sm"
+										checked={filters.halal === h}
+										onClick={() => toggleRadio('halal', h)}
+										onChange={() => {}}
+									/>
+									<span className="text-sm">{HALAL_LABELS[h]}</span>
+								</label>
+							))}
 						</div>
 					</div>
 				</div>
+
+				{/* Soßenmenge */}
 				<label className="flex flex-col col-span-2">
-					<Slider
-						className="max-w-md"
-						defaultValue={[
-							filters.sauce_amount_min ?? 0,
-							filters.sauce_amount_max ?? 100,
-						]}
-						label="Soßenmenge"
-						maxValue={100}
-						minValue={0}
-						step={1}
-						onChange={(e) => {
-							console.log(e)
-							const [min, max] = e as [number, number]
-							update({
-								sauce_amount_min: min,
-								sauce_amount_max: max,
-							})
-						}}
-					/>
+					<ClientOnly
+						fallback={
+							<div className="h-12 animate-pulse bg-base-200 rounded"></div>
+						}
+					>
+						<Slider
+							className="max-w-md"
+							value={[sauceMin, sauceMax]}
+							label="Soßenmenge"
+							maxValue={100}
+							minValue={0}
+							step={1}
+							onChange={(e) => {
+								const [min, max] = e as [number, number]
+								update({ sauce_amount_min: min, sauce_amount_max: max })
+							}}
+						/>
+					</ClientOnly>
 				</label>
+
+				{/* Fleischanteil */}
 				<label className="flex flex-col col-span-2">
-					<Slider
-						className="max-w-md"
-						defaultValue={[
-							filters.meat_ratio_min ?? 0,
-							filters.meat_ratio_max ?? 100,
-						]}
-						label="Fleischanteil"
-						maxValue={100}
-						minValue={0}
-						step={1}
-						onChange={(e) => {
-							console.log(e)
-							const [min, max] = e as [number, number]
-							update({
-								meat_ratio_min: min,
-								meat_ratio_max: max,
-							})
-						}}
-					/>
+					<ClientOnly
+						fallback={
+							<div className="h-12 animate-pulse bg-base-200 rounded"></div>
+						}
+					>
+						<Slider
+							className="max-w-md"
+							value={[meatMin, meatMax]}
+							label="Fleischanteil"
+							maxValue={100}
+							minValue={0}
+							step={1}
+							onChange={(e) => {
+								const [min, max] = e as [number, number]
+								update({ meat_ratio_min: min, meat_ratio_max: max })
+							}}
+						/>
+					</ClientOnly>
 				</label>
+
+				{/* Wartezeit (abwählbar) */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Wartezeit</label>
 					<div className="overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.waiting_time == 'FAST'}
-									onChange={() =>
-										update({
-											waiting_time:
-												filters.waiting_time == 'FAST' ? undefined : 'FAST',
-										})
-									}
-								/>
-								<span className="text-sm">Schnell</span>
-							</label>
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.waiting_time == 'AVERAGE'}
-									onChange={() =>
-										update({
-											waiting_time:
-												filters.waiting_time == 'AVERAGE'
-													? undefined
-													: 'AVERAGE',
-										})
-									}
-								/>
-								<span className="text-sm">normal</span>
-							</label>
+							{(Object.keys(WAITING_TIME_LABELS) as WaitingTime[]).map((w) => (
+								<label
+									key={w}
+									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
+								>
+									<input
+										type="radio"
+										name="waiting_time"
+										className="radio radio-sm"
+										checked={filters.waiting_time === w}
+										onClick={() => toggleRadio('waiting_time', w)}
+										onChange={() => {}}
+									/>
+									<span className="text-sm">{WAITING_TIME_LABELS[w]}</span>
+								</label>
+							))}
 						</div>
 					</div>
 				</div>
+
+				{/* Bezahlung (abwählbar) */}
 				<div className="flex flex-col gap-2 col-span-2">
 					<label className="text-sm font-medium">Bezahlung</label>
 					<div className="overflow-y-auto border rounded-md p-2 bg-base-100">
 						<div className="flex flex-col gap-1">
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.payment_methods == 'NFC'}
-									onChange={() =>
-										update({
-											payment_methods:
-												filters.payment_methods == 'NFC' ? undefined : 'NFC',
-										})
-									}
-								/>
-								<span className="text-sm">Kartenzahlung möglich</span>
-							</label>
-							<label className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer">
-								<input
-									type="checkbox"
-									className="checkbox checkbox-sm"
-									checked={filters.payment_methods == 'CASH'}
-									onChange={() =>
-										update({
-											payment_methods:
-												filters.payment_methods == 'CASH' ? undefined : 'CASH',
-										})
-									}
-								/>
-								<span className="text-sm">nur Cash</span>
-							</label>
+							{(Object.keys(PAYMENT_LABELS) as PaymentMethod[]).map((p) => (
+								<label
+									key={p}
+									className="flex items-center gap-2 p-1 hover:bg-base-200 rounded cursor-pointer"
+								>
+									<input
+										type="radio"
+										name="payment_methods"
+										className="radio radio-sm"
+										checked={filters.payment_methods === p}
+										onClick={() => toggleRadio('payment_methods', p)}
+										onChange={() => {}}
+									/>
+									<span className="text-sm">{PAYMENT_LABELS[p]}</span>
+								</label>
+							))}
 						</div>
 					</div>
 				</div>
