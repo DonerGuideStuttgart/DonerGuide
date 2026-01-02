@@ -19,7 +19,7 @@ export function useExplore() {
 	// Data state
 	const [stores, setStores] = useState<StoreSummary[]>([])
 	const [error, setError] = useState<string | null>(null)
-	const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(true)
 	const [hasMore, setHasMore] = useState(true)
 
 	// URL state
