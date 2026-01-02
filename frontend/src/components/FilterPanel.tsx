@@ -2,18 +2,18 @@
 import { useExplore } from '@/app/(entdecken)/useExplore'
 import type { District, Halal, PaymentMethod, WaitingTime } from '@/types/store'
 import {
+	createCheckboxHandler,
+	createRangeSliderHandler,
+	getSliderValues,
+} from '../helpers/filter/filterHandlers'
+import { UI_DEFAULTS } from '../helpers/filter/filterUtils'
+import {
 	DISTRICT_LABELS,
 	HALAL_LABELS,
 	PAYMENT_LABELS,
 	WAITING_TIME_LABELS,
 } from '../types/records'
 import { CheckboxGroup } from './filters/CheckboxGroup'
-import {
-	createCheckboxHandler,
-	createRangeSliderHandler,
-	getSliderValues,
-} from './filters/filterHandlers'
-import { UI_DEFAULTS } from './filters/filterUtils'
 import { RangeSlider } from './filters/RangeSlider'
 
 type Props = {
