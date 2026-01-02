@@ -81,8 +81,8 @@ Mapping des `paymentOptions` Objekts der Google API auf `doner_types`:
 - `acceptsNfc: true` -> `PaymentMethods.NFC`
 
 ## 6. Konfiguration (Umgebungsvariablen)
-- `PLACE_SEARCH_DRY_RUN`: `true/false` (Simuliert API & DB Writes).
-- `PLACE_SEARCH_GRID_VERSION`: Aktuelle Version (z.B. "v1").
+- `PLACE_SEARCH_DRY_RUN`: `true/false` (Simuliert API).
+- `PLACE_SEARCH_GRID_VERSION`: Aktuelle Version (z.B. "1").
 - `GOOGLE_PLACES_API_KEY`: API Key (aus Key Vault).
 - `PLACE_SEARCH_STUTTGART_MIN_LAT/LON`, `MAX_LAT/LON`: Stadtgrenzen.
 
