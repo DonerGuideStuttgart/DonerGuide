@@ -1,13 +1,15 @@
-import { Review } from "@/types/Review";
+import { Review } from '@/types/store'
 
 export default function ReviewItem({ user, date, rating, text }: Review) {
-    return (
-        <div className="pb-6">
-            <p className="text-ml">{user}</p>
-            {/* Rating + Date */}
-            <div className="flex justify-between items-center mb-1">
-                <div className="flex items-center gap-1 mb-2 text-sm"> Sterne
-                    {/*{Array.from({ length: 5 }).map((_, i) => (
+	return (
+		<div className="pb-6">
+			<p className="text-ml">{user}</p>
+			{/* Rating + Date */}
+			<div className="flex justify-between items-center mb-1">
+				<div className="flex items-center gap-1 mb-2 text-sm">
+					{' '}
+					Sterne
+					{/*{Array.from({ length: 5 }).map((_, i) => (
                     <StarIcon
                         key={i}
                         className={`w-4 h-4 ${
@@ -15,12 +17,12 @@ export default function ReviewItem({ user, date, rating, text }: Review) {
                         }`}
                     />
                 ))}*/}
-                </div>
-                <span className="text-sm text-base-content">{date}</span>
-            </div>
+				</div>
+				<span className="text-sm text-base-content">{date}</span>
+			</div>
 
-            {/* Review Text */}
-            <p className="text-sm text-base-content">{text}</p>
-        </div>
-    );
+			{/* Review Text */}
+			<p className="text-sm text-base-content">{text}</p>
+		</div>
+	)
 }
