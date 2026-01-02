@@ -3,7 +3,7 @@
  * later: find additional photos with serpapi.com
  */
 
-import { Container, CosmosClient, PartitionKeyKind } from "@azure/cosmos";
+import { Container, CosmosClient, PartitionKeyKind, SpatialType } from "@azure/cosmos";
 import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Place } from "doner_types";
 import { PaymentMethods } from "doner_types";
@@ -25,12 +25,38 @@ app.timer("placeSearch", {
 export async function placeSearch(myTimer: Timer, context: InvocationContext): Promise<string | undefined> {
   context.log("Place Search function ran at", new Date().toISOString());
   const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
-  const container = (
+  
+  // Initialize Places container
+  const placesContainer = (
     await database.containers.createIfNotExists({
-      id: COSMOSDB_CONTAINER_NAME,
+      id: "Places",
       partitionKey: {
         paths: ["/id"],
         kind: PartitionKeyKind.Hash,
+      },
+    })
+  ).container;
+
+  // Initialize GridCells container with Spatial Index
+  const gridCellsContainer = (
+    await database.containers.createIfNotExists({
+      id: "GridCells",
+      partitionKey: {
+        paths: ["/id"],
+        kind: PartitionKeyKind.Hash,
+      },
+      indexingPolicy: {
+        includedPaths: [
+          {
+            path: "/*",
+          },
+        ],
+        spatialIndexes: [
+          {
+            path: "/geometry/*",
+            types: ["Polygon"] as SpatialType[],
+          } as any,
+        ],
       },
     })
   ).container;
@@ -70,7 +96,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     servesVegetarianFood: true,
   };
 
-  await createOrPatchItem(container, place);
+  await createOrPatchItem(placesContainer, place);
 
   return JSON.stringify({
     id: place.id,
