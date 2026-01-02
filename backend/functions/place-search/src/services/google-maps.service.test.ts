@@ -27,7 +27,7 @@ describe("GoogleMapsService", () => {
           method: "POST",
           headers: expect.objectContaining({
             "X-Goog-Api-Key": apiKey,
-            "X-Goog-FieldMask": expect.stringContaining("places.id"),
+            "X-Goog-FieldMask": expect.stringContaining("places.photos.name"),
           }),
           body: expect.stringContaining('"low":{"latitude":48,"longitude":9}'),
         })

@@ -17,6 +17,8 @@ services:
       - servicebus-emulator
       - cosmosdb-emulator
       - azurite
+    ports:
+      - 7071:7071
     env_file:
       - ./functions/place-search/.env
 

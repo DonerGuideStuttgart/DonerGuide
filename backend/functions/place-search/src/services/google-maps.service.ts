@@ -46,6 +46,7 @@ export class GoogleMapsService {
       "places.location",
       "places.regularOpeningHours",
       "places.addressComponents",
+      "places.photos.name",
       "places.photos.widthPx",
       "places.photos.heightPx",
       "places.photos.authorAttributions",
