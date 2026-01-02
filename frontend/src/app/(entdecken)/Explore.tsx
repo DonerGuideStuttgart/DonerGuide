@@ -72,7 +72,14 @@ export default function Explore() {
 					</div>
 
 					{/* Error Handling */}
-					{error && <div className="text-red-600">{error}</div>}
+					{error && (
+						<div className="alert alert-error alert-outline">
+							<div>
+								<h3 className="font-bold">Fehler beim Laden der Daten</h3>
+								<div className="text-sm">{error}</div>
+							</div>
+						</div>
+					)}
 					{/* Error Handling End */}
 
 					{/* Kebab Store Cards */}
@@ -82,7 +89,7 @@ export default function Explore() {
 								<DonerCardSkeleton key={index} />
 							))}
 						</>
-					) : stores.length === 0 ? (
+					) : stores.length === 0 && !error && !loading ? (
 						<div className="flex flex-col items-center justify-center py-16 text-center">
 							<h3 className="text-xl font-medium mb-2">Keine Döner gefunden</h3>
 							<p className="text-neutral">
