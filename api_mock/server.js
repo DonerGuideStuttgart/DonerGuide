@@ -1,18 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const dataDir = path.join(__dirname, 'data');
+const dataDir = path.join(__dirname, "data");
 
 function readJson(file) {
   try {
     const p = path.join(dataDir, file);
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
+    return JSON.parse(fs.readFileSync(p, "utf8"));
   } catch (e) {
     return null;
   }
@@ -30,12 +30,12 @@ function parseMulti(q, name) {
   const raw = Array.isArray(v) ? v : [v];
   const out = [];
   for (const part of raw) {
-    if (typeof part === 'string') {
-      for (const seg of part.split(',')) {
+    if (typeof part === "string") {
+      for (const seg of part.split(",")) {
         const t = seg.trim();
         if (t) out.push(t);
       }
-    } else if (typeof part === 'number' || typeof part === 'boolean') {
+    } else if (typeof part === "number" || typeof part === "boolean") {
       out.push(String(part));
     }
   }
@@ -49,13 +49,13 @@ function parseMulti(q, name) {
  */
 function parseBoolean(value) {
   if (value === null || value === undefined) return null;
-  if (typeof value === 'boolean') return value;
-  if (typeof value === 'number') return value !== 0;
-  if (typeof value === 'string') {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
     const s = value.trim().toLowerCase();
     if (!s) return null;
-    if (s === 'true' || s === '1' || s === 'yes' || s === 'y') return true;
-    if (s === 'false' || s === '0' || s === 'no' || s === 'n') return false;
+    if (s === "true" || s === "1" || s === "yes" || s === "y") return true;
+    if (s === "false" || s === "0" || s === "no" || s === "n") return false;
   }
   return null;
 }
@@ -65,7 +65,7 @@ function parseBoolean(value) {
  */
 function parseNumber(value) {
   if (value === null || value === undefined) return null;
-  const n = typeof value === 'number' ? value : parseFloat(String(value));
+  const n = typeof value === "number" ? value : parseFloat(String(value));
   return Number.isFinite(n) ? n : null;
 }
 
@@ -104,36 +104,55 @@ function normalizeUpperFrom(arr, allowedSet) {
  * - Prefer 'rating' if present, otherwise use 'ai_score'.
  */
 function ratingValueForSort(item) {
-  if (typeof item.rating === 'number') return item.rating;
-  if (typeof item.ai_score === 'number') return item.ai_score;
+  if (typeof item.rating === "number") return item.rating;
+  if (typeof item.ai_score === "number") return item.ai_score;
   return -Infinity;
 }
 
-app.get('/places', (req, res) => {
+app.get("/places", (req, res) => {
   try {
-    const list = readJson('places_list.json'); // dataDir already points to /data
+    const list = readJson("places_list.json"); // dataDir already points to /data
     if (!list) {
-      return res.status(500).json({ message: 'Failed to load places list' });
+      return res.status(500).json({ message: "Failed to load places list" });
     }
 
     // Preserve existing response shape: items + meta
-    const originalItems = Array.isArray(list.items) ? list.items : Array.isArray(list) ? list : [];
-    const datasetHasHalal = originalItems.some((it) => Object.prototype.hasOwnProperty.call(it, 'halal'));
+    const originalItems = Array.isArray(list.items)
+      ? list.items
+      : Array.isArray(list)
+      ? list
+      : [];
+    const datasetHasHalal = originalItems.some((it) =>
+      Object.prototype.hasOwnProperty.call(it, "halal")
+    );
 
     // 1) Parse filters
     // - district: string or array; case-insensitive substring match
-    const districtFiltersRaw = parseMulti(req.query, 'district');
+    const districtFiltersRaw = parseMulti(req.query, "district");
     const districtFilters = districtFiltersRaw
       ? districtFiltersRaw.map((d) => d.toLowerCase())
       : null;
 
     // - rating: number (1-5); minimum. If dataset has 'rating', use it; else map to ai_score >= rating*20
     const ratingMin = parseNumber(req.query.rating);
-    const ratingMinValid = ratingMin !== null && ratingMin >= 1 && ratingMin <= 5 ? ratingMin : null;
+    const ratingMinValid =
+      ratingMin !== null && ratingMin >= 1 && ratingMin <= 5 ? ratingMin : null;
+
+    // - min_score/max_score: ai_score range (0-100)
+    const minScore = parseNumber(req.query.min_score);
+    const maxScore = parseNumber(req.query.max_score);
 
     // - price range: inclusive bounds
     const priceMin = parseNumber(req.query.price_min);
     const priceMax = parseNumber(req.query.price_max);
+
+    // - sauce_amount range (0-100)
+    const sauceMin = parseNumber(req.query.sauce_amount_min);
+    const sauceMax = parseNumber(req.query.sauce_amount_max);
+
+    // - meat_ratio range (0-100)
+    const meatMin = parseNumber(req.query.meat_ratio_min);
+    const meatMax = parseNumber(req.query.meat_ratio_max);
 
     // - vegetarian: boolean-like mapping to servesVegetarianFood
     const vegetarian = parseBoolean(req.query.vegetarian);
@@ -143,64 +162,126 @@ app.get('/places', (req, res) => {
     const applyHalal = datasetHasHalal && halal !== null;
 
     // - waiting_time: enum FAST | AVERAGE | SLOW
-    const ALLOWED_WAITING = new Set(['FAST', 'AVERAGE', 'SLOW']);
-    const waitingFilters = normalizeUpperFrom(parseMulti(req.query, 'waiting_time'), ALLOWED_WAITING);
+    const ALLOWED_WAITING = new Set(["FAST", "AVERAGE", "SLOW"]);
+    const waitingFilters = normalizeUpperFrom(
+      parseMulti(req.query, "waiting_time"),
+      ALLOWED_WAITING
+    );
 
     // - payment_methods: enum CASH | CREDIT_CARD | DEBIT_CARD | NFC (ANY match)
-    const ALLOWED_PM = new Set(['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'NFC']);
-    const paymentFilters = normalizeUpperFrom(parseMulti(req.query, 'payment_methods'), ALLOWED_PM);
+    const ALLOWED_PM = new Set(["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]);
+    const paymentFilters = normalizeUpperFrom(
+      parseMulti(req.query, "payment_methods"),
+      ALLOWED_PM
+    );
 
     // 2) Apply filtering
     let filtered = originalItems.filter((item) => {
       // district filter: case-insensitive substring match on item.district
       if (districtFilters && districtFilters.length) {
-        const d = typeof item.district === 'string' ? item.district.toLowerCase() : '';
+        const d =
+          typeof item.district === "string" ? item.district.toLowerCase() : "";
         if (!districtFilters.some((q) => d.includes(q))) return false;
       }
 
       // rating/ai_score minimum
       if (ratingMinValid !== null) {
-        if (typeof item.rating === 'number') {
+        if (typeof item.rating === "number") {
           if (!(item.rating >= ratingMinValid)) return false;
-        } else if (typeof item.ai_score === 'number') {
+        } else if (typeof item.ai_score === "number") {
           const threshold = ratingMinValid * 20;
           if (!(item.ai_score >= threshold)) return false;
         }
         // If neither rating nor ai_score exists, treat as not filtered out (graceful)
       }
 
+      // min_score (ai_score minimum)
+      if (minScore !== null) {
+        if (typeof item.ai_score !== "number" || !(item.ai_score >= minScore))
+          return false;
+      }
+      // max_score (ai_score maximum)
+      if (maxScore !== null) {
+        if (typeof item.ai_score !== "number" || !(item.ai_score <= maxScore))
+          return false;
+      }
+
       // price_min inclusive
       if (priceMin !== null) {
-        if (typeof item.price !== 'number' || !(item.price >= priceMin)) return false;
+        if (typeof item.price !== "number" || !(item.price >= priceMin))
+          return false;
       }
       // price_max inclusive
       if (priceMax !== null) {
-        if (typeof item.price !== 'number' || !(item.price <= priceMax)) return false;
+        if (typeof item.price !== "number" || !(item.price <= priceMax))
+          return false;
+      }
+
+      // sauce_amount_min
+      if (sauceMin !== null) {
+        if (
+          typeof item.sauce_amount !== "number" ||
+          !(item.sauce_amount >= sauceMin)
+        )
+          return false;
+      }
+      // sauce_amount_max
+      if (sauceMax !== null) {
+        if (
+          typeof item.sauce_amount !== "number" ||
+          !(item.sauce_amount <= sauceMax)
+        )
+          return false;
+      }
+
+      // meat_ratio_min
+      if (meatMin !== null) {
+        if (
+          typeof item.meat_ratio !== "number" ||
+          !(item.meat_ratio >= meatMin)
+        )
+          return false;
+      }
+      // meat_ratio_max
+      if (meatMax !== null) {
+        if (
+          typeof item.meat_ratio !== "number" ||
+          !(item.meat_ratio <= meatMax)
+        )
+          return false;
       }
 
       // vegetarian exact match
       if (vegetarian !== null) {
-        if (typeof item.servesVegetarianFood !== 'boolean' || item.servesVegetarianFood !== vegetarian) {
+        if (
+          typeof item.servesVegetarianFood !== "boolean" ||
+          item.servesVegetarianFood !== vegetarian
+        ) {
           return false;
         }
       }
 
       // halal exact match (only if dataset contains halal)
       if (applyHalal) {
-        if (typeof item.halal !== 'boolean' || item.halal !== halal) {
+        if (typeof item.halal !== "boolean" || item.halal !== halal) {
           return false;
         }
       }
 
       // waiting_time exact enum match (ANY of provided)
       if (waitingFilters && waitingFilters.length) {
-        const wt = typeof item.waiting_time === 'string' ? item.waiting_time.toUpperCase() : '';
+        const wt =
+          typeof item.waiting_time === "string"
+            ? item.waiting_time.toUpperCase()
+            : "";
         if (!waitingFilters.includes(wt)) return false;
       }
 
       // payment_methods: ANY match
       if (paymentFilters && paymentFilters.length) {
-        const methods = Array.isArray(item.paymentMethods) ? item.paymentMethods : [];
+        const methods = Array.isArray(item.paymentMethods)
+          ? item.paymentMethods
+          : [];
         const normalized = methods.map((m) => String(m).toUpperCase());
         const anyMatch = paymentFilters.some((pm) => normalized.includes(pm));
         if (!anyMatch) return false;
@@ -211,19 +292,30 @@ app.get('/places', (req, res) => {
 
     // 3) Sorting
     // Default: preserve original order (no sorting) to match current behavior when 'sort' not provided.
-    const sortParam = typeof req.query.sort === 'string' ? req.query.sort : null;
-    if (sortParam === 'rating_desc' || sortParam === 'rating_asc') {
+    const sortParam =
+      typeof req.query.sort === "string" ? req.query.sort : null;
+    if (sortParam === "rating_desc" || sortParam === "rating_asc") {
       filtered = [...filtered].sort((a, b) => {
         const av = ratingValueForSort(a);
         const bv = ratingValueForSort(b);
         // When dataset lacks 'rating', av/bv will be ai_score; otherwise rating
-        return sortParam === 'rating_desc' ? bv - av : av - bv;
+        return sortParam === "rating_desc" ? bv - av : av - bv;
       });
-    } else if (sortParam === 'price_asc' || sortParam === 'price_desc') {
+    } else if (sortParam === "price_asc" || sortParam === "price_desc") {
       filtered = [...filtered].sort((a, b) => {
-        const av = typeof a.price === 'number' ? a.price : (sortParam === 'price_asc' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY);
-        const bv = typeof b.price === 'number' ? b.price : (sortParam === 'price_asc' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY);
-        return sortParam === 'price_desc' ? bv - av : av - bv;
+        const av =
+          typeof a.price === "number"
+            ? a.price
+            : sortParam === "price_asc"
+            ? Number.POSITIVE_INFINITY
+            : Number.NEGATIVE_INFINITY;
+        const bv =
+          typeof b.price === "number"
+            ? b.price
+            : sortParam === "price_asc"
+            ? Number.POSITIVE_INFINITY
+            : Number.NEGATIVE_INFINITY;
+        return sortParam === "price_desc" ? bv - av : av - bv;
       });
     }
     // else: keep as-is
@@ -242,22 +334,22 @@ app.get('/places', (req, res) => {
         page,
         pageSize: limit,
         totalItems,
-        totalPages
-      }
+        totalPages,
+      },
     };
 
     return res.json(response);
   } catch (err) {
-    return res.status(500).json({ message: 'Unexpected error' });
+    return res.status(500).json({ message: "Unexpected error" });
   }
 });
 
-app.get('/places/:id', (req, res) => {
+app.get("/places/:id", (req, res) => {
   const id = req.params.id;
   const file = `place_${id}.json`;
   const place = readJson(file);
   if (!place) {
-    return res.status(404).json({ message: 'Place not found' });
+    return res.status(404).json({ message: "Place not found" });
   }
   res.json(place);
 });
@@ -265,9 +357,11 @@ app.get('/places/:id', (req, res) => {
 /**
  * Serve the OpenAPI specification for easy inspection.
  */
-app.get('/openapi.yaml', (req, res) => {
-  res.sendFile(path.join(__dirname, 'openapi.yaml'));
+app.get("/openapi.yaml", (req, res) => {
+  res.sendFile(path.join(__dirname, "openapi.yaml"));
 });
 
 const port = process.env.PORT || 3001;
-app.listen(port, () => console.log(`API Mock listening on http://localhost:${port}`));
+app.listen(port, () =>
+  console.log(`API Mock listening on http://localhost:${port}`)
+);

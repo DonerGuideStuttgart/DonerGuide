@@ -1,19 +1,15 @@
 'use client'
+import Close from '@/assets/icons/close.svg'
 import { useEffect } from 'react'
 
-interface DrawerProps {
+interface Props {
 	isOpen: boolean
 	onClose: () => void
 	children: React.ReactNode
 	title?: string
 }
 
-export default function Drawer({
-	isOpen,
-	onClose,
-	children,
-	title,
-}: DrawerProps) {
+export default function Drawer({ isOpen, onClose, children, title }: Props) {
 	useEffect(() => {
 		if (isOpen) {
 			document.body.style.overflow = 'hidden'
@@ -30,40 +26,28 @@ export default function Drawer({
 	return (
 		<>
 			<div
-				className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+				className="fixed inset-0 bg-neutral-content/70 z-40 transition-opacity"
 				onClick={onClose}
 			/>
 			<div
-				className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+				className={`fixed top-0 right-0 h-full w-90 max-w-[90vw] bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
 					isOpen ? 'translate-x-0' : 'translate-x-full'
 				}`}
 			>
 				<div className="flex flex-col h-full">
-					<div className="flex items-center justify-between p-4 border-b">
+					<div className="flex items-center justify-between pt-4 px-4 pb-2">
 						<h2 className="text-lg font-semibold">{title || 'Filters'}</h2>
 						<button
 							onClick={onClose}
-							className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+							className="hover:bg-neutral-content/30 rounded-full transition-colors p-3"
 							aria-label="Close drawer"
 						>
-							<svg
-								className="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
+							<Close className="size-3.5" />
 						</button>
 					</div>
 
 					{/* Content */}
-					<div className="flex-1 overflow-y-auto p-4">{children}</div>
+					<div className="flex-1 overflow-y-auto">{children}</div>
 				</div>
 			</div>
 		</>

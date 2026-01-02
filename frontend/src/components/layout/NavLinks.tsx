@@ -29,7 +29,7 @@ export default function NavLinks({
 								className={
 									active
 										? 'bg-secondary text-white pointer-events-none'
-										: 'hover:bg-secondary hover:text-white'
+										: 'hover:bg-neutral-content/30'
 								}
 							>
 								{link.label}

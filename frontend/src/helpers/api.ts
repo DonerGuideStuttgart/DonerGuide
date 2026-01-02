@@ -1,15 +1,44 @@
-export function buildStoreQuery(
-	filters: Record<string, unknown>,
-	sort?: string,
-) {
-	const params = new URLSearchParams()
-	for (const k of Object.keys(filters)) {
-		const v = filters[k]
-		if (v === undefined || v === null || v === '') continue
-		params.set(k, String(v))
+import { FilterParams } from '@/types/store'
+
+type FilterKey = keyof FilterParams
+
+function convertFilterValueToQueryString(
+	filterValue: FilterParams[FilterKey],
+): string | null {
+	if (filterValue === undefined || filterValue === null) {
+		return null
 	}
-	if (sort) params.set('sort', sort)
-	return params.toString()
+
+	if (Array.isArray(filterValue)) {
+		if (filterValue.length === 0) {
+			return null
+		}
+		return filterValue.join(',')
+	}
+
+	return String(filterValue)
+}
+
+export function buildStoreQuery(filters: FilterParams, sort?: string) {
+	const searchParams = new URLSearchParams()
+
+	const filterEntries = Object.entries(filters) as Array<
+		[FilterKey, FilterParams[FilterKey]]
+	>
+
+	for (const [filterKey, filterValue] of filterEntries) {
+		const queryStringValue = convertFilterValueToQueryString(filterValue)
+		if (queryStringValue === null) {
+			continue
+		}
+		searchParams.set(filterKey, queryStringValue)
+	}
+
+	if (sort !== undefined && sort !== null && sort !== '') {
+		searchParams.set('sort', sort)
+	}
+
+	return searchParams.toString()
 }
 
 export async function fetchPlaces(query: string) {
