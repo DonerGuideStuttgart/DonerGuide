@@ -108,7 +108,24 @@ export default function Explore() {
 				onClose={() => setIsDrawerOpen(false)}
 				title="Filter"
 			>
-				<FilterPanel />
+				<FilterPanel isMobile />
+
+				<section className="flex items-center justify-between px-5 pb-4">
+					<button
+						className="link link-hover text-sm"
+						onClick={handleResetAllFilters}
+					>
+						Filter zurücksetzen
+					</button>
+
+					<button
+						onClick={() => setIsDrawerOpen(false)}
+						className="flex items-center cursor-pointer bg-secondary text-white text-sm rounded-full shadow-[0_3px_0px_#b54615] active:shadow-none active:translate-y-0.5 py-1.5 px-4"
+						aria-label="Open filters"
+					>
+						{stores.length} Döner anzeigen
+					</button>
+				</section>
 			</Drawer>
 			{/* Filter Drawer Mobile End */}
 		</>

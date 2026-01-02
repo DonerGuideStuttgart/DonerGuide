@@ -114,7 +114,7 @@ export function RangeSlider({
 							defaultValue={formatValue(currentMin, false)}
 							key={currentMin}
 							onBlur={handleMinBlur}
-							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${suffix ? 'pr-8' : ''}`}
+							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none pr-7`}
 						/>
 						{suffix && (
 							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-content pointer-events-none z-10">
@@ -130,7 +130,7 @@ export function RangeSlider({
 							defaultValue={formatValue(currentMax, false)}
 							key={currentMax}
 							onBlur={handleMaxBlur}
-							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${suffix ? 'pr-8' : ''}`}
+							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none pr-7`}
 						/>
 						{suffix && (
 							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-content pointer-events-none z-10">
