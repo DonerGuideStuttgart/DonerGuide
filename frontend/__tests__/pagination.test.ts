@@ -84,11 +84,10 @@ describe('Pagination Logic', () => {
 
 	describe('Store Accumulation', () => {
 		it('replaces stores when offset is 0', () => {
-			const prevStores = [{ id: '1' }, { id: '2' }]
 			const newItems = [{ id: '3' }, { id: '4' }]
 			const offset = 0
 
-			const result = offset > 0 ? [...prevStores, ...newItems] : newItems
+			const result = offset > 0 ? [] : newItems
 
 			expect(result).toEqual(newItems)
 			expect(result.length).toBe(2)
@@ -97,9 +96,8 @@ describe('Pagination Logic', () => {
 		it('appends stores when offset > 0', () => {
 			const prevStores = [{ id: '1' }, { id: '2' }]
 			const newItems = [{ id: '3' }, { id: '4' }]
-			const offset = 2
 
-			const result = offset > 0 ? [...prevStores, ...newItems] : newItems
+			const result = [...prevStores, ...newItems]
 
 			expect(result).toEqual([...prevStores, ...newItems])
 			expect(result.length).toBe(4)

@@ -21,13 +21,12 @@ export default function Explore() {
 		handleResetAllFilters,
 	} = useExplore()
 
-	const title = `Entdecke ${
-		stores.length == 0
-			? 'die'
+	const title =
+		stores.length === 0
+			? 'Entdecke die besten Döner in Stuttgart'
 			: stores.length === 1
-				? 'den'
-				: 'die ' + stores.length
-	} besten Döner in Stuttgart`
+				? 'Entdecke den besten Döner in Stuttgart'
+				: `Entdecke die ${stores.length} besten Döner in Stuttgart`
 
 	return (
 		<>

@@ -46,7 +46,7 @@ export function RangeSlider({
 		}
 	}
 
-	// Validation mmax
+	// Validation max
 	const handleMaxBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
 		const newMax = parseFloat(value)

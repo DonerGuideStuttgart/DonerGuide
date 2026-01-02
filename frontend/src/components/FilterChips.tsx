@@ -47,8 +47,8 @@ const FILTER_CONFIGS: FilterConfig[] = [
 		type: 'range',
 		minKey: 'min_score',
 		maxKey: 'max_score',
-		defaultMin: 1,
-		defaultMax: 5,
+		defaultMin: 0,
+		defaultMax: 100,
 		formatLabel: (min, max) => (
 			<span className="flex items-center gap-1">
 				{min} - {max}

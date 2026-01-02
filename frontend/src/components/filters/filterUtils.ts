@@ -45,35 +45,3 @@ export function resetKey(
 
 	return { ...current, [k]: undefined } as FilterParams
 }
-
-export function removeFilterValue(
-	filters: FilterParams,
-	key: keyof FilterParams | (keyof FilterParams)[],
-	valueToRemove?: string,
-): FilterParams {
-	if (Array.isArray(key)) {
-		let next = { ...filters }
-		for (const k of key) next = resetKey(k, next)
-		return next
-	}
-
-	if (
-		valueToRemove &&
-		(key === 'district' ||
-			key === 'open_hours' ||
-			key === 'vegetarian' ||
-			key === 'halal' ||
-			key === 'waiting_time' ||
-			key === 'payment_methods')
-	) {
-		const currentArr = (filters[key] ?? []) as string[]
-		const nextArr = currentArr.filter((v) => String(v) !== valueToRemove)
-
-		return {
-			...filters,
-			[key]: nextArr.length ? nextArr : undefined,
-		} as FilterParams
-	}
-
-	return resetKey(key, filters)
-}

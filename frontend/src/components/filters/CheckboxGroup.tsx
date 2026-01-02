@@ -9,6 +9,7 @@ type CheckboxGroupProps<T extends string> = {
 	onToggle: (item: T) => void
 	maxHeight?: string
 	showSearch?: boolean
+	searchPlaceholder?: string
 }
 
 export function CheckboxGroup<T extends string>({
@@ -19,6 +20,7 @@ export function CheckboxGroup<T extends string>({
 	onToggle,
 	maxHeight = '200px',
 	showSearch = false,
+	searchPlaceholder = 'Suchen...',
 }: CheckboxGroupProps<T>) {
 	const [searchTerm, setSearchTerm] = useState('')
 
@@ -36,7 +38,7 @@ export function CheckboxGroup<T extends string>({
 					<Search className="h-4 w-4 opacity-50" />
 					<input
 						type="search"
-						placeholder="Suche nach einem Bezirk..."
+						placeholder={searchPlaceholder}
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 						className="grow focus:outline-none"
