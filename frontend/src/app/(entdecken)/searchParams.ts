@@ -52,10 +52,17 @@ export const exploreParsers = {
 	district: parseAsArrayOf(parseAsStringEnum(districts), ',').withDefault([]),
 	open_hours: parseAsArrayOf(parseAsStringEnum(openHours), ',').withDefault([]),
 
-	vegetarian: parseAsStringEnum(vegetarians),
-	halal: parseAsStringEnum(halals),
-	waiting_time: parseAsStringEnum(waitingTimes),
-	payment_methods: parseAsStringEnum(payments),
+	vegetarian: parseAsArrayOf(parseAsStringEnum(vegetarians), ',').withDefault(
+		[],
+	),
+	halal: parseAsArrayOf(parseAsStringEnum(halals), ',').withDefault([]),
+	waiting_time: parseAsArrayOf(
+		parseAsStringEnum(waitingTimes),
+		',',
+	).withDefault([]),
+	payment_methods: parseAsArrayOf(parseAsStringEnum(payments), ',').withDefault(
+		[],
+	),
 
 	sort: parseAsString.withDefault(''),
 }

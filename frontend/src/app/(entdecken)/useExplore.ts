@@ -1,11 +1,9 @@
 'use client'
-
-import { useQueryStates } from 'nuqs'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
 import type { StoreSummary } from '@/components/DonerCard'
 import { buildStoreQuery, fetchPlaces } from '@/helpers/api'
 import type { FilterParams } from '@/types/store'
+import { useQueryStates } from 'nuqs'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
 	filtersToUrlParams,
 	removeFilterValue,
@@ -22,6 +20,7 @@ export function useExplore() {
 	const [stores, setStores] = useState<StoreSummary[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState(false)
+	const [hasMore, setHasMore] = useState(true)
 
 	// URL state
 	const [urlParams, setUrlParams] = useQueryStates(exploreParsers)
@@ -56,6 +55,11 @@ export function useExplore() {
 
 			// Append for pagination, replace otherwise
 			setStores((prev) => (filters.offset > 0 ? [...prev, ...items] : items))
+
+			// Check if there are more items to load
+			// If we got fewer items than requested, there are no more
+			const expectedCount = filters.offset > 0 ? LOAD_MORE_COUNT : INITIAL_LIMIT
+			setHasMore(items.length >= expectedCount)
 		} catch (err) {
 			if (currentRequestId !== requestIdRef.current) return
 			setError(err instanceof Error ? err.message : 'Unknown error')
@@ -97,7 +101,14 @@ export function useExplore() {
 	useEffect(() => {
 		if (isInitialMount.current) {
 			isInitialMount.current = false
-			void fetchData(urlFilters, urlParams.sort)
+			// Reset offset to 0 on initial mount to avoid showing only partial results
+			const initialFilters = { ...urlFilters, offset: 0, limit: INITIAL_LIMIT }
+			setUiFilters(initialFilters)
+			void fetchData(initialFilters, urlParams.sort)
+			// Update URL if offset was non-zero
+			if (urlFilters.offset > 0) {
+				void setUrlParams(filtersToUrlParams(initialFilters, urlParams.sort))
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -174,6 +185,7 @@ export function useExplore() {
 		loading,
 		uiFilters,
 		uiSort,
+		hasMore,
 
 		// Handlers
 		handleFiltersChange,

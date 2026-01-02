@@ -1,5 +1,4 @@
 'use client'
-
 import Filter from '@/assets/icons/filter.svg'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
@@ -13,8 +12,14 @@ import { useExplore } from './useExplore'
 export default function Explore() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const { stores, error, loading, handleLoadMore, handleResetAllFilters } =
-		useExplore()
+	const {
+		stores,
+		error,
+		loading,
+		hasMore,
+		handleLoadMore,
+		handleResetAllFilters,
+	} = useExplore()
 
 	const title = `Entdecke ${
 		stores.length == 0
@@ -38,7 +43,7 @@ export default function Explore() {
 
 			<section className="grid grid-cols-1 md:grid-cols-4 gap-4">
 				{/* Filter Desktop */}
-				<div className="hidden md:block md:col-span-1">
+				<section className="hidden md:block md:col-span-1">
 					<section className="flex justify-between text-sm mb-1">
 						<p>{stores.length} Döner</p>
 
@@ -48,10 +53,10 @@ export default function Explore() {
 					</section>
 
 					<FilterPanel />
-				</div>
+				</section>
 				{/* Filter Desktop End */}
 
-				<div className="md:col-span-3 space-y-3">
+				<section className="md:col-span-3 space-y-3">
 					<div className="flex items-center flex-wrap gap-2 text-base-300">
 						{/* Filter Mobile Button */}
 						<button
@@ -73,33 +78,35 @@ export default function Explore() {
 					{/* Kebab Store Cards */}
 					{loading && stores.length === 0 ? (
 						<>
-							{Array.from({ length: INITIAL_LIMIT }).map((_, i) => (
-								<DonerCardSkeleton key={i} />
+							{Array.from({ length: INITIAL_LIMIT }).map((_, index) => (
+								<DonerCardSkeleton key={index} />
 							))}
 						</>
 					) : (
 						<>
-							{stores.map((s) => (
-								<DonerCard key={s.id} store={s} />
+							{stores.map((store) => (
+								<DonerCard key={store.id} store={store} />
 							))}
 							{loading &&
-								Array.from({ length: LOAD_MORE_COUNT }).map((_, i) => (
-									<DonerCardSkeleton key={`loading-${i}`} />
+								Array.from({ length: LOAD_MORE_COUNT }).map((_, index) => (
+									<DonerCardSkeleton key={`loading-${index}`} />
 								))}
 						</>
 					)}
 
-					<div className="pt-2">
-						<button
-							className="btn btn-outline w-full"
-							disabled={loading}
-							onClick={handleLoadMore}
-						>
-							Mehr laden
-						</button>
-					</div>
+					{hasMore && stores.length > 0 && (
+						<div className="flex justify-center mt-4">
+							<button
+								onClick={handleLoadMore}
+								disabled={loading}
+								className="link link-outline btn-primary"
+							>
+								Mehr laden
+							</button>
+						</div>
+					)}
 					{/* Kebab Store Cards End */}
-				</div>
+				</section>
 			</section>
 
 			{/* Filter Drawer Mobile */}

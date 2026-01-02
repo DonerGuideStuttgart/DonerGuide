@@ -55,14 +55,18 @@ export function urlParamsToFilters(urlParams: {
 		price_max: urlParams.price_max ?? undefined,
 		district: urlParams.district?.length ? urlParams.district : undefined,
 		open_hours: urlParams.open_hours?.length ? urlParams.open_hours : undefined,
-		vegetarian: urlParams.vegetarian ?? undefined,
-		halal: urlParams.halal ?? undefined,
+		vegetarian: urlParams.vegetarian?.length ? urlParams.vegetarian : undefined,
+		halal: urlParams.halal?.length ? urlParams.halal : undefined,
 		sauce_amount_min: urlParams.sauce_amount_min ?? undefined,
 		sauce_amount_max: urlParams.sauce_amount_max ?? undefined,
 		meat_ratio_min: urlParams.meat_ratio_min ?? undefined,
 		meat_ratio_max: urlParams.meat_ratio_max ?? undefined,
-		waiting_time: urlParams.waiting_time ?? undefined,
-		payment_methods: urlParams.payment_methods ?? undefined,
+		waiting_time: urlParams.waiting_time?.length
+			? urlParams.waiting_time
+			: undefined,
+		payment_methods: urlParams.payment_methods?.length
+			? urlParams.payment_methods
+			: undefined,
 	}
 }
 

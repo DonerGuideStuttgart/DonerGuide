@@ -1,5 +1,4 @@
 'use client'
-
 import { useSyncExternalStore, type ReactNode } from 'react'
 
 type ClientOnlyProps = {

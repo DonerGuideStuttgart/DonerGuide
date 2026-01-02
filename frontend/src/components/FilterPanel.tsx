@@ -1,5 +1,4 @@
 'use client'
-
 import { useExplore } from '@/app/(entdecken)/useExplore'
 import type {
 	District,
