@@ -1,3 +1,19 @@
-# Ignore artifacts:
+# Dependencies
+node_modules
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build outputs
+.next
+out
 build
 coverage
+
+# Environment files
+.env*.local
+
+# Other
+.cache

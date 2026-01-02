@@ -9,16 +9,31 @@
     "place-search",
     "image-classifier",
     "llm-analyzer",
-    "data-persistence"
+    "shops"
   ],
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --fix --cache",
+    "format": "prettier --write . --cache",
+    "format:check": "prettier --check . --cache",
+    "types:check": "npm run -ws types:check",
+    "check": "npm run lint && npm run format:check && npm run types:check",
+    "prepare-hooks": "lefthook install",
+    "test": "npm run -ws test"
+  },
   "devDependencies": {
-    "typescript": "^5.3.0",
+    "@eslint/js": "^9.39.1",
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
     "jest": "^30.2.0",
-    "@types/jest": "^30.0.0"
+    "lefthook": "^2.0.9",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "license": "MIT"
 }

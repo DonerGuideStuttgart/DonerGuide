@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @plugin "daisyui" {
-	themes: bumblebee;}
+	themes: bumblebee;
+}
 @plugin "daisyui/theme" {
 	name: 'bumblebee';
 	default: true;
@@ -13,11 +14,11 @@
 	--color-primary: #341c0a;
 	--color-primary-content: #fef7ec;
 	--color-secondary: #fb783a;
-	--color-secondary-content: #fef7ec;
+	--color-secondary-content: #b54615;
 	--color-accent: #5f8525;
 	--color-accent-content: #fed34a;
-	--color-neutral: #fb783a;
-	--color-neutral-content: #fef7ec;
+	--color-neutral: #878380;
+	--color-neutral-content: #cfc1b7;
 	--color-info: #341c0a;
 	--color-info-content: #fef7ec;
 	--color-success: #5f8525;
@@ -26,8 +27,8 @@
 	--color-warning-content: #341c0a;
 	--color-error: #b54615;
 	--color-error-content: #fef7ec;
-	--radius-selector: 2rem;
-	--radius-field: 2rem;
+	--radius-selector: 0.3rem;
+	--radius-field: 1rem;
 	--radius-box: 1rem;
 	--size-selector: 0.25rem;
 	--size-field: 0.25rem;
@@ -36,26 +37,30 @@
 	--noise: 0;
 }
 
+@utility container {
+	@apply mx-auto lg:max-w-6xl px-4;
+}
+
 /* Slider Styles */
-[data-slot="base"] {
-    @apply relative w-full flex flex-col gap-3;
+[data-slot='base'] {
+	@apply relative w-full flex flex-col gap-3;
 }
 
-[data-slot="track"] {
-    @apply relative w-full h-1 rounded-full bg-base-300;
+[data-slot='track'] {
+	@apply relative w-full h-1 rounded-full bg-base-300;
 }
 
-[data-slot="filler"] {
-    @apply absolute h-full rounded-full bg-secondary;
+[data-slot='filler'] {
+	@apply absolute h-full rounded-full bg-secondary;
 }
 
-[data-slot="thumb"] {
-    @apply absolute w-4 h-4 rounded-full bg-secondary border-2 border-base-100 shadow-md cursor-pointer;
-    @apply hover:scale-110 transition-transform;
-    top: 50%;
-    transform: translateY(-50%);
+[data-slot='thumb'] {
+	@apply absolute w-4 h-4 rounded-full bg-secondary border-2 border-base-100 shadow-md cursor-pointer;
+	@apply hover:scale-110 transition-transform;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
-[data-slot="value"] {
-    @apply text-sm text-base-content/70;
+[data-slot='value'] {
+	@apply text-sm text-base-content/70;
 }
