@@ -82,6 +82,13 @@ export default function Explore() {
 								<DonerCardSkeleton key={index} />
 							))}
 						</>
+					) : stores.length === 0 ? (
+						<div className="flex flex-col items-center justify-center py-16 text-center">
+							<h3 className="text-xl font-medium mb-2">Keine Döner gefunden</h3>
+							<p className="text-neutral">
+								Versuche es mit anderen Filtern oder setze die Filter zurück.
+							</p>
+						</div>
 					) : (
 						<>
 							{stores.map((store) => (
