@@ -111,4 +111,79 @@ export class GridService {
     cell.lastProcessedAt = new Date().toISOString();
     await this.container.items.upsert(cell);
   }
+
+  /**
+   * Splits a cell into two child cells along its longest axis.
+   * If MAX_LEVEL is reached, marks as COMPLETED with overflow.
+   */
+  async splitCell(cell: GridCell): Promise<void> {
+    const MAX_LEVEL = 10;
+
+    if (cell.level >= MAX_LEVEL) {
+      console.warn(`[GridService] MAX_LEVEL reached for cell ${cell.id}. Marking as COMPLETED (Overflow).`);
+      cell.status = "COMPLETED";
+      cell.lastProcessedAt = new Date().toISOString();
+      await this.container.items.upsert(cell);
+      return;
+    }
+
+    const { minLat, minLon, maxLat, maxLon } = cell.boundaryBox;
+    const latDiff = maxLat - minLat;
+    const lonDiff = maxLon - minLon;
+
+    const childCells: GridCell[] = [];
+    const newLevel = cell.level + 1;
+
+    if (latDiff >= lonDiff) {
+      // Split Latitude
+      const midLat = minLat + latDiff / 2;
+      
+      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, maxLat: midLat }, newLevel));
+      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, minLat: midLat }, newLevel));
+    } else {
+      // Split Longitude
+      const midLon = minLon + lonDiff / 2;
+
+      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, maxLon: midLon }, newLevel));
+      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, minLon: midLon }, newLevel));
+    }
+
+    // Mark parent as SPLIT
+    cell.status = "SPLIT";
+    cell.lastProcessedAt = new Date().toISOString();
+
+    // Atomic-like update: Create children first, then update parent
+    // (CosmosDB throughput permitting, we could use batch but simple loop is fine for 2 items)
+    for (const child of childCells) {
+      await this.container.items.create(child);
+    }
+    await this.container.items.upsert(cell);
+
+    console.log(`[GridService] Cell ${cell.id} split into ${childCells[0].id} and ${childCells[1].id} (Level ${newLevel})`);
+  }
+
+  private createChildCell(parent: GridCell, bbox: GridCell["boundaryBox"], level: number): GridCell {
+    return {
+      id: uuidv4(),
+      gridVersion: parent.gridVersion,
+      level: level,
+      status: "PENDING",
+      boundaryBox: bbox,
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [bbox.minLon, bbox.minLat],
+            [bbox.maxLon, bbox.minLat],
+            [bbox.maxLon, bbox.maxLat],
+            [bbox.minLon, bbox.maxLat],
+            [bbox.minLon, bbox.minLat],
+          ],
+        ],
+      },
+      resultsCount: 0,
+      foundPlaceIds: [],
+      lastProcessedAt: new Date(0).toISOString(),
+    };
+  }
 }
