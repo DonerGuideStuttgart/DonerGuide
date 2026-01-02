@@ -31,6 +31,7 @@ jest.mock('@/app/(entdecken)/useExplore', () => ({
 		loading: false,
 		uiFilters: mockUiFilters,
 		uiSort: '',
+		hasMore: true,
 		handleFiltersChange: mockHandleFiltersChange,
 		handleSortChange: mockHandleSortChange,
 		handleLoadMore: mockHandleLoadMore,
@@ -64,6 +65,7 @@ describe('ChipsFilterBar Component', () => {
 			loading: false,
 			uiFilters: createFilters(),
 			uiSort: '',
+			hasMore: true,
 			handleFiltersChange: mockHandleFiltersChange,
 			handleSortChange: mockHandleSortChange,
 			handleLoadMore: mockHandleLoadMore,
@@ -90,6 +92,7 @@ describe('ChipsFilterBar Component', () => {
 			loading: false,
 			uiFilters: filters,
 			uiSort: '',
+			hasMore: true,
 			handleFiltersChange: mockHandleFiltersChange,
 			handleSortChange: mockHandleSortChange,
 			handleLoadMore: mockHandleLoadMore,
@@ -115,6 +118,7 @@ describe('ChipsFilterBar Component', () => {
 			loading: false,
 			uiFilters: filters,
 			uiSort: '',
+			hasMore: true,
 			handleFiltersChange: mockHandleFiltersChange,
 			handleSortChange: mockHandleSortChange,
 			handleLoadMore: mockHandleLoadMore,
@@ -138,6 +142,7 @@ describe('ChipsFilterBar Component', () => {
 			loading: false,
 			uiFilters: filters,
 			uiSort: '',
+			hasMore: true,
 			handleFiltersChange: mockHandleFiltersChange,
 			handleSortChange: mockHandleSortChange,
 			handleLoadMore: mockHandleLoadMore,
@@ -154,7 +159,7 @@ describe('ChipsFilterBar Component', () => {
 
 	it('renders remove button for each chip', () => {
 		const filters = createFilters({
-			halal: 'halal',
+			halal: ['halal'],
 		})
 
 		mockUseExplore.mockReturnValue({
@@ -163,6 +168,7 @@ describe('ChipsFilterBar Component', () => {
 			loading: false,
 			uiFilters: filters,
 			uiSort: '',
+			hasMore: true,
 			handleFiltersChange: mockHandleFiltersChange,
 			handleSortChange: mockHandleSortChange,
 			handleLoadMore: mockHandleLoadMore,

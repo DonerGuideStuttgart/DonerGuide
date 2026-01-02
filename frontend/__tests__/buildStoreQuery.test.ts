@@ -21,7 +21,7 @@ describe('buildStoreQuery', () => {
 		const filters = createFilters({
 			min_score: 5,
 			price_max: 12,
-			halal: 'halal',
+			halal: ['halal'],
 		})
 
 		const queryString = buildStoreQuery(filters)
@@ -90,7 +90,7 @@ describe('buildStoreQuery', () => {
 			offset: 30,
 			district: ['West', 'Ost'],
 			min_score: 10,
-			halal: 'not_halal',
+			halal: ['not_halal'],
 		})
 
 		const queryString = buildStoreQuery(filters, 'score_desc')
