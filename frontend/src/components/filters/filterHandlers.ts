@@ -1,43 +1,28 @@
-import type { District, FilterParams, OpenHours } from '@/types/store'
+import type { FilterParams } from '@/types/store'
 import { toggleInArray } from './filterUtils'
 
-export function createToggleDistrict(
-	filters: FilterParams,
-	onChange: (next: FilterParams) => void,
-) {
-	return (d: District) => {
-		const districts = filters.district ?? []
-		const next = toggleInArray(districts, d)
-		onChange({ ...filters, district: next.length ? next : undefined })
-	}
-}
+type ArrayFilterKey = Extract<
+	keyof FilterParams,
+	| 'district'
+	| 'open_hours'
+	| 'vegetarian'
+	| 'halal'
+	| 'waiting_time'
+	| 'payment_methods'
+>
 
-export function createToggleOpenHour(
+export function createCheckboxHandler<K extends ArrayFilterKey>(
+	key: K,
 	filters: FilterParams,
 	onChange: (next: FilterParams) => void,
 ) {
-	return (h: OpenHours) => {
-		const openHours = filters.open_hours ?? []
-		const next = toggleInArray(openHours, h)
-		onChange({ ...filters, open_hours: next.length ? next : undefined })
-	}
-}
-
-export function createToggleRadio(
-	filters: FilterParams,
-	onChange: (next: FilterParams) => void,
-) {
-	return <
-		K extends 'vegetarian' | 'halal' | 'waiting_time' | 'payment_methods',
-	>(
-		key: K,
-		value: NonNullable<FilterParams[K]>,
-	) => {
-		const current = filters[key]
+	return (value: string) => {
+		const currentArray = (filters[key] ?? []) as string[]
+		const nextArray = toggleInArray(currentArray, value)
 		onChange({
 			...filters,
-			[key]: current === value ? undefined : value,
-		} as FilterParams)
+			[key]: nextArray.length ? nextArray : undefined,
+		})
 	}
 }
 

@@ -37,14 +37,14 @@ export function urlParamsToFilters(urlParams: {
 	price_max: number | null
 	district: string[] | null
 	open_hours: string[] | null
-	vegetarian: string | null
-	halal: string | null
+	vegetarian: string[] | null
+	halal: string[] | null
 	sauce_amount_min: number | null
 	sauce_amount_max: number | null
 	meat_ratio_min: number | null
 	meat_ratio_max: number | null
-	waiting_time: string | null
-	payment_methods: string | null
+	waiting_time: string[] | null
+	payment_methods: string[] | null
 }): FilterParams {
 	return {
 		limit: urlParams.limit,
@@ -81,16 +81,16 @@ export function removeFilterValue(
 		for (const k of key) {
 			newFilters = { ...newFilters, [k]: undefined } as FilterParams
 		}
-	} else if (value && (key === 'district' || key === 'open_hours')) {
-		// Remove one element from array fields
-		const currentArr = (filters[key] ?? []) as string[]
+	} else if (value !== undefined && Array.isArray(filters[key])) {
+		// Remove one element from array field
+		const currentArr = filters[key] as string[]
 		const nextArr = currentArr.filter((v) => String(v) !== value)
 		newFilters = {
 			...newFilters,
 			[key]: nextArr.length ? nextArr : undefined,
 		} as FilterParams
 	} else {
-		// Reset single field
+		// Reset field
 		newFilters = { ...newFilters, [key]: undefined } as FilterParams
 	}
 

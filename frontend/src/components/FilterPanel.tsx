@@ -19,15 +19,14 @@ import {
 	VEGETARIAN_LABELS,
 	WAITING_TIME_LABELS,
 } from '../types/records'
-import { CheckboxGroup, RangeSlider, SingleCheckboxGroup } from './filters'
+import { CheckboxGroup } from './filters/CheckboxGroup'
 import {
+	createCheckboxHandler,
 	createRangeSliderHandler,
-	createToggleDistrict,
-	createToggleOpenHour,
-	createToggleRadio,
 	getSliderValues,
 } from './filters/filterHandlers'
 import { UI_DEFAULTS } from './filters/filterUtils'
+import { RangeSlider } from './filters/RangeSlider'
 
 export interface FilterPanelHandle {
 	removeFilter: (
@@ -45,9 +44,36 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 		}))
 
 		// Create handlers
-		const toggleDistrict = createToggleDistrict(uiFilters, handleFiltersChange)
-		const toggleOpenHour = createToggleOpenHour(uiFilters, handleFiltersChange)
-		const toggleRadio = createToggleRadio(uiFilters, handleFiltersChange)
+		const toggleDistrict = createCheckboxHandler(
+			'district',
+			uiFilters,
+			handleFiltersChange,
+		)
+		const toggleOpenHour = createCheckboxHandler(
+			'open_hours',
+			uiFilters,
+			handleFiltersChange,
+		)
+		const toggleVegetarian = createCheckboxHandler(
+			'vegetarian',
+			uiFilters,
+			handleFiltersChange,
+		)
+		const toggleHalal = createCheckboxHandler(
+			'halal',
+			uiFilters,
+			handleFiltersChange,
+		)
+		const toggleWaitingTime = createCheckboxHandler(
+			'waiting_time',
+			uiFilters,
+			handleFiltersChange,
+		)
+		const togglePaymentMethod = createCheckboxHandler(
+			'payment_methods',
+			uiFilters,
+			handleFiltersChange,
+		)
 		const handleRangeChange = createRangeSliderHandler(
 			uiFilters,
 			handleFiltersChange,
@@ -89,7 +115,7 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 						currentMin={priceMin}
 						currentMax={priceMax}
 						step={1}
-						formatOptions={{ style: 'currency', currency: 'EUR' }}
+						suffix="€"
 						onChange={(min, max) =>
 							handleRangeChange({ price_min: min, price_max: max })
 						}
@@ -115,22 +141,22 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 						onToggle={toggleOpenHour}
 					/>
 
-					{/* Vegetarisch/Vegan (abwählbar) */}
-					<SingleCheckboxGroup
+					{/* Vegetarisch/Vegan */}
+					<CheckboxGroup
 						label="Vegetarisch/Vegan"
 						items={Object.keys(VEGETARIAN_LABELS) as Vegetarian[]}
 						labels={VEGETARIAN_LABELS}
-						selectedItem={uiFilters.vegetarian}
-						onToggle={(v) => toggleRadio('vegetarian', v)}
+						selectedItems={uiFilters.vegetarian ?? []}
+						onToggle={toggleVegetarian}
 					/>
 
-					{/* Halal (abwählbar) */}
-					<SingleCheckboxGroup
+					{/* Halal */}
+					<CheckboxGroup
 						label="Halal"
 						items={Object.keys(HALAL_LABELS) as Halal[]}
 						labels={HALAL_LABELS}
-						selectedItem={uiFilters.halal}
-						onToggle={(h) => toggleRadio('halal', h)}
+						selectedItems={uiFilters.halal ?? []}
+						onToggle={toggleHalal}
 					/>
 
 					{/* Soßenmenge */}
@@ -141,6 +167,7 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 						currentMin={sauceMin}
 						currentMax={sauceMax}
 						step={1}
+						suffix="%"
 						onChange={(min, max) =>
 							handleRangeChange({
 								sauce_amount_min: min,
@@ -157,27 +184,28 @@ const FilterPanel = forwardRef<FilterPanelHandle, Record<string, never>>(
 						currentMin={meatMin}
 						currentMax={meatMax}
 						step={1}
+						suffix="%"
 						onChange={(min, max) =>
 							handleRangeChange({ meat_ratio_min: min, meat_ratio_max: max })
 						}
 					/>
 
-					{/* Wartezeit (abwählbar) */}
-					<SingleCheckboxGroup
+					{/* Wartezeit */}
+					<CheckboxGroup
 						label="Wartezeit"
 						items={Object.keys(WAITING_TIME_LABELS) as WaitingTime[]}
 						labels={WAITING_TIME_LABELS}
-						selectedItem={uiFilters.waiting_time}
-						onToggle={(w) => toggleRadio('waiting_time', w)}
+						selectedItems={uiFilters.waiting_time ?? []}
+						onToggle={toggleWaitingTime}
 					/>
 
-					{/* Bezahlung (abwählbar) */}
-					<SingleCheckboxGroup
+					{/* Bezahlung */}
+					<CheckboxGroup
 						label="Bezahlung"
 						items={Object.keys(PAYMENT_LABELS) as PaymentMethod[]}
 						labels={PAYMENT_LABELS}
-						selectedItem={uiFilters.payment_methods}
-						onToggle={(p) => toggleRadio('payment_methods', p)}
+						selectedItems={uiFilters.payment_methods ?? []}
+						onToggle={togglePaymentMethod}
 					/>
 				</div>
 			</section>

@@ -96,22 +96,22 @@ const FILTER_CONFIGS: FilterConfig[] = [
 		labels: OPEN_HOURS_LABELS,
 	},
 	{
-		type: 'single',
+		type: 'array',
 		key: 'vegetarian',
 		labels: VEGETARIAN_LABELS,
 	},
 	{
-		type: 'single',
+		type: 'array',
 		key: 'halal',
 		labels: HALAL_LABELS,
 	},
 	{
-		type: 'single',
+		type: 'array',
 		key: 'waiting_time',
 		labels: WAITING_TIME_LABELS,
 	},
 	{
-		type: 'single',
+		type: 'array',
 		key: 'payment_methods',
 		labels: PAYMENT_LABELS,
 	},

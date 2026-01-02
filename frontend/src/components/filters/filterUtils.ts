@@ -24,14 +24,12 @@ export function resetKey(
 	// Arrays
 	if (k === 'district') return { ...current, district: undefined }
 	if (k === 'open_hours') return { ...current, open_hours: undefined }
-
-	// Radios / single selects -> "nicht gesetzt"
 	if (k === 'vegetarian') return { ...current, vegetarian: undefined }
 	if (k === 'halal') return { ...current, halal: undefined }
 	if (k === 'waiting_time') return { ...current, waiting_time: undefined }
 	if (k === 'payment_methods') return { ...current, payment_methods: undefined }
 
-	// Slider & numbers -> "nicht gesetzt"
+	// Slider & numbers
 	if (
 		k === 'min_score' ||
 		k === 'max_score' ||
@@ -45,7 +43,6 @@ export function resetKey(
 		return { ...current, [k]: undefined } as FilterParams
 	}
 
-	// limit/offset etc. (falls du es je brauchst)
 	return { ...current, [k]: undefined } as FilterParams
 }
 
@@ -60,12 +57,18 @@ export function removeFilterValue(
 		return next
 	}
 
-	// remove one element from array fields
-	if (valueToRemove && (key === 'district' || key === 'open_hours')) {
+	if (
+		valueToRemove &&
+		(key === 'district' ||
+			key === 'open_hours' ||
+			key === 'vegetarian' ||
+			key === 'halal' ||
+			key === 'waiting_time' ||
+			key === 'payment_methods')
+	) {
 		const currentArr = (filters[key] ?? []) as string[]
 		const nextArr = currentArr.filter((v) => String(v) !== valueToRemove)
 
-		// wenn leer -> undefined (damit buildStoreQuery es nicht sendet)
 		return {
 			...filters,
 			[key]: nextArr.length ? nextArr : undefined,

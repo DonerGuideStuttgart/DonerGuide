@@ -9,6 +9,7 @@ type RangeSliderProps = {
 	currentMax: number
 	step?: number
 	formatOptions?: Intl.NumberFormatOptions
+	suffix?: string
 	onChange: (min: number, max: number) => void
 	className?: string
 	showInputs?: boolean
@@ -22,29 +23,37 @@ export function RangeSlider({
 	currentMax,
 	step = 1,
 	formatOptions,
+	suffix,
 	onChange,
 	className,
 	showInputs = true,
 }: RangeSliderProps) {
-	const formatValue = (value: number) => {
-		return formatOptions
+	const formatValue = (value: number, includeSuffix = true) => {
+		const formatted = formatOptions
 			? new Intl.NumberFormat('de-DE', formatOptions).format(value)
 			: value.toString()
+		return includeSuffix && suffix ? `${formatted}${suffix}` : formatted
 	}
 
+	// Validation min
 	const handleMinBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
 		const newMin = parseFloat(value)
 		if (!isNaN(newMin) && newMin >= minValue && newMin <= currentMax) {
 			onChange(Math.round(newMin), currentMax)
+		} else {
+			e.target.value = currentMin.toString()
 		}
 	}
 
+	// Validation mmax
 	const handleMaxBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
 		const newMax = parseFloat(value)
 		if (!isNaN(newMax) && newMax <= maxValue && newMax >= currentMin) {
 			onChange(currentMin, Math.round(newMax))
+		} else {
+			e.target.value = currentMax.toString()
 		}
 	}
 
@@ -98,21 +107,37 @@ export function RangeSlider({
 			</ClientOnly>
 			{showInputs && (
 				<div className="flex items-center gap-2">
-					<input
-						type="text"
-						defaultValue={formatValue(currentMin)}
-						key={currentMin}
-						onBlur={handleMinBlur}
-						className="input input-bordered input-sm rounded-full flex-1 text-center text-sm focus:outline-none focus:border-2 focus:border-primary"
-					/>
+					<div className="relative flex-1">
+						<input
+							type="number"
+							inputMode="numeric"
+							defaultValue={formatValue(currentMin, false)}
+							key={currentMin}
+							onBlur={handleMinBlur}
+							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${suffix ? 'pr-8' : ''}`}
+						/>
+						{suffix && (
+							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-content pointer-events-none z-10">
+								{suffix}
+							</span>
+						)}
+					</div>
 					<span className="text-neutral-content/50">-</span>
-					<input
-						type="text"
-						defaultValue={formatValue(currentMax)}
-						key={currentMax}
-						onBlur={handleMaxBlur}
-						className="input input-bordered input-sm rounded-full flex-1 text-center text-sm focus:outline-none focus:border-2 focus:border-primary"
-					/>
+					<div className="relative flex-1">
+						<input
+							type="number"
+							inputMode="numeric"
+							defaultValue={formatValue(currentMax, false)}
+							key={currentMax}
+							onBlur={handleMaxBlur}
+							className={`input input-bordered input-sm rounded-full w-full text-center text-sm focus:outline-none focus:border-2 focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${suffix ? 'pr-8' : ''}`}
+						/>
+						{suffix && (
+							<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-content pointer-events-none z-10">
+								{suffix}
+							</span>
+						)}
+					</div>
 				</div>
 			)}
 		</section>

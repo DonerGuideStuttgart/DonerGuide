@@ -76,10 +76,10 @@ export type FilterParams = {
 	district?: District[]
 	open_hours?: OpenHours[]
 
-	vegetarian?: Vegetarian
-	halal?: Halal
-	waiting_time?: WaitingTime
-	payment_methods?: PaymentMethod
+	vegetarian?: Vegetarian[]
+	halal?: Halal[]
+	waiting_time?: WaitingTime[]
+	payment_methods?: PaymentMethod[]
 
 	sauce_amount_min?: number
 	sauce_amount_max?: number
