@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react'
 import DonerCard, {
 	DonerCardSkeleton,
 	type StoreSummary,
 } from '@/components/DonerCard'
+import { render, screen } from '@testing-library/react'
 
 describe('DonerCard Component', () => {
 	const mockStore: StoreSummary = {
@@ -80,7 +80,7 @@ describe('DonerCardSkeleton Component', () => {
 	it('renders skeleton placeholder elements', () => {
 		const { container } = render(<DonerCardSkeleton />)
 
-		const placeholders = container.querySelectorAll('.bg-base-200')
+		const placeholders = container.querySelectorAll('.bg-neutral-content\\/30')
 		expect(placeholders.length).toBeGreaterThan(0)
 	})
 })
