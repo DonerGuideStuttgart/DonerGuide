@@ -128,6 +128,11 @@ export default function FilterChips() {
 				const min = (minValue as number) ?? config.defaultMin
 				const max = (maxValue as number) ?? config.defaultMax
 
+				// Don't show chip if values are at defaults
+				if (min === config.defaultMin && max === config.defaultMax) {
+					return []
+				}
+
 				return [
 					{
 						label: config.formatLabel(min, max),
