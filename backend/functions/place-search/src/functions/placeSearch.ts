@@ -16,15 +16,15 @@ const COSMOSDB_DATABASE_NAME = process.env.PLACE_SEARCH_COSMOSDB_DATABASE_NAME ?
 const COSMOSDB_CONTAINER_NAME = process.env.PLACE_SEARCH_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
+const serviceBusOutput = output.serviceBusQueue({
+  queueName: "places",
+  connection: "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING",
+});
+
 app.timer("placeSearch", {
   schedule: process.env.PLACE_SEARCH_CRON ?? "0 */15 * * * *",
   handler: placeSearch,
-  extraOutputs: [
-    output.serviceBusQueue({
-      queueName: "places",
-      connection: "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING",
-    }),
-  ],
+  extraOutputs: [serviceBusOutput],
 });
 
 export async function placeSearch(myTimer: Timer, context: InvocationContext): Promise<string | undefined> {
@@ -126,13 +126,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
   }
 
   if (messages.length > 0) {
-    context.extraOutputs.set(
-      output.serviceBusQueue({
-        queueName: "places",
-        connection: "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING",
-      }),
-      messages
-    );
+    context.extraOutputs.set(serviceBusOutput, messages);
     context.log(`Sent ${messages.length} places to Service Bus.`);
   }
 
