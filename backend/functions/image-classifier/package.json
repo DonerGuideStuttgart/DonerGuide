@@ -8,6 +8,7 @@
     "watch": "tsc -w",
     "clean": "rimraf dist",
     "start": "func start",
+    "predev": "npm run build",
     "dev": "concurrently --raw 'npm run watch' 'npm run start'",
     "test": "echo \"No tests yet...\"",
     "types:check": "tsc --noEmit"
@@ -19,7 +20,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "azure-functions-core-tools": "^4.x",
     "concurrently": "^9.2.1",
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3"

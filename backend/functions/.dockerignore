@@ -1,0 +1,52 @@
+# Node modules (installed in container)
+**/node_modules/
+node_modules/
+
+# Build artifacts (built in container)
+**/dist/
+dist/
+
+# Development files
+**/.git/
+.git/
+**/.gitignore
+.gitignore
+**/.vscode/
+.vscode/
+**/.eslintcache
+.eslintcache
+
+# Test files
+**/__tests__/
+**/test/
+**/*.test.ts
+**/*.spec.ts
+
+# Environment files
+**/.env
+.env
+**/.env.*
+.env.*
+**/local.settings.json
+local.settings.json
+
+# Documentation
+README.md
+**/*.md
+
+# CI/CD
+.github/
+**/.github/
+
+# Logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Function specific
+**/.funcignore

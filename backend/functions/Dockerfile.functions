@@ -1,0 +1,62 @@
+# ============================================
+# Stage 1: Base
+# ============================================
+FROM node:22-bookworm AS base
+
+# Install Azure Functions Core Tools via official Microsoft repository
+# This approach works on both ARM64 and AMD64 architectures
+RUN apt-get update && \
+    apt-get install -y wget gnupg && \
+    wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y azure-functions-core-tools-4 && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ============================================
+# Stage 2: Development (for docker-compose)
+# ============================================
+FROM base AS development
+
+# Install TypeScript globally for watch mode
+RUN npm install -g typescript
+
+# Shared types are mounted via volume and built by shared-builder
+# Services install their own dependencies at runtime
+
+CMD ["sh", "-c", "npm run dev"]
+
+# ============================================
+# Stage 3: Production (for future use)
+# ============================================
+FROM base AS production
+
+# Copy package files
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY shared/doner_types/package*.json ./shared/doner_types/
+COPY place-search/package*.json ./place-search/
+COPY image-classifier/package*.json ./image-classifier/
+COPY llm-analyzer/package*.json ./llm-analyzer/
+
+# Install dependencies (workspace-aware)
+RUN npm ci --workspaces
+
+# Copy source code
+COPY shared/doner_types ./shared/doner_types
+COPY place-search ./place-search
+COPY image-classifier ./image-classifier
+COPY llm-analyzer ./llm-analyzer
+
+# Build in correct order: shared types first
+RUN npm run build --workspace=shared/doner_types && \
+    npm run build --workspace=place-search && \
+    npm run build --workspace=image-classifier && \
+    npm run build --workspace=llm-analyzer
+
+# Production dependencies only
+RUN npm ci --workspaces --omit=dev
+
+CMD ["sh", "-c", "npm start"]
