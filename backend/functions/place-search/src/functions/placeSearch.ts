@@ -28,49 +28,51 @@ app.timer("placeSearch", {
 });
 
 export async function placeSearch(myTimer: Timer, context: InvocationContext): Promise<string | undefined> {
-  context.log("Place Search function ran at", new Date().toISOString());
-  const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
-  
-  // Initialize Places container
-  const placesContainer = (
-    await database.containers.createIfNotExists({
-      id: "Places",
-      partitionKey: {
-        paths: ["/id"],
-        kind: PartitionKeyKind.Hash,
-      },
-    })
-  ).container;
+  try {
+    const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
+    
+    // Initialize Places container
+    const placesContainer = (
+      await database.containers.createIfNotExists({
+        id: "Places",
+        partitionKey: {
+          paths: ["/id"],
+          kind: PartitionKeyKind.Hash,
+        },
+      })
+    ).container;
 
-  // Initialize GridCells container with Spatial Index
-  const gridCellsContainer = (
-    await database.containers.createIfNotExists({
-      id: "GridCells",
-      partitionKey: {
-        paths: ["/id"],
-        kind: PartitionKeyKind.Hash,
-      },
-      indexingPolicy: {
-        includedPaths: [
-          {
-            path: "/*",
-          },
-        ],
-        spatialIndexes: [
-          {
-            path: "/geometry/*",
-            types: ["Polygon"] as SpatialType[],
-          } as any,
-        ],
-      },
-    })
-  ).container;
+    // Initialize GridCells container with Spatial Index
+    const gridCellsContainer = (
+      await database.containers.createIfNotExists({
+        id: "GridCells",
+        partitionKey: {
+          paths: ["/id"],
+          kind: PartitionKeyKind.Hash,
+        },
+        indexingPolicy: {
+          indexingMode: "consistent",
+          automatic: true,
+          includedPaths: [
+            {
+              path: "/*",
+            },
+          ],
+          spatialIndexes: [
+            {
+              path: "/geometry/*",
+              types: ["Polygon"] as SpatialType[],
+            } as any,
+          ],
+        },
+      })
+    ).container;
 
-  const GRID_VERSION = process.env.PLACE_SEARCH_GRID_VERSION ?? "v1";
-  const gridService = new GridService(gridCellsContainer);
+    const GRID_VERSION = process.env.PLACE_SEARCH_GRID_VERSION ?? "v1";
+    const gridService = new GridService(gridCellsContainer);
 
-  // 1. Initialize Grid
-  await gridService.initializeGrid(GRID_VERSION);
+    // 1. Initialize Grid
+    await gridService.initializeGrid(GRID_VERSION);
 
   // 2. Get Next Cell
   const cell = await gridService.getNextCell(GRID_VERSION);
@@ -90,28 +92,51 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
   );
 
   context.log(`Searching for places in cell ${cell.id}...`);
-  const googlePlaces = await googleMapsService.searchAllPages(
-    cell.boundaryBox.minLat,
-    cell.boundaryBox.minLon,
-    cell.boundaryBox.maxLat,
-    cell.boundaryBox.maxLon
-  );
+  let googlePlaces: any[] = [];
+  try {
+    googlePlaces = await googleMapsService.searchAllPages(
+      cell.boundaryBox.minLat,
+      cell.boundaryBox.minLon,
+      cell.boundaryBox.maxLat,
+      cell.boundaryBox.maxLon
+    );
+  } catch (error: any) {
+    context.error(`Error searching places for cell ${cell.id}: ${error.message}`);
+    // If it's a quota error, we might want to stop or just fail this cell
+    if (error.message.includes("429")) {
+      context.log("Quota exceeded. Stopping search for this run.");
+      return;
+    }
+    // For other errors, we might want to retry later (keep status PENDING via timeout)
+    throw error;
+  }
 
-  context.log(`Found ${googlePlaces.length} places.`);
+  context.log(`Found ${googlePlaces.length} places in Google Maps.`);
 
+  let newPlacesCount = 0;
+  let updatedPlacesCount = 0;
   const messages: any[] = [];
 
   for (const googlePlace of googlePlaces) {
-    const place = googleMapsService.mapGooglePlaceToPlace(googlePlace);
-    const isNewOrUpdated = await createOrUpdateItem(placesContainer, place);
-    
-    if (isNewOrUpdated) {
-      messages.push({
-        id: place.id,
-        photos: place.photos.uncategorized,
-      });
+    try {
+      const place = googleMapsService.mapGooglePlaceToPlace(googlePlace);
+      const { created, updated } = await createOrUpdateItem(placesContainer, place);
+      
+      if (created || updated) {
+        if (created) newPlacesCount++;
+        if (updated) updatedPlacesCount++;
+
+        messages.push({
+          id: place.id,
+          photos: place.photos.uncategorized,
+        });
+      }
+    } catch (error: any) {
+      context.error(`Error processing place ${googlePlace.id}: ${error.message}`);
     }
   }
+
+  context.log(`Results: ${googlePlaces.length} total, ${newPlacesCount} new, ${updatedPlacesCount} updated.`);
 
   // Update cell results and determine if split is needed
   cell.resultsCount = googlePlaces.length;
@@ -121,25 +146,30 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     context.log(`Cell ${cell.id} has ${googlePlaces.length} results. Splitting...`);
     await gridService.splitCell(cell);
   } else {
+    context.log(`Cell ${cell.id} search completed.`);
     cell.status = "COMPLETED";
     await gridCellsContainer.items.upsert(cell);
   }
 
-  if (messages.length > 0) {
-    context.extraOutputs.set(serviceBusOutput, messages);
-    context.log(`Sent ${messages.length} places to Service Bus.`);
+    if (messages.length > 0) {
+      context.extraOutputs.set(serviceBusOutput, messages);
+      context.log(`Sent ${messages.length} places to Service Bus for photo processing.`);
+    }
+
+  } catch (error: any) {
+    context.error(`Error in placeSearch handler: ${error.message}`);
   }
 
   return;
 }
 
-async function createOrUpdateItem(container: Container, itemBody: Place): Promise<boolean> {
+async function createOrUpdateItem(container: Container, itemBody: Place): Promise<{ created: boolean; updated: boolean }> {
   const { resource: existingItem } = await container.item(itemBody.id, itemBody.id).read<Place>();
 
   if (!existingItem) {
     itemBody.lastUpdated = new Date().toISOString();
     await container.items.create(itemBody);
-    return true;
+    return { created: true, updated: false };
   }
 
   // Merge photos with deduplication
@@ -152,7 +182,6 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
   };
 
   // Check if anything meaningful changed
-  // We compare number of uncategorized photos and some basic fields
   const hasNewPhotos = (mergedPhotos.uncategorized?.length ?? 0) > (existingItem.photos?.uncategorized?.length ?? 0);
   
   const hasDataChanges = 
@@ -167,7 +196,7 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
     JSON.stringify(existingItem.paymentMethods) !== JSON.stringify(itemBody.paymentMethods);
 
   if (!hasNewPhotos && !hasDataChanges) {
-    return false;
+    return { created: false, updated: false };
   }
 
   const updatedItem: Place = {
@@ -178,5 +207,5 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
   };
 
   await container.items.upsert(updatedItem);
-  return true;
+  return { created: false, updated: true };
 }

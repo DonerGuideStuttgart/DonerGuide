@@ -10,11 +10,9 @@ export class GridService {
    * Creates a 4x4 level 0 grid for Stuttgart.
    */
   async initializeGrid(gridVersion: string): Promise<void> {
+    const query = `SELECT VALUE COUNT(c.id) FROM c WHERE c.gridVersion = '${gridVersion}'`;
     const { resources: existing } = await this.container.items
-      .query({
-        query: "SELECT VALUE count(1) FROM c WHERE c.gridVersion = @version",
-        parameters: [{ name: "@version", value: gridVersion }],
-      })
+      .query({ query })
       .fetchAll();
 
     if (existing[0] > 0) {
@@ -63,7 +61,7 @@ export class GridService {
           },
           resultsCount: 0,
           foundPlaceIds: [],
-          lastProcessedAt: new Date(0).toISOString(), // Beginning of time
+          lastProcessedAt: "2000-01-01T00:00:00Z", // Use a static old date without lots of trailing zeros
         };
         cells.push(cell);
       }
@@ -82,23 +80,21 @@ export class GridService {
   async getNextCell(gridVersion: string): Promise<GridCell | null> {
     const staleThreshold = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
-    const querySpec = {
-      query: `
+    const query = `
         SELECT * FROM c 
-        WHERE c.gridVersion = @version 
+        WHERE c.gridVersion = '${gridVersion}' 
         AND c.status != 'SPLIT' 
-        AND (c.status != 'PROCESSING' OR c.lastProcessedAt < @staleThreshold)
+        AND (c.status != 'PROCESSING' OR c.lastProcessedAt < '${staleThreshold}')
         ORDER BY c.lastProcessedAt ASC
-      `,
-      parameters: [
-        { name: "@version", value: gridVersion },
-        { name: "@staleThreshold", value: staleThreshold },
-      ],
-    };
+      `;
 
     const { resources: cells } = await this.container.items
-      .query<GridCell>(querySpec)
+      .query<GridCell>({ query })
       .fetchAll();
+
+    if (cells.length > 0 && cells[0].status === "PROCESSING") {
+      console.log(`[GridService] Zombie-Reset: Picking up stale cell ${cells[0].id} (Last processed: ${cells[0].lastProcessedAt})`);
+    }
 
     return cells.length > 0 ? cells[0] : null;
   }

@@ -216,6 +216,8 @@ export class GoogleMapsService {
   ): GooglePlaceResponse {
     if (pageToken === "end") return { places: [] };
 
+    console.log(`[GoogleMapsService] MOCK: Searching in [${minLat}, ${minLon}] to [${maxLat}, ${maxLon}], pageToken: ${pageToken}`);
+
     // Generate 5 mock places within the bounding box
     const places = Array.from({ length: 5 }).map((_, i) => {
       const lat = minLat + Math.random() * (maxLat - minLat);
@@ -223,7 +225,7 @@ export class GoogleMapsService {
       const id = `mock_place_${Date.now()}_${i}`;
       return {
         id,
-        displayName: { text: `Mock Doner ${i + 1}`, languageCode: "de" },
+        displayName: { text: `Mock Doner ${i + 1} (${pageToken || 'p1'})`, languageCode: "de" },
         location: { latitude: lat, longitude: lon },
         internationalPhoneNumber: "+49 711 1234567",
         addressComponents: [
@@ -264,9 +266,13 @@ export class GoogleMapsService {
       };
     });
 
+    let nextPageToken: string | undefined = undefined;
+    if (!pageToken) nextPageToken = "token_2";
+    else if (pageToken === "token_2") nextPageToken = "end";
+
     return { 
       places, 
-      nextPageToken: pageToken ? "end" : "token_2" 
+      nextPageToken
     };
   }
 }
