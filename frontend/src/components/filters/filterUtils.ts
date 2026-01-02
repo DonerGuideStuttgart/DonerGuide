@@ -1,8 +1,16 @@
-import type { FilterParams } from '@/types/store'
+/**
+ * UI utility functions for filter components
+ */
 
+/**
+ * Toggle an item in an array (add if not present, remove if present)
+ */
 export const toggleInArray = <T>(arr: T[], item: T): T[] =>
 	arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]
 
+/**
+ * Default slider ranges for UI components
+ */
 export const UI_DEFAULTS = {
 	min_score: 0,
 	max_score: 100,
@@ -15,33 +23,4 @@ export const UI_DEFAULTS = {
 
 	meat_ratio_min: 0,
 	meat_ratio_max: 100,
-}
-
-export function resetKey(
-	k: keyof FilterParams,
-	current: FilterParams,
-): FilterParams {
-	// Arrays
-	if (k === 'district') return { ...current, district: undefined }
-	if (k === 'open_hours') return { ...current, open_hours: undefined }
-	if (k === 'vegetarian') return { ...current, vegetarian: undefined }
-	if (k === 'halal') return { ...current, halal: undefined }
-	if (k === 'waiting_time') return { ...current, waiting_time: undefined }
-	if (k === 'payment_methods') return { ...current, payment_methods: undefined }
-
-	// Slider & numbers
-	if (
-		k === 'min_score' ||
-		k === 'max_score' ||
-		k === 'price_min' ||
-		k === 'price_max' ||
-		k === 'sauce_amount_min' ||
-		k === 'sauce_amount_max' ||
-		k === 'meat_ratio_min' ||
-		k === 'meat_ratio_max'
-	) {
-		return { ...current, [k]: undefined } as FilterParams
-	}
-
-	return { ...current, [k]: undefined } as FilterParams
-}
+} as const

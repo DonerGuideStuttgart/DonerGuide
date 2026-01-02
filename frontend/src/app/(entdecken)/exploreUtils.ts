@@ -1,7 +1,12 @@
+/**
+ * Utility functions for the explore page
+ * Handles filter/URL conversion, filter manipulation, and pagination
+ */
+
 import type { FilterParams } from '@/types/store'
 
 /**
- * Convert FilterParams to URL params
+ * Convert FilterParams to URL query parameters
  */
 export function filtersToUrlParams(filters: FilterParams, sort: string) {
 	return {
@@ -26,7 +31,7 @@ export function filtersToUrlParams(filters: FilterParams, sort: string) {
 }
 
 /**
- * Convert URL params to FilterParams
+ * Convert URL query parameters to FilterParams
  */
 export function urlParamsToFilters(urlParams: {
 	limit: number
