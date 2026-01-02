@@ -137,32 +137,46 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
   const { resource: existingItem } = await container.item(itemBody.id, itemBody.id).read<Place>();
 
   if (!existingItem) {
+    itemBody.lastUpdated = new Date().toISOString();
     await container.items.create(itemBody);
     return true;
   }
 
-  // Check if anything meaningful changed (simplified for now)
-  // In a real app, we might compare lastUpdateTime from Google
-  
-  // Merge photos
+  // Merge photos with deduplication
   const mergedPhotos = {
-    uncategorized: [...(existingItem.photos.uncategorized ?? []), ...(itemBody.photos.uncategorized ?? [])].filter(
+    uncategorized: [...(existingItem.photos?.uncategorized ?? []), ...(itemBody.photos?.uncategorized ?? [])].filter(
       (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
     ),
-    food: [...(existingItem.photos.food ?? []), ...(itemBody.photos.food ?? [])].filter(
-      (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
-    ),
-    places: [...(existingItem.photos.places ?? []), ...(itemBody.photos.places ?? [])].filter(
-      (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
-    ),
+    food: existingItem.photos?.food ?? [],
+    places: existingItem.photos?.places ?? [],
   };
 
-  const updatedItem = {
-    ...existingItem, // Keep existing fields like ai_analysis
-    ...itemBody,     // Overwrite with new data from Google
+  // Check if anything meaningful changed
+  // We compare number of uncategorized photos and some basic fields
+  const hasNewPhotos = (mergedPhotos.uncategorized?.length ?? 0) > (existingItem.photos?.uncategorized?.length ?? 0);
+  
+  const hasDataChanges = 
+    existingItem.name !== itemBody.name ||
+    existingItem.internationalPhoneNumber !== itemBody.internationalPhoneNumber ||
+    JSON.stringify(existingItem.address) !== JSON.stringify(itemBody.address) ||
+    JSON.stringify(existingItem.openingHours) !== JSON.stringify(itemBody.openingHours) ||
+    existingItem.takeout !== itemBody.takeout ||
+    existingItem.delivery !== itemBody.delivery ||
+    existingItem.dineIn !== itemBody.dineIn ||
+    existingItem.servesVegetarianFood !== itemBody.servesVegetarianFood ||
+    JSON.stringify(existingItem.paymentMethods) !== JSON.stringify(itemBody.paymentMethods);
+
+  if (!hasNewPhotos && !hasDataChanges) {
+    return false;
+  }
+
+  const updatedItem: Place = {
+    ...itemBody,
+    ai_analysis: existingItem.ai_analysis, // Preserve AI analysis
     photos: mergedPhotos,
+    lastUpdated: new Date().toISOString(),
   };
 
   await container.items.upsert(updatedItem);
-  return true; // For now always return true to trigger analysis, can be optimized later
+  return true;
 }
