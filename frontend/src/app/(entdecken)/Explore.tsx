@@ -1,5 +1,6 @@
 'use client'
 
+import Filter from '@/assets/icons/filter.svg'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
 import FilterChips from '@/components/FilterChips'
@@ -51,22 +52,18 @@ export default function Explore() {
 				{/* Filter Desktop End */}
 
 				<div className="md:col-span-3 space-y-3">
-					{/* Filter Mobile */}
-					<div className="flex items-center gap-2 text-base-300">
+					<div className="flex items-center flex-wrap gap-2 text-base-300">
+						{/* Filter Mobile Button */}
 						<button
 							onClick={() => setIsDrawerOpen(true)}
-							className="md:hidden flex items-center gap-2 px-4 py-2 bg-amber-950 hover:bg-amber-900 rounded-lg transition-colors"
+							className="md:hidden flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4"
 							aria-label="Open filters"
 						>
-							<span>Filter</span>
+							<Filter className="size-5" />
 						</button>
-						{/* Filter Mobile End */}
+						{/* Filter Mobile Button End */}
 
-						{/* Filter Chips */}
-						<section>
-							<FilterChips />
-						</section>
-						{/* Filter Chips */}
+						<FilterChips />
 					</div>
 
 					{/* Error Handling */}

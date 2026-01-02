@@ -168,19 +168,17 @@ export default function FilterChips() {
 
 	return (
 		<ClientOnly>
-			<div className="flex flex-wrap gap-2">
-				{chips.map((chip) => (
-					<button
-						onClick={chip.onRemove}
-						key={chip.key}
-						aria-label="Remove filter"
-						className="flex items-center text-sm text-primary bg-base-100 border border-primary rounded-full cursor-pointer py-1 px-3"
-					>
-						<span className="mr-2">{chip.label}</span>
-						<Close className="size-2.5" />
-					</button>
-				))}
-			</div>
+			{chips.map((chip) => (
+				<button
+					onClick={chip.onRemove}
+					key={chip.key}
+					aria-label="Remove filter"
+					className="flex items-center text-sm text-primary bg-base-100 border border-primary rounded-full cursor-pointer py-1 px-3"
+				>
+					<span className="mr-2">{chip.label}</span>
+					<Close className="size-2.5" />
+				</button>
+			))}
 		</ClientOnly>
 	)
 }
