@@ -115,7 +115,18 @@ describe("GoogleMapsService", () => {
         dineIn: true,
         servesVegetarianFood: true,
         photos: [
-          { name: "places/ch_123/photos/p1" },
+          { 
+            name: "places/ch_123/photos/p1",
+            widthPx: 1200,
+            heightPx: 800,
+            authorAttributions: [
+              {
+                displayName: "John Doe",
+                uri: "https://example.com/john",
+                photoUri: "https://example.com/john.jpg",
+              }
+            ]
+          },
           { name: "places/ch_123/photos/p2" },
         ],
       };
@@ -133,6 +144,9 @@ describe("GoogleMapsService", () => {
       expect(place.paymentMethods).toContain(PaymentMethods.NFC);
       expect(place.photos.uncategorized).toHaveLength(2);
       expect(place.photos.uncategorized?.[0].id).toBe("places/ch_123/photos/p1");
+      expect(place.photos.uncategorized?.[0].widthPx).toBe(1200);
+      expect(place.photos.uncategorized?.[0].heightPx).toBe(800);
+      expect(place.photos.uncategorized?.[0].authorAttributions?.[0].displayName).toBe("John Doe");
       expect(place.takeout).toBe(true);
       expect(place.delivery).toBe(false);
     });
