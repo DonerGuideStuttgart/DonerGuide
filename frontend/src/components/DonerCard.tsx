@@ -25,7 +25,7 @@ export default function DonerCard({ store }: { store: StoreSummary }) {
 
 export function DonerCardSkeleton() {
 	return (
-		<article className="border rounded-lg p-4 shadow-sm animate-pulse">
+		<article className="border rounded-lg p-4 shadow-sm animate-pulse mt-3">
 			<div className="h-6 bg-neutral-content/30 rounded w-3/4 mb-2"></div>
 			<div className="h-4 bg-neutral-content/30 rounded w-1/4 mb-4"></div>
 			<div className="flex items-center justify-between mb-4">

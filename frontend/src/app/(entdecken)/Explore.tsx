@@ -32,18 +32,18 @@ export default function Explore() {
 	return (
 		<>
 			{/* Header with Title */}
-			<header className="flex items-center justify-between mb-4">
+			<header className="flex items-center justify-between mb-2 lg:mb-0">
 				<h1 className="text-2xl font-bold">{title}</h1>
 			</header>
 
 			{/* Sort */}
-			<section className="flex justify-end mb-2">
+			<section className="flex justify-end mb-2 lg:mb-4">
 				<Sort />
 			</section>
 
-			<section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+			<section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 				{/* Filter Desktop */}
-				<section className="hidden md:block md:col-span-1">
+				<section className="hidden lg:block lg:col-span-1">
 					<section className="flex justify-between text-sm mb-1">
 						<p>{stores.length} Döner</p>
 
@@ -56,12 +56,12 @@ export default function Explore() {
 				</section>
 				{/* Filter Desktop End */}
 
-				<section className="md:col-span-3 space-y-3">
-					<div className="flex items-center flex-wrap gap-2 text-base-300">
+				<section className="lg:col-span-3">
+					<div className="flex items-center flex-wrap gap-2 mb-3">
 						{/* Filter Mobile Button */}
 						<button
 							onClick={() => setIsDrawerOpen(true)}
-							className="md:hidden flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4"
+							className="lg:hidden flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4 lg:mb-3"
 							aria-label="Open filters"
 						>
 							<Filter className="size-5" />
@@ -83,31 +83,40 @@ export default function Explore() {
 					{/* Error Handling End */}
 
 					{/* Kebab Store Cards */}
-					{loading && stores.length === 0 ? (
+					{/* Initial loading */}
+					{loading && stores.length === 0 && (
 						<>
 							{Array.from({ length: INITIAL_LIMIT }).map((_, index) => (
 								<DonerCardSkeleton key={index} />
 							))}
 						</>
-					) : stores.length === 0 && !error && !loading ? (
+					)}
+
+					{/* Empty State */}
+					{!loading && stores.length === 0 && !error && (
 						<div className="flex flex-col items-center justify-center py-16 text-center">
 							<h3 className="text-xl font-medium mb-2">Keine Döner gefunden</h3>
 							<p className="text-neutral">
 								Versuche es mit anderen Filtern oder setze die Filter zurück.
 							</p>
 						</div>
-					) : (
-						<>
-							{stores.map((store) => (
-								<DonerCard key={store.id} store={store} />
-							))}
-							{loading &&
-								Array.from({ length: LOAD_MORE_COUNT }).map((_, index) => (
-									<DonerCardSkeleton key={`loading-${index}`} />
-								))}
-						</>
 					)}
 
+					{/* Store Cards */}
+					<section className="space-y-3 mt-3 lg:mt-0">
+						{stores.map((store) => (
+							<DonerCard key={store.id} store={store} />
+						))}
+					</section>
+
+					{/* Load More Skeletons */}
+					{loading &&
+						stores.length > 0 &&
+						Array.from({ length: LOAD_MORE_COUNT }).map((_, index) => (
+							<DonerCardSkeleton key={`loading-${index}`} />
+						))}
+
+					{/* Load more button */}
 					{hasMore && stores.length > 0 && (
 						<div className="flex justify-center mt-4">
 							<button
