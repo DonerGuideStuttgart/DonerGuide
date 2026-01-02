@@ -7,6 +7,8 @@ import { Container, CosmosClient, PartitionKeyKind, SpatialType } from "@azure/c
 import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Place } from "doner_types";
 import { PaymentMethods } from "doner_types";
+import { GridService } from "../services/grid.service";
+import { GridCell } from "../types/grid";
 
 const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.PLACE_SEARCH_COSMOSDB_CONNECTION_STRING ?? "";
 const COSMOSDB_DATABASE_NAME = process.env.PLACE_SEARCH_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
@@ -60,6 +62,25 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
       },
     })
   ).container;
+
+  const GRID_VERSION = process.env.PLACE_SEARCH_GRID_VERSION ?? "v1";
+  const gridService = new GridService(gridCellsContainer);
+
+  // 1. Initialize Grid
+  await gridService.initializeGrid(GRID_VERSION);
+
+  // 2. Get Next Cell
+  const cell = await gridService.getNextCell(GRID_VERSION);
+  if (!cell) {
+    context.log("No cell to process.");
+    return;
+  }
+
+  context.log(`Processing cell ${cell.id} at level ${cell.level}`);
+
+  // 3. Mark as processing
+  await gridService.markAsProcessing(cell);
+
 
   const place: Place = {
     id: "place_12345",
