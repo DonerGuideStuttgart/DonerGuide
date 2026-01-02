@@ -87,7 +87,7 @@ describe('Pagination Logic', () => {
 			const newItems = [{ id: '3' }, { id: '4' }]
 			const offset = 0
 
-			const result = offset > 0 ? [] : newItems
+			const result = offset === 0 ? newItems : []
 
 			expect(result).toEqual(newItems)
 			expect(result.length).toBe(2)

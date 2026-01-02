@@ -28,14 +28,14 @@ export default function Sort() {
 
 				<div className="dropdown dropdown-end w-full sm:w-auto">
 					{/* Button */}
-					<div
+					<button
 						tabIndex={0}
-						role="button"
+						type="button"
 						className="btn btn-ghost bg-base-100 font-normal border border-primary rounded-full px-4 gap-2 w-full sm:w-auto"
 					>
 						{displayLabel}
 						<Chevrondown className="size-3" />
-					</div>
+					</button>
 					{/* Button End */}
 
 					{/* Dropdown */}

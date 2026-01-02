@@ -36,24 +36,24 @@ export function RangeSlider({
 	}
 
 	// Validation min
-	const handleMinBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
+	const handleMinBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+		const value = event.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
 		const newMin = parseFloat(value)
 		if (!isNaN(newMin) && newMin >= minValue && newMin <= currentMax) {
 			onChange(Math.round(newMin), currentMax)
 		} else {
-			e.target.value = currentMin.toString()
+			event.target.value = currentMin.toString()
 		}
 	}
 
 	// Validation max
-	const handleMaxBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
+	const handleMaxBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+		const value = event.target.value.replace(/[^\d,.-]/g, '').replace(',', '.')
 		const newMax = parseFloat(value)
 		if (!isNaN(newMax) && newMax <= maxValue && newMax >= currentMin) {
 			onChange(currentMin, Math.round(newMax))
 		} else {
-			e.target.value = currentMax.toString()
+			event.target.value = currentMax.toString()
 		}
 	}
 
@@ -72,8 +72,8 @@ export function RangeSlider({
 					minValue={minValue}
 					step={step}
 					aria-label={label}
-					onChange={(e) => {
-						const [min, max] = e as [number, number]
+					onChange={(event) => {
+						const [min, max] = event as [number, number]
 						onChange(min, max)
 					}}
 					hideThumb={false}
@@ -88,15 +88,7 @@ export function RangeSlider({
 						const displayValue = index === 0 ? currentMin : currentMax
 						return (
 							<div {...props} className="group relative">
-								<div
-									className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-primary shadow-md rounded-full cursor-grab data-[dragging=true]:cursor-grabbing size-4"
-									style={{
-										backgroundColor: 'white',
-										borderColor: 'hsl(var(--p))',
-										borderWidth: '1px',
-										borderStyle: 'solid',
-									}}
-								/>
+								<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-primary shadow-md rounded-full cursor-grab data-[dragging=true]:cursor-grabbing size-4" />
 								<div className="absolute bg-base-100 border border-primary bottom-full left-1/2 -translate-x-1/2 text-xs rounded whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 group-data-[dragging=true]:opacity-100 transition-opacity px-2 py-1 mb-3">
 									{formatValue(displayValue)}
 								</div>

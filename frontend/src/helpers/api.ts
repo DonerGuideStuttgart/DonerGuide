@@ -20,7 +20,7 @@ function convertFilterValueToQueryString(
 }
 
 export function buildStoreQuery(filters: FilterParams, sort?: string) {
-	const searchParameters = new URLSearchParams()
+	const searchParams = new URLSearchParams()
 
 	const filterEntries = Object.entries(filters) as Array<
 		[FilterKey, FilterParams[FilterKey]]
@@ -31,14 +31,14 @@ export function buildStoreQuery(filters: FilterParams, sort?: string) {
 		if (queryStringValue === null) {
 			continue
 		}
-		searchParameters.set(filterKey, queryStringValue)
+		searchParams.set(filterKey, queryStringValue)
 	}
 
 	if (sort !== undefined && sort !== null && sort !== '') {
-		searchParameters.set('sort', sort)
+		searchParams.set('sort', sort)
 	}
 
-	return searchParameters.toString()
+	return searchParams.toString()
 }
 
 export async function fetchPlaces(query: string) {

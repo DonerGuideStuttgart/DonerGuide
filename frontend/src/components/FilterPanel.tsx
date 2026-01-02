@@ -1,6 +1,13 @@
 'use client'
 import { useExplore } from '@/app/(entdecken)/useExplore'
-import type { District, Halal, PaymentMethod, WaitingTime } from '@/types/store'
+import type {
+	District,
+	Halal,
+	OpenHours,
+	PaymentMethod,
+	Vegetarian,
+	WaitingTime,
+} from '@/types/store'
 import {
 	createCheckboxHandler,
 	createRangeSliderHandler,
@@ -10,7 +17,9 @@ import { UI_DEFAULTS } from '../helpers/filter/filterUtils'
 import {
 	DISTRICT_LABELS,
 	HALAL_LABELS,
+	OPEN_HOURS_LABELS,
 	PAYMENT_LABELS,
+	VEGETARIAN_LABELS,
 	WAITING_TIME_LABELS,
 } from '../types/records'
 import { CheckboxGroup } from './filters/CheckboxGroup'
@@ -111,6 +120,24 @@ export default function FilterPanel({ isMobile }: Props) {
 					maxHeight="220px"
 					showSearch
 					searchPlaceholder="Suche nach einem Bezirk..."
+				/>
+
+				{/* Öffnungszeiten */}
+				<CheckboxGroup
+					label="Öffnungszeiten"
+					items={Object.keys(OPEN_HOURS_LABELS) as OpenHours[]}
+					labels={OPEN_HOURS_LABELS}
+					selectedItems={uiFilters.open_hours ?? []}
+					onToggle={toggleOpenHour}
+				/>
+
+				{/* Vegetarisch/Vegan */}
+				<CheckboxGroup
+					label="Vegetarisch/Vegan"
+					items={Object.keys(VEGETARIAN_LABELS) as Vegetarian[]}
+					labels={VEGETARIAN_LABELS}
+					selectedItems={uiFilters.vegetarian ?? []}
+					onToggle={toggleVegetarian}
 				/>
 
 				{/* Halal */}
