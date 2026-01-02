@@ -120,7 +120,7 @@ export function useExplore() {
 		setUiFilters(urlFilters)
 		setUiSort(urlParams.sort)
 		void fetchData(urlFilters, urlParams.sort)
-	}, [urlFilters, urlParams.sort, fetchData])
+	}, [urlParams, urlFilters, fetchData])
 
 	// Cleanup debounce timer on unmount
 	useEffect(() => {
