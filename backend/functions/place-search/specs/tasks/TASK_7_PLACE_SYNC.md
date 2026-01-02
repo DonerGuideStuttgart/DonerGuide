@@ -9,4 +9,4 @@ Datenpersistenz und Triggerung der KI-Pipeline.
   - `ai_analysis` Feld muss erhalten bleiben.
   - Photo-Arrays werden gemerged (Deduplizierung).
 - [ ] Implementiere den Service Bus Publisher für die Queue `places`.
-- [ ] Sende nur die IDs und neue Fotos an den Service Bus, um Payload-Größe zu minimieren.
+- [ ] **Optimierung:** Sende nur eine Nachricht, wenn der Laden neu ist oder sich die Daten (`last_updated` von Google) geändert haben.

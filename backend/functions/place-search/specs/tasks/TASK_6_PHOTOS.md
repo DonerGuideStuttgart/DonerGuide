@@ -1,10 +1,9 @@
-# Task 6: Photo & Blob Integration
+# Task 6: Photo Metadata Integration
 
 ## Ziel
-Effizientes Handling von Bildern.
+Sammeln von Photo-Referenzen für die spätere Verarbeitung.
 
 ## Details
-- [ ] Implementiere den parallelen Download von bis zu 10 Fotos pro Place.
-- [ ] Implementiere die `BlobStorageService` Anbindung.
-- [ ] Implementiere Deduplizierung: Prüfe vor dem Download, ob `PHOTO_REFERENCE.jpg` bereits im Blob Storage existiert.
-- [ ] Speichere die resultierenden Blob-URLs im `Place` Objekt.
+- [ ] Extrahiere bis zu 10 `photo_reference` IDs und zugehörige Metadaten pro Place.
+- [ ] Speichere diese Informationen im `Places` Dokument in CosmosDB.
+- [ ] *Der eigentliche Download erfolgt durch den `image-classifier`.*
