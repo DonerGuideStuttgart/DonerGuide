@@ -19,8 +19,8 @@
   "aiScore": 80,
   "price": 4.8,
   "vegetarian": ["VEGETARIAN"],
-  "waitingTime": "AVERAGE",
-  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "waitingTime": "FAST",
+  "paymentMethods": ["CREDIT_CARD"],
   "sauceAmount": 70,
   "meatRatio": 68,
   "openingHours": {

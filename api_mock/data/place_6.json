@@ -18,7 +18,7 @@
   "aiScore": 77,
   "price": 5.5,
   "waitingTime": "SLOW",
-  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "paymentMethods": ["CREDIT_CARD"],
   "sauceAmount": 60,
   "meatRatio": 65,
   "openingHours": {

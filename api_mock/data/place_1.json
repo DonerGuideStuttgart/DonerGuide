@@ -24,7 +24,7 @@
   "price": 4.5,
   "vegetarian": ["VEGETARIAN", "VEGAN"],
   "waitingTime": "FAST",
-  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "paymentMethods": ["CREDIT_CARD"],
   "sauceAmount": 65,
   "meatRatio": 70,
   "openingHours": {
