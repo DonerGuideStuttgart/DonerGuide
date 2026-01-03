@@ -29,22 +29,22 @@ export const OPEN_HOURS_LABELS: Record<string, string> = {
 }
 
 export const VEGETARIAN_LABELS: Record<string, string> = {
-	meat: 'Fleisch',
-	vegetarian: 'Vegetarisch',
-	vegan: 'Vegan',
+	VEGETARIAN: 'Vegetarisch',
+	VEGAN: 'Vegan',
 }
 
 export const HALAL_LABELS: Record<string, string> = {
-	halal: 'Halal',
-	not_halal: 'Nicht Halal',
+	HALAL: 'Halal',
+	NOT_HALAL: 'Nicht Halal',
 }
 
 export const WAITING_TIME_LABELS: Record<string, string> = {
 	FAST: 'Schnell',
 	AVERAGE: 'Normal',
+	SLOW: 'Langsam',
 }
 
 export const PAYMENT_LABELS: Record<string, string> = {
-	NFC: 'Kartenzahlung',
+	CREDIT_CARD: 'Kartenzahlung',
 	CASH: 'Nur Cash',
 }

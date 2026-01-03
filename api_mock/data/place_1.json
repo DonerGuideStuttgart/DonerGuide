@@ -1,9 +1,9 @@
 {
   "slug": "hasans-doener",
   "imageUrls": [
-    "https://example.com/images/hasan.jpg",
-    "https://example.com/photos/hasan_food1.jpg",
-    "https://example.com/photos/hasan_place1.jpg"
+    "https://fastly.picsum.photos/id/972/200/200.jpg?hmac=TeAvfwW2T9YMpPW-sWWTeAiseERb12wSeR3mYzuG6TE",
+    "https://fastly.picsum.photos/id/27/3264/1836.jpg?hmac=p3BVIgKKQpHhfGRRCbsi2MCAzw8mWBCayBsKxxtWO8g",
+    "https://fastly.picsum.photos/id/29/4000/2670.jpg?hmac=rCbRAl24FzrSzwlR5tL-Aqzyu5tX_PA95VJtnUXegGU"
   ],
   "name": "Hasan's Döner",
   "phone": "+49 711 123456",
@@ -22,9 +22,11 @@
   },
   "aiScore": 87,
   "price": 4.5,
-  "vegetarian": ["SERVES_VEGETARIAN"],
-  "waitingTime": "AVERAGE",
-  "payment": ["CASH", "NFC"],
+  "vegetarian": ["VEGETARIAN", "VEGAN"],
+  "waitingTime": "FAST",
+  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "sauceAmount": 65,
+  "meatRatio": 70,
   "openingHours": {
     "hours": {
       "mon": [{ "start": "11:00", "end": "22:30" }],
