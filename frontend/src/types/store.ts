@@ -22,7 +22,9 @@ export interface Location {
 
 export type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
 export type OpeningHours = {
-	hours: Partial<Record<Weekday, { start: string; end: string }[]>>
+	// start and end are minutes since midnight (0-1439)
+	// Example: 10:00 = 600, 14:30 = 870, 23:45 = 1425
+	hours: Partial<Record<Weekday, { start: number; end: number }[]>>
 	timezone?: string // z.B. "Europe/Berlin"
 }
 

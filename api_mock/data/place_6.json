@@ -23,15 +23,30 @@
   "meatRatio": 65,
   "openingHours": {
     "hours": {
-      "mon": [{ "start": "11:00", "end": "22:00" }],
-      "tue": [{ "start": "11:00", "end": "22:00" }],
-      "wed": [{ "start": "11:00", "end": "22:00" }],
-      "thu": [{ "start": "11:00", "end": "22:00" }],
-      "fri": [{ "start": "11:00", "end": "22:00" }],
-      "sat": [{ "start": "11:00", "end": "22:00" }],
-      "sun": [{ "start": "11:00", "end": "22:00" }]
+      "mon": [
+        { "start": 600, "end": 840 },
+        { "start": 1020, "end": 1320 }
+      ],
+      "tue": [
+        { "start": 600, "end": 840 },
+        { "start": 1020, "end": 1320 }
+      ],
+      "wed": [
+        { "start": 600, "end": 840 },
+        { "start": 1020, "end": 1320 }
+      ],
+      "thu": [
+        { "start": 600, "end": 840 },
+        { "start": 1020, "end": 1320 }
+      ],
+      "fri": [
+        { "start": 600, "end": 840 },
+        { "start": 1020, "end": 1380 }
+      ],
+      "sat": [{ "start": 660, "end": 1380 }],
+      "sun": [{ "start": 660, "end": 1320 }]
     },
     "timezone": "Europe/Berlin"
   },
-  "aiSummary": "Orient Express bietet einen guten AI-Score von 77 bei einem fairen Preis. Täglich geöffnet mit konstanten Öffnungszeiten. Zahlung mit Bargeld oder Kreditkarte möglich."
+  "aiSummary": "Orient Express bietet einen guten AI-Score von 77 bei einem fairen Preis. Mit Mittagspause von 14-17 Uhr. Zahlung mit Bargeld oder Kreditkarte möglich."
 }

@@ -26,13 +26,13 @@
   "meatRatio": 85,
   "openingHours": {
     "hours": {
-      "mon": [{ "start": "11:00", "end": "00:30" }],
-      "tue": [{ "start": "11:00", "end": "00:30" }],
-      "wed": [{ "start": "11:00", "end": "00:30" }],
-      "thu": [{ "start": "11:00", "end": "00:30" }],
-      "fri": [{ "start": "11:00", "end": "01:00" }],
-      "sat": [{ "start": "11:00", "end": "01:00" }],
-      "sun": [{ "start": "11:00", "end": "00:00" }]
+      "mon": [{ "start": 660, "end": 30 }],
+      "tue": [{ "start": 660, "end": 30 }],
+      "wed": [{ "start": 660, "end": 30 }],
+      "thu": [{ "start": 660, "end": 30 }],
+      "fri": [{ "start": 660, "end": 60 }],
+      "sat": [{ "start": 720, "end": 60 }],
+      "sun": [{ "start": 720, "end": 1410 }]
     },
     "timezone": "Europe/Berlin"
   },

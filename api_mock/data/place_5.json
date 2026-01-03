@@ -27,10 +27,10 @@
     "hours": {
       "mon": [{ "start": "11:00", "end": "20:00" }],
       "tue": [{ "start": "11:00", "end": "20:00" }],
-      "wed": [{ "start": "11:00", "end": "20:00" }],
-      "thu": [{ "start": "11:00", "end": "20:00" }],
-      "fri": [{ "start": "11:00", "end": "20:00" }],
-      "sat": [{ "start": "11:00", "end": "20:00" }]
+      "wed": [{ "start": 660, "end": 1200 }],
+      "thu": [{ "start": 660, "end": 1200 }],
+      "fri": [{ "start": 660, "end": 1200 }],
+      "sat": [{ "start": 660, "end": 1200 }]
     },
     "timezone": "Europe/Berlin"
   },

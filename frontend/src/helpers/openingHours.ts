@@ -1,6 +1,23 @@
 import type { OpeningHours, Weekday } from '@/types/store'
 
 /**
+ * Convert time string (HH:MM) to minutes since midnight
+ */
+function timeToMinutes(timeStr: string): number {
+	const [hours, minutes] = timeStr.split(':').map(Number)
+	return hours * 60 + minutes
+}
+
+/**
+ * Convert minutes since midnight to time string (HH:MM)
+ */
+function minutesToTime(minutes: number): string {
+	const hours = Math.floor(minutes / 60)
+	const mins = minutes % 60
+	return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
+}
+
+/**
  * Check if a store is currently open based on opening hours
  */
 export function isStoreOpen(openingHours?: OpeningHours): boolean {
@@ -36,9 +53,17 @@ export function isStoreOpen(openingHours?: OpeningHours): boolean {
 	const todayHours = openingHours.hours[weekday]
 	if (!todayHours || todayHours.length === 0) return false
 
+	const currentMinutes = timeToMinutes(currentTime)
+
 	// Check if current time is within any of today's time ranges
+	// range.start and range.end are already in minutes
 	return todayHours.some((range) => {
-		return currentTime >= range.start && currentTime <= range.end
+		// Handle times that cross midnight
+		if (range.end < range.start) {
+			// If end time is earlier than start (e.g., 660 - 30 for 11:00 - 00:30), it crosses midnight
+			return currentMinutes >= range.start || currentMinutes <= range.end
+		}
+		return currentMinutes >= range.start && currentMinutes <= range.end
 	})
 }
 
@@ -78,13 +103,25 @@ export function getOpeningStatusText(openingHours?: OpeningHours): string {
 	const todayHours = openingHours.hours[weekday]
 	if (!todayHours || todayHours.length === 0) return 'Heute geschlossen'
 
-	// Find current or next time range
+	const currentMinutes = timeToMinutes(currentTime)
+
+	// Check if currently open in any time range
+	// range.start and range.end are already in minutes
 	for (const range of todayHours) {
-		if (currentTime >= range.start && currentTime <= range.end) {
-			return `Schließt um ${range.end} Uhr`
+		const crossesMidnight = range.end < range.start
+		const isCurrentlyOpen = crossesMidnight
+			? currentMinutes >= range.start || currentMinutes <= range.end
+			: currentMinutes >= range.start && currentMinutes <= range.end
+
+		if (isCurrentlyOpen) {
+			return `Schließt um ${minutesToTime(range.end)} Uhr`
 		}
-		if (currentTime < range.start) {
-			return `Öffnet um ${range.start} Uhr`
+	}
+
+	// Not currently open - check when opens next
+	for (const range of todayHours) {
+		if (currentMinutes < range.start) {
+			return `Öffnet um ${minutesToTime(range.start)} Uhr`
 		}
 	}
 

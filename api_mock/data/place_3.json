@@ -27,11 +27,11 @@
   "openingHours": {
     "hours": {
       "mon": [{ "start": "10:00", "end": "23:00" }],
-      "tue": [{ "start": "10:00", "end": "23:00" }],
-      "wed": [{ "start": "10:00", "end": "23:00" }],
-      "thu": [{ "start": "10:00", "end": "23:00" }],
-      "fri": [{ "start": "10:00", "end": "24:00" }],
-      "sat": [{ "start": "11:00", "end": "24:00" }]
+      "tue": [{ "start": 600, "end": 1380 }],
+      "wed": [{ "start": 600, "end": 1380 }],
+      "thu": [{ "start": 600, "end": 1380 }],
+      "fri": [{ "start": 600, "end": 1440 }],
+      "sat": [{ "start": 660, "end": 1440 }]
     },
     "timezone": "Europe/Berlin"
   },
