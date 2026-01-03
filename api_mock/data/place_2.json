@@ -1,6 +1,6 @@
 {
   "slug": "alis-imbiss",
-  "imageUrls": ["https://example.com/images/ali.jpg"],
+  "imageUrls": [],
   "name": "Ali's Imbiss",
   "phone": "+49 711 234567",
   "district": "Bad_Cannstatt",
@@ -18,8 +18,9 @@
   },
   "aiScore": 74,
   "price": 3.9,
+  "halal": ["NOT_HALAL"],
   "waitingTime": "FAST",
-  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "paymentMethods": ["CASH_ONLY"],
   "sauceAmount": 55,
   "meatRatio": 80,
   "openingHours": {

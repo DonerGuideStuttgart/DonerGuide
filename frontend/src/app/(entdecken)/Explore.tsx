@@ -104,7 +104,7 @@ export default function Explore() {
 					{/* Store Cards */}
 					<section className="space-y-3 mt-3 lg:mt-0">
 						{stores.map((store) => (
-							<DonerCard key={store.id} store={store} />
+							<DonerCard key={store.slug} store={store} />
 						))}
 					</section>
 

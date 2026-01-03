@@ -21,7 +21,7 @@
   "vegetarian": ["VEGETARIAN"],
   "halal": ["HALAL"],
   "waitingTime": "FAST",
-  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "paymentMethods": ["CREDIT_CARD"],
   "sauceAmount": 75,
   "meatRatio": 85,
   "openingHours": {

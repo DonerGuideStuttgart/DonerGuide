@@ -17,8 +17,9 @@
   },
   "aiScore": 69,
   "price": 4.0,
+  "halal": ["NOT_HALAL"],
   "waitingTime": "FAST",
-  "paymentMethods": ["CASH"],
+  "paymentMethods": ["CASH_ONLY"],
   "sauceAmount": 40,
   "meatRatio": 75,
   "openingHours": {

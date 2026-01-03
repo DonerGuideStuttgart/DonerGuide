@@ -40,11 +40,10 @@ export const HALAL_LABELS: Record<string, string> = {
 
 export const WAITING_TIME_LABELS: Record<string, string> = {
 	FAST: 'Schnell',
-	AVERAGE: 'Normal',
 	SLOW: 'Langsam',
 }
 
 export const PAYMENT_LABELS: Record<string, string> = {
 	CREDIT_CARD: 'Kartenzahlung',
-	CASH: 'Nur Cash',
+	CASH_ONLY: 'Nur Cash',
 }

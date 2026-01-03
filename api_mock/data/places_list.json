@@ -25,8 +25,8 @@
       "aiScore": 87,
       "price": 4.5,
       "vegetarian": ["VEGETARIAN", "VEGAN"],
-      "waitingTime": "AVERAGE",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "waitingTime": "FAST",
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 65,
       "meatRatio": 70,
       "openingHours": {
@@ -44,7 +44,7 @@
     },
     {
       "slug": "alis-imbiss",
-      "imageUrls": ["https://example.com/images/ali.jpg"],
+      "imageUrls": [],
       "name": "Ali's Imbiss",
       "phone": "+49 711 234567",
       "district": "Bad_Cannstatt",
@@ -62,8 +62,9 @@
       },
       "aiScore": 74,
       "price": 3.9,
+      "halal": ["NOT_HALAL"],
       "waitingTime": "FAST",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "paymentMethods": ["CASH_ONLY"],
       "sauceAmount": 55,
       "meatRatio": 80,
       "openingHours": {
@@ -99,7 +100,7 @@
       "aiScore": 65,
       "price": 5.0,
       "waitingTime": "SLOW",
-      "paymentMethods": ["CASH"],
+      "paymentMethods": ["CASH_ONLY"],
       "sauceAmount": 45,
       "meatRatio": 55,
       "openingHours": {
@@ -137,7 +138,7 @@
       "vegetarian": ["VEGETARIAN"],
       "halal": ["HALAL"],
       "waitingTime": "FAST",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 75,
       "meatRatio": 85,
       "openingHours": {
@@ -173,8 +174,9 @@
       "aiScore": 55,
       "price": 4.2,
       "vegetarian": ["VEGETARIAN"],
-      "waitingTime": "AVERAGE",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "halal": ["NOT_HALAL"],
+      "waitingTime": "FAST",
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 50,
       "meatRatio": 60,
       "openingHours": {
@@ -209,7 +211,7 @@
       "aiScore": 77,
       "price": 5.5,
       "waitingTime": "SLOW",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 60,
       "meatRatio": 65,
       "openingHours": {
@@ -244,8 +246,9 @@
       },
       "aiScore": 69,
       "price": 4.0,
+      "halal": ["NOT_HALAL"],
       "waitingTime": "FAST",
-      "paymentMethods": ["CASH"],
+      "paymentMethods": ["CASH_ONLY"],
       "sauceAmount": 40,
       "meatRatio": 75,
       "openingHours": {
@@ -281,8 +284,8 @@
       "aiScore": 80,
       "price": 4.8,
       "vegetarian": ["VEGETARIAN"],
-      "waitingTime": "AVERAGE",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "waitingTime": "FAST",
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 70,
       "meatRatio": 68,
       "openingHours": {
@@ -317,8 +320,9 @@
       },
       "aiScore": 50,
       "price": 3.5,
+      "halal": ["NOT_HALAL"],
       "waitingTime": "SLOW",
-      "paymentMethods": ["CASH"],
+      "paymentMethods": ["CASH_ONLY"],
       "sauceAmount": 35,
       "meatRatio": 50,
       "openingHours": {
@@ -354,8 +358,8 @@
       "aiScore": 88,
       "price": 5.2,
       "vegetarian": ["VEGETARIAN"],
-      "waitingTime": "AVERAGE",
-      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "waitingTime": "FAST",
+      "paymentMethods": ["CREDIT_CARD"],
       "sauceAmount": 80,
       "meatRatio": 72,
       "openingHours": {

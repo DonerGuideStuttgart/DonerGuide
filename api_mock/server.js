@@ -101,11 +101,12 @@ function normalizeUpperFrom(arr, allowedSet) {
 
 /**
  * Get numeric "rating" for sorting:
- * - Prefer 'rating' if present, otherwise use 'ai_score'.
+ * - Prefer 'aiScore' if present, otherwise use 'ai_score', otherwise 'rating'.
  */
 function ratingValueForSort(item) {
-  if (typeof item.rating === "number") return item.rating;
+  if (typeof item.aiScore === "number") return item.aiScore;
   if (typeof item.ai_score === "number") return item.ai_score;
+  if (typeof item.rating === "number") return item.rating;
   return -Infinity;
 }
 
@@ -170,15 +171,15 @@ app.get("/places", (req, res) => {
       ALLOWED_HALAL
     );
 
-    // - waiting_time: enum FAST | AVERAGE | SLOW
-    const ALLOWED_WAITING = new Set(["FAST", "AVERAGE", "SLOW"]);
+    // - waiting_time: enum FAST | SLOW
+    const ALLOWED_WAITING = new Set(["FAST", "SLOW"]);
     const waitingFilters = normalizeUpperFrom(
       parseMulti(req.query, "waiting_time"),
       ALLOWED_WAITING
     );
 
-    // - payment_methods: enum CASH | CREDIT_CARD (Kartenzahlung)
-    const ALLOWED_PM = new Set(["CASH", "CREDIT_CARD"]);
+    // - payment_methods: enum CASH_ONLY | CREDIT_CARD (Kartenzahlung)
+    const ALLOWED_PM = new Set(["CASH_ONLY", "CREDIT_CARD"]);
     const paymentFilters = normalizeUpperFrom(
       parseMulti(req.query, "payment_methods"),
       ALLOWED_PM
@@ -229,34 +230,28 @@ app.get("/places", (req, res) => {
       // sauce_amount_min
       if (sauceMin !== null) {
         if (
-          typeof item.sauce_amount !== "number" ||
-          !(item.sauce_amount >= sauceMin)
+          typeof item.sauceAmount !== "number" ||
+          !(item.sauceAmount >= sauceMin)
         )
           return false;
       }
       // sauce_amount_max
       if (sauceMax !== null) {
         if (
-          typeof item.sauce_amount !== "number" ||
-          !(item.sauce_amount <= sauceMax)
+          typeof item.sauceAmount !== "number" ||
+          !(item.sauceAmount <= sauceMax)
         )
           return false;
       }
 
       // meat_ratio_min
       if (meatMin !== null) {
-        if (
-          typeof item.meat_ratio !== "number" ||
-          !(item.meat_ratio >= meatMin)
-        )
+        if (typeof item.meatRatio !== "number" || !(item.meatRatio >= meatMin))
           return false;
       }
       // meat_ratio_max
       if (meatMax !== null) {
-        if (
-          typeof item.meat_ratio !== "number" ||
-          !(item.meat_ratio <= meatMax)
-        )
+        if (typeof item.meatRatio !== "number" || !(item.meatRatio <= meatMax))
           return false;
       }
 
@@ -283,8 +278,8 @@ app.get("/places", (req, res) => {
       // waiting_time exact enum match (ANY of provided)
       if (waitingFilters && waitingFilters.length) {
         const wt =
-          typeof item.waiting_time === "string"
-            ? item.waiting_time.toUpperCase()
+          typeof item.waitingTime === "string"
+            ? item.waitingTime.toUpperCase()
             : "";
         if (!waitingFilters.includes(wt)) return false;
       }
@@ -306,12 +301,19 @@ app.get("/places", (req, res) => {
     // Default: preserve original order (no sorting) to match current behavior when 'sort' not provided.
     const sortParam =
       typeof req.query.sort === "string" ? req.query.sort : null;
-    if (sortParam === "rating_desc" || sortParam === "rating_asc") {
+    if (
+      sortParam === "rating_desc" ||
+      sortParam === "rating_asc" ||
+      sortParam === "score_desc" ||
+      sortParam === "score_asc"
+    ) {
       filtered = [...filtered].sort((a, b) => {
         const av = ratingValueForSort(a);
         const bv = ratingValueForSort(b);
         // When dataset lacks 'rating', av/bv will be ai_score; otherwise rating
-        return sortParam === "rating_desc" ? bv - av : av - bv;
+        return sortParam === "rating_desc" || sortParam === "score_desc"
+          ? bv - av
+          : av - bv;
       });
     } else if (sortParam === "price_asc" || sortParam === "price_desc") {
       filtered = [...filtered].sort((a, b) => {
