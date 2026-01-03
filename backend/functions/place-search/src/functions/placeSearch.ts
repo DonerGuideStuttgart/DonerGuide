@@ -128,7 +128,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
         messages.push({
           id: place.id,
-          photos: place.photos.uncategorized,
+          photos: place.photos,
         });
       }
     } catch (error: any) {
@@ -172,17 +172,16 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
     return { created: true, updated: false };
   }
 
-  // Merge photos with deduplication
-  const mergedPhotos = {
-    uncategorized: [...(existingItem.photos?.uncategorized ?? []), ...(itemBody.photos?.uncategorized ?? [])].filter(
-      (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
-    ),
-    food: existingItem.photos?.food ?? [],
-    places: existingItem.photos?.places ?? [],
-  };
+  // Merge photos with deduplication, preserving existing classifications
+  const mergedPhotos = [
+    ...(existingItem.photos ?? []),
+    ...itemBody.photos
+  ].filter(
+    (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
+  );
 
   // Check if anything meaningful changed
-  const hasNewPhotos = (mergedPhotos.uncategorized?.length ?? 0) > (existingItem.photos?.uncategorized?.length ?? 0);
+  const hasNewPhotos = (mergedPhotos.length ?? 0) > (existingItem.photos?.length ?? 0);
   
   const hasDataChanges = 
     existingItem.name !== itemBody.name ||

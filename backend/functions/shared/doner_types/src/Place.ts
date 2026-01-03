@@ -24,11 +24,7 @@ export interface Place {
     sublocality?: string;
     streetAddress?: string;
   };
-  photos: {
-    uncategorized?: Photo[];
-    food?: Photo[];
-    places?: Photo[];
-  };
+  photos: Photo[];
   ai_analysis?: StoreAnalysis;
   paymentMethods?: PaymentMethods[]; // e.g., ["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]
   takeout?: boolean;

@@ -1,4 +1,4 @@
-import type { Place } from "doner_types";
+import type { Place, Photo } from "doner_types";
 import { PaymentMethods } from "doner_types";
 
 export interface GooglePlaceResponse {
@@ -120,11 +120,7 @@ export class GoogleMapsService {
       longitude: location?.longitude,
       address: this.parseAddressComponents(addressComponents),
       openingHours: this.mapOpeningHours(regularOpeningHours),
-      photos: {
-        uncategorized: this.mapPhotos(photos, id),
-        food: [],
-        places: [],
-      },
+      photos: this.mapPhotos(photos, id),
       paymentMethods: this.mapPaymentOptions(paymentOptions),
       takeout,
       delivery,
@@ -182,11 +178,14 @@ export class GoogleMapsService {
     return openingHours;
   }
 
-  private mapPhotos(googlePhotos: any[], placeId: string): any[] {
+  private mapPhotos(googlePhotos: any[], placeId: string): Photo[] {
     if (!googlePhotos) return [];
     return googlePhotos.slice(0, 10).map((photo) => ({
       id: photo.name, // Format is "places/PLACE_ID/photos/PHOTO_ID"
-      photoUrl: `https://places.googleapis.com/v1/${photo.name}/media?key=${this.apiKey}&maxHeightPx=1000`,
+      url: `https://places.googleapis.com/v1/${photo.name}/media?key=${this.apiKey}&maxHeightPx=1000`,
+      mimeType: "unknown",
+      category: "uncategorized",
+      confidence: 0,
     }));
   }
 
