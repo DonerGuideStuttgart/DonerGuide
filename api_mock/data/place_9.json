@@ -1,65 +1,37 @@
 {
-    "id": "9",
-    "name": "Express Kebap",
-    "doner_guide_version": 1,
-    "latitude": 48.800000,
-    "longitude": 9.160000,
-    "openingHours": {
-        "Mo": [
-            660,
-            1185
-        ],
-        "Tu": [
-            660,
-            1185
-        ],
-        "We": [
-            660,
-            1185
-        ],
-        "Th": [
-            660,
-            1185
-        ],
-        "Fr": [
-            660,
-            1215
-        ],
-        "Sa": [
-            720,
-            1215
-        ]
+  "slug": "express-kebap",
+  "imageUrls": ["https://example.com/images/express.jpg"],
+  "name": "Express Kebap",
+  "district": "Feuerbach",
+  "location": {
+    "coordinates": {
+      "lat": 48.8,
+      "lng": 9.16
     },
     "address": {
-        "postalCode": "70469",
-        "locality": "Stuttgart",
-        "sublocality": "Feuerbach",
-        "streetAddress": "Feuerbachweg 9"
+      "postalCode": "70469",
+      "locality": "Stuttgart",
+      "sublocality": "Feuerbach",
+      "streetAddress": "Feuerbacher Weg 25"
+    }
+  },
+  "aiScore": 50,
+  "price": 3.5,
+  "halal": ["NOT_HALAL"],
+  "waitingTime": "SLOW",
+  "paymentMethods": ["CASH_ONLY"],
+  "sauceAmount": 35,
+  "meatRatio": 50,
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": 660, "end": 1185 }],
+      "tue": [{ "start": 660, "end": 1185 }],
+      "wed": [{ "start": 660, "end": 1185 }],
+      "thu": [{ "start": 660, "end": 1185 }],
+      "fri": [{ "start": 660, "end": 1185 }],
+      "sat": [{ "start": 660, "end": 1185 }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p9f1",
-                "photoUrl": "https://example.com/photos/express_food1.jpg"
-            }
-        ],
-        "places": []
-    },
-    "ai_analysis": {
-        "score": 50,
-        "meat_ratio": 90,
-        "sauce_amount": 35,
-        "size": 55,
-        "waiting_time": "FAST",
-        "image_URL": "https://example.com/analysis/express.jpg",
-        "text": "Sehr günstig, kleine Portionen."
-    },
-    "paymentMethods": [
-        "CASH"
-    ],
-    "takeout": true,
-    "delivery": false,
-    "dineIn": false,
-    "servesVegetarianFood": false
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Express Kebap ist die Budget-Option mit einem Preis von nur 3.50€. AI-Score von 50. Sehr hoher Fleischanteil von 90%. Schneller Service, aber kürzere Öffnungszeiten. Nur Barzahlung."
 }

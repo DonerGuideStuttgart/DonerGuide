@@ -10,8 +10,8 @@ type SortOption = {
 
 const SORT_OPTIONS: SortOption[] = [
 	{ value: '', label: 'Relevanz' },
-	{ value: 'rating_desc', label: 'KI Rating (Höchster)' },
-	{ value: 'rating_asc', label: 'KI Rating (Niedrigster)' },
+	{ value: 'score_desc', label: 'KI Rating (Höchster)' },
+	{ value: 'score_asc', label: 'KI Rating (Niedrigster)' },
 	{ value: 'price_asc', label: 'Preis (Niedrigster)' },
 	{ value: 'price_desc', label: 'Preis (Höchster)' },
 ]

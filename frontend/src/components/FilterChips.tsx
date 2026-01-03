@@ -45,19 +45,6 @@ type FilterConfig =
 const FILTER_CONFIGS: FilterConfig[] = [
 	{
 		type: 'range',
-		minKey: 'min_score',
-		maxKey: 'max_score',
-		defaultMin: 0,
-		defaultMax: 100,
-		formatLabel: (min, max) => (
-			<span className="flex items-center gap-1">
-				{min} - {max}
-				<Aistars className="size-4" />
-			</span>
-		),
-	},
-	{
-		type: 'range',
 		minKey: 'price_min',
 		maxKey: 'price_max',
 		defaultMin: 0,

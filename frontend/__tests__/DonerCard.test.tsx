@@ -1,17 +1,103 @@
-import DonerCard, {
-	DonerCardSkeleton,
-	type StoreSummary,
-} from '@/components/DonerCard'
+import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
+import type { StoreBase } from '@/types/store'
 import { render, screen } from '@testing-library/react'
 
+// Mock all SVG imports
+jest.mock('@/assets/icons/aistars.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="aistars-icon" />,
+}))
+jest.mock('@/assets/icons/infocircle.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="infocircle-icon" />,
+}))
+jest.mock('@/assets/icons/circlesolid.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="circlesolid-icon" />,
+}))
+jest.mock('@/assets/icons/clock.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="clock-icon" />,
+}))
+jest.mock('@/assets/icons/vegetarian.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="vegetarian-icon" />,
+}))
+jest.mock('@/assets/icons/vegan.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="vegan-icon" />,
+}))
+jest.mock('@/assets/icons/run.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="run-icon" />,
+}))
+jest.mock('@/assets/icons/xcircle.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="xcircle-icon" />,
+}))
+jest.mock('@/assets/icons/creditcard.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="creditcard-icon" />,
+}))
+jest.mock('@/assets/icons/cash.svg', () => ({
+	__esModule: true,
+	default: () => <svg data-testid="cash-icon" />,
+}))
+
+// Mock Next.js Link and Image
+jest.mock('next/link', () => ({
+	__esModule: true,
+	default: ({
+		children,
+		href,
+	}: {
+		children: React.ReactNode
+		href: string
+	}) => <a href={href}>{children}</a>,
+}))
+jest.mock('next/image', () => ({
+	__esModule: true,
+	default: ({
+		src,
+		alt,
+		...props
+	}: {
+		src: string
+		alt: string
+		[key: string]: unknown
+		// eslint-disable-next-line @next/next/no-img-element
+	}) => <img src={src} alt={alt} {...props} />,
+}))
+
 describe('DonerCard Component', () => {
-	const mockStore: StoreSummary = {
-		id: '1',
+	const mockStore: StoreBase = {
+		slug: 'test-doener',
+		imageUrls: [],
 		name: 'Test Döner',
 		district: 'Mitte',
-		ai_score: 85,
+		location: {
+			coordinates: { lat: 48.775845, lng: 9.182932 },
+			address: {
+				postalCode: '70173',
+				locality: 'Stuttgart',
+				sublocality: 'Mitte',
+				streetAddress: 'Teststraße 1',
+			},
+		},
+		aiScore: 85,
 		price: 7,
-		ai_summary: 'Ein leckerer Döner mit viel Fleisch.',
+		openingHours: {
+			hours: {
+				mon: [{ start: 600, end: 1320 }],
+				tue: [{ start: 600, end: 1320 }],
+				wed: [{ start: 600, end: 1320 }],
+				thu: [{ start: 600, end: 1320 }],
+				fri: [{ start: 600, end: 1320 }],
+				sat: [{ start: 660, end: 1380 }],
+				sun: [{ start: 660, end: 1320 }],
+			},
+			timezone: 'Europe/Berlin',
+		},
 	}
 
 	it('renders store name', () => {
@@ -26,46 +112,36 @@ describe('DonerCard Component', () => {
 		expect(screen.getByText('Mitte')).toBeInTheDocument()
 	})
 
-	it('renders store rating', () => {
+	it('renders store AI score', () => {
 		render(<DonerCard store={mockStore} />)
 
-		expect(screen.getByText('Rating: 85')).toBeInTheDocument()
+		expect(screen.getByText('85')).toBeInTheDocument()
 	})
 
 	it('renders store price', () => {
 		render(<DonerCard store={mockStore} />)
 
-		expect(screen.getByText('Price: €7')).toBeInTheDocument()
+		expect(screen.getByText(/7€/)).toBeInTheDocument()
 	})
 
-	it('renders store summary', () => {
+	it('renders opening hours status', () => {
 		render(<DonerCard store={mockStore} />)
 
-		expect(
-			screen.getByText('Ein leckerer Döner mit viel Fleisch.'),
-		).toBeInTheDocument()
-	})
-
-	it('renders dash when rating is missing', () => {
-		const storeWithoutRating: StoreSummary = {
-			...mockStore,
-			ai_score: undefined,
-		}
-
-		render(<DonerCard store={storeWithoutRating} />)
-
-		expect(screen.getByText('Rating: —')).toBeInTheDocument()
+		// Should show opening hours text - use getAllByText since badge also contains opening status
+		const openingTexts = screen.getAllByText(/Schließt|Öffnet|geschlossen/i)
+		expect(openingTexts.length).toBeGreaterThan(0)
 	})
 
 	it('renders dash when price is missing', () => {
-		const storeWithoutPrice: StoreSummary = {
+		const storeWithoutPrice: StoreBase = {
 			...mockStore,
 			price: undefined,
 		}
 
 		render(<DonerCard store={storeWithoutPrice} />)
 
-		expect(screen.getByText('Price: €—')).toBeInTheDocument()
+		// When price is missing, the price section should not be rendered
+		expect(screen.queryByText(/Döner Preis/)).not.toBeInTheDocument()
 	})
 })
 
