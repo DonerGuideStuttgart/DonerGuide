@@ -1,65 +1,37 @@
 {
-    "id": "3",
-    "name": "Kebap König",
-    "doner_guide_version": 1,
-    "latitude": 48.789000,
-    "longitude": 9.178000,
-    "openingHours": {
-        "Mo": [
-            600,
-            1380
-        ],
-        "Tu": [
-            600,
-            1380
-        ],
-        "We": [
-            600,
-            1380
-        ],
-        "Th": [
-            600,
-            1380
-        ],
-        "Fr": [
-            600,
-            1440
-        ],
-        "Sa": [
-            660,
-            1440
-        ]
+  "slug": "kebap-koenig",
+  "imageUrls": [
+    "https://example.com/images/kebap-koenig.jpg",
+    "https://example.com/photos/kebap_food1.jpg"
+  ],
+  "name": "Kebap König",
+  "district": "Nord",
+  "location": {
+    "coordinates": {
+      "lat": 48.789,
+      "lng": 9.178
     },
     "address": {
-        "postalCode": "70191",
-        "locality": "Stuttgart",
-        "sublocality": "Nord",
-        "streetAddress": "Nordstraße 3"
+      "postalCode": "70191",
+      "locality": "Stuttgart",
+      "sublocality": "Nord",
+      "streetAddress": "Nordstraße 3"
+    }
+  },
+  "aiScore": 65,
+  "price": 5.0,
+  "waitingTime": "SLOW",
+  "payment": ["CASH"],
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": "10:00", "end": "23:00" }],
+      "tue": [{ "start": "10:00", "end": "23:00" }],
+      "wed": [{ "start": "10:00", "end": "23:00" }],
+      "thu": [{ "start": "10:00", "end": "23:00" }],
+      "fri": [{ "start": "10:00", "end": "24:00" }],
+      "sat": [{ "start": "11:00", "end": "24:00" }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p3f1",
-                "photoUrl": "https://example.com/photos/kebap_food1.jpg"
-            }
-        ],
-        "places": []
-    },
-    "ai_analysis": {
-        "score": 65,
-        "meat_ratio": 85,
-        "sauce_amount": 60,
-        "size": 75,
-        "waiting_time": "SLOW",
-        "image_URL": "https://example.com/analysis/kebap.jpg",
-        "text": "Große Portionen, etwas langsam."
-    },
-    "paymentMethods": [
-        "CASH"
-    ],
-    "takeout": true,
-    "delivery": false,
-    "dineIn": false,
-    "servesVegetarianFood": false
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Kebap König bietet täglich bis 23 Uhr seinen Service an. Mit einem AI-Score von 65 und einem hohen Fleischanteil von 85% richtet sich das Angebot eher an Fleischliebhaber. Die Wartezeit kann länger ausfallen. Nur Barzahlung möglich."
 }

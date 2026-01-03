@@ -1,66 +1,35 @@
 {
-    "id": "5",
-    "name": "Murat's",
-    "doner_guide_version": 1,
-    "latitude": 48.743000,
-    "longitude": 9.163000,
-    "openingHours": {
-        "Mo": [
-            660,
-            1200
-        ],
-        "Tu": [
-            660,
-            1200
-        ],
-        "We": [
-            660,
-            1200
-        ],
-        "Th": [
-            660,
-            1200
-        ],
-        "Fr": [
-            660,
-            1260
-        ],
-        "Sa": [
-            720,
-            1260
-        ]
+  "slug": "murats",
+  "imageUrls": ["https://example.com/images/murats.jpg"],
+  "name": "Murat's",
+  "district": "Vaihingen",
+  "location": {
+    "coordinates": {
+      "lat": 48.743,
+      "lng": 9.163
     },
     "address": {
-        "postalCode": "70563",
-        "locality": "Stuttgart",
-        "sublocality": "Vaihingen",
-        "streetAddress": "Vaihingenweg 4"
+      "postalCode": "70563",
+      "locality": "Stuttgart",
+      "sublocality": "Vaihingen",
+      "streetAddress": "Vaihinger Straße 20"
+    }
+  },
+  "aiScore": 55,
+  "price": 4.2,
+  "vegetarian": ["SERVES_VEGETARIAN"],
+  "waitingTime": "AVERAGE",
+  "payment": ["CASH", "DEBIT_CARD"],
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": "11:00", "end": "20:00" }],
+      "tue": [{ "start": "11:00", "end": "20:00" }],
+      "wed": [{ "start": "11:00", "end": "20:00" }],
+      "thu": [{ "start": "11:00", "end": "20:00" }],
+      "fri": [{ "start": "11:00", "end": "20:00" }],
+      "sat": [{ "start": "11:00", "end": "20:00" }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p5f1",
-                "photoUrl": "https://example.com/photos/murats_food1.jpg"
-            }
-        ],
-        "places": []
-    },
-    "ai_analysis": {
-        "score": 55,
-        "meat_ratio": 50,
-        "sauce_amount": 45,
-        "size": 50,
-        "waiting_time": "AVERAGE",
-        "image_URL": "https://example.com/analysis/murats.jpg",
-        "text": "Günstig, solide Portionen."
-    },
-    "paymentMethods": [
-        "CASH",
-        "DEBIT_CARD"
-    ],
-    "takeout": true,
-    "delivery": false,
-    "dineIn": false,
-    "servesVegetarianFood": true
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Murat's ist eine solide Wahl mit einem AI-Score von 55. Günstige Preise bei 4.20€. Vegetarische Optionen verfügbar. Sonntags geschlossen. Durchschnittliche Wartezeiten."
 }

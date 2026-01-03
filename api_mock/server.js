@@ -344,6 +344,21 @@ app.get("/places", (req, res) => {
   }
 });
 
+app.get("/places/by-slug/:slug", (req, res) => {
+  const slug = req.params.slug;
+
+  // Read all place files and find the one matching the slug
+  for (let i = 1; i <= 10; i++) {
+    const file = `place_${i}.json`;
+    const place = readJson(file);
+    if (place && place.slug === slug) {
+      return res.json(place);
+    }
+  }
+
+  return res.status(404).json({ message: "Place not found" });
+});
+
 app.get("/places/:id", (req, res) => {
   const id = req.params.id;
   const file = `place_${id}.json`;
