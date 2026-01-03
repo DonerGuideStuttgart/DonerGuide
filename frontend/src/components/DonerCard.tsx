@@ -7,15 +7,15 @@ import Image from 'next/image'
 import Aistars from '@/assets/icons/aistars.svg'
 import InfoCircle from '@/assets/icons/infocircle.svg'
 import CircleSolid from '@/assets/icons/circlesolid.svg'
+import Location from '@/assets/icons/location.svg'
+import { getOpeningStatusText, isStoreOpen } from '@/helpers/openingHours'
+import { DISTRICT_LABELS } from '@/types/records'
 
 export default function DonerCard({ store }: { store: StoreBase }) {
 	const mainImage =
 		store.imageUrls && store.imageUrls.length > 0 ? store.imageUrls[0] : null
 
-	const isOpen = () => {
-		// TODO: Implement proper opening hours check
-		return false
-	}
+	const isOpen = () => isStoreOpen(store.openingHours)
 
 	// Helper to get badges based on store data
 	const getBadges = () => {
@@ -69,14 +69,14 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 	}
 
 	const badges = getBadges()
-	const openCloseingText = 'Schließt um 22:00 Uhr' // TODO: Dynamically generate this text based on opening hours
+	const openClosingText = getOpeningStatusText(store.openingHours)
 
 	return (
 		<Link href={routes.storeDetail(store.slug)} className="block">
-			<article className="flex justify-between border border-primary bg-base-100 hover:bg-base-200 rounded-xl p-6">
-				<div>
+			<article className="flex justify-between border border-primary bg-base-100 hover:bg-base-200 rounded-xl gap-4 p-6">
+				<div className="w-full space-y-2">
 					{/* Header with name and score */}
-					<div className="flex items-center gap-3 mb-2">
+					<div className="flex items-center gap-3">
 						<h3 className="text-lg font-bold">{store.name}</h3>
 						<div
 							className="flex items-center gap-2 tooltip tooltip-primary"
@@ -93,8 +93,8 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 					{/* Header with name and score End */}
 
 					{/* Closing/Opening Hour Today & Price */}
-					<div className="flex items-center mb-4">
-						<div className="text-neutral text-sm">{openCloseingText}</div>
+					<div className="flex items-center">
+						<div className="text-neutral text-sm">{openClosingText}</div>
 						<CircleSolid className="size-1 fill-neutral mx-2" />
 						{store.price && (
 							<div className="text-neutral text-sm">
@@ -103,6 +103,17 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 						)}
 					</div>
 					{/* Closing/Opening Hour Today & Price End */}
+
+					{/* District */}
+					<div className="flex items-center gap-2 mb-4">
+						<Location className="size-4 fill-neutral" />
+						<p className="text-neutral text-sm">
+							{store.district && DISTRICT_LABELS[store.district]
+								? DISTRICT_LABELS[store.district]
+								: store.district}
+						</p>
+					</div>
+					{/* District End */}
 
 					{/* Badges */}
 					<div className="flex flex-wrap grid-cols-2 gap-2">
@@ -118,19 +129,23 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 							)
 						})}
 					</div>
+					{/* Badges End */}
 				</div>
 
 				{/* Image */}
-				{mainImage && (
+				{mainImage ? (
 					<Image
 						src={mainImage}
 						alt={store.name}
 						loading="eager"
-						width={96}
-						height={96}
+						width={128}
+						height={128}
 						className="object-cover rounded-lg"
 					/>
+				) : (
+					<div className="min-w-24 size-24"></div>
 				)}
+				{/* Image End */}
 			</article>
 		</Link>
 	)
