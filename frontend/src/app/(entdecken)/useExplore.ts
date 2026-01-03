@@ -55,10 +55,10 @@ export function useExplore() {
 			// Append for pagination, replace otherwise
 			setStores((prev) => (filters.offset > 0 ? [...prev, ...items] : items))
 
-			// Check if there are more items to load
-			// If we got fewer items than requested, there are no more
-			const expectedCount = filters.offset > 0 ? LOAD_MORE_COUNT : INITIAL_LIMIT
-			setHasMore(items.length >= expectedCount)
+			// Check if there are more items to load using total count from backend
+			const totalItems = payload.meta?.totalItems ?? 0
+			const currentlyLoaded = filters.offset + items.length
+			setHasMore(currentlyLoaded < totalItems)
 		} catch (err) {
 			if (currentRequestId !== requestIdRef.current) return
 			setError(err instanceof Error ? err.message : 'Unknown error')
