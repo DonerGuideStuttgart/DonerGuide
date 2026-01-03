@@ -16,13 +16,11 @@ services:
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
-    environment:
-      PLACE_SEARCH_CRON: "*/10 * * * * *"
-      PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
-      PLACE_SEARCH_SERVICEBUS_QUEUE_NAME: "places"
-      PLACE_SEARCH_COSMOSDB_CONNECTION_STRING: "AccountEndpoint=http://cosmosdb-emulator:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
-      PLACE_SEARCH_COSMOSDB_DATABASE_NAME: "DoenerGuideDB"
-      PLACE_SEARCH_COSMOSDB_CONTAINER_NAME: "Places"
+      - azurite
+    ports:
+      - 7071:7071
+    env_file:
+      - ./functions/place-search/.env
 
   image-classifier:
     image: node:22
@@ -113,8 +111,6 @@ services:
       - "10000:10000"
       - "10001:10001"
       - "10002:10002"
-    environment:
-      AZURITE_ACCOUNTS: test_account_place_search_timer_trigger:secure_key
   
   cosmosdb-emulator:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
@@ -141,7 +137,8 @@ services:
       MSSQL_SA_PASSWORD: "Secure!12346"
       ACCEPT_EULA: "Y"
     depends_on:
-      - sqledge
+      sqledge:
+        condition: service_healthy
     
   sqledge:
     image: "mcr.microsoft.com/azure-sql-edge:latest"
@@ -151,6 +148,11 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "Secure!12346"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Secure!12346' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   node_modules_place-search:

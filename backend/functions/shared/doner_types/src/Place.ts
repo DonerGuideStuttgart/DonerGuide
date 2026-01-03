@@ -35,4 +35,5 @@ export interface Place {
   delivery?: boolean;
   dineIn?: boolean;
   servesVegetarianFood?: boolean;
+  lastUpdated?: string; // ISO timestamp
 }
