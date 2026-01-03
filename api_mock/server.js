@@ -110,6 +110,81 @@ function ratingValueForSort(item) {
   return -Infinity;
 }
 
+/**
+ * Convert time string (HH:MM) to minutes since midnight
+ */
+function timeToMinutes(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Check if a store is open at a specific time
+ * @param {Object} openingHours - Opening hours object with hours as minutes since midnight
+ * @param {string} checkTime - Time in format "HH:MM"
+ * @param {string} weekday - Weekday (mon, tue, wed, thu, fri, sat, sun)
+ * @returns {boolean}
+ */
+function isOpenAt(openingHours, checkTime, weekday) {
+  if (!openingHours || !openingHours.hours) return false;
+  const todayHours = openingHours.hours[weekday];
+  if (!todayHours || todayHours.length === 0) return false;
+
+  const checkMinutes = timeToMinutes(checkTime);
+
+  const result = todayHours.some((range) => {
+    // range.start and range.end are already in minutes
+    // Handle times that cross midnight
+    if (range.end < range.start) {
+      // If end time is earlier than start (e.g., 660 - 30 for 11:00 - 00:30), it crosses midnight
+      return checkMinutes >= range.start || checkMinutes <= range.end;
+    }
+    return checkMinutes >= range.start && checkMinutes <= range.end;
+  });
+
+  // Debug logging
+  if (openingHours.hours[weekday] && openingHours.hours[weekday].length > 1) {
+    console.log(
+      `[DEBUG] isOpenAt(${checkTime}, ${weekday}): ${checkMinutes} minutes, ranges:`,
+      todayHours,
+      "=> result:",
+      result
+    );
+  }
+
+  return result;
+}
+
+/**
+ * Get current time info in Europe/Berlin timezone
+ */
+function getCurrentTimeInfo() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString("de-DE", {
+    timeZone: "Europe/Berlin",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const weekdayShort = now.toLocaleDateString("en-US", {
+    timeZone: "Europe/Berlin",
+    weekday: "short",
+  });
+  const weekdayMap = {
+    Mon: "mon",
+    Tue: "tue",
+    Wed: "wed",
+    Thu: "thu",
+    Fri: "fri",
+    Sat: "sat",
+    Sun: "sun",
+  };
+  return {
+    currentTime: timeStr,
+    weekday: weekdayMap[weekdayShort] || "mon",
+  };
+}
+
 app.get("/places", (req, res) => {
   try {
     const list = readJson("places_list.json"); // dataDir already points to /data
@@ -184,6 +259,20 @@ app.get("/places", (req, res) => {
       parseMulti(req.query, "payment_methods"),
       ALLOWED_PM
     );
+
+    // - open_hours: enum open_now | open_this_evening | open_late
+    const ALLOWED_OPEN_HOURS = new Set([
+      "open_now",
+      "open_this_evening",
+      "open_late",
+    ]);
+    const openHoursFilters = normalizeUpperFrom(
+      parseMulti(req.query, "open_hours"),
+      ALLOWED_OPEN_HOURS
+    );
+
+    // Get current time info for opening hours filtering
+    const timeInfo = openHoursFilters ? getCurrentTimeInfo() : null;
 
     // 2) Apply filtering
     let filtered = originalItems.filter((item) => {
@@ -292,6 +381,53 @@ app.get("/places", (req, res) => {
         const normalized = methods.map((m) => String(m).toUpperCase());
         const anyMatch = paymentFilters.some((pm) => normalized.includes(pm));
         if (!anyMatch) return false;
+      }
+
+      // open_hours: check if store matches any of the requested opening hour filters
+      if (openHoursFilters && openHoursFilters.length && timeInfo) {
+        const matchesAnyFilter = openHoursFilters.some((filter) => {
+          const filterUpper = filter.toUpperCase();
+
+          // open_now: currently open
+          if (filterUpper === "OPEN_NOW") {
+            const isOpen = isOpenAt(
+              item.openingHours,
+              timeInfo.currentTime,
+              timeInfo.weekday
+            );
+            // Debug for stores with lunch breaks
+            if (
+              item.slug === "ali-baba-grill" ||
+              item.slug === "orient-express"
+            ) {
+              console.log(
+                `[FILTER] ${item.name} (${item.slug}): time=${timeInfo.currentTime}, day=${timeInfo.weekday}, isOpen=${isOpen}`
+              );
+            }
+            return isOpen;
+          }
+
+          // open_this_evening: open between 18:00 and 23:59
+          if (filterUpper === "OPEN_THIS_EVENING") {
+            // Check if open at 18:00 or 20:00
+            return (
+              isOpenAt(item.openingHours, "18:00", timeInfo.weekday) ||
+              isOpenAt(item.openingHours, "20:00", timeInfo.weekday)
+            );
+          }
+
+          // open_late: open after 22:00
+          if (filterUpper === "OPEN_LATE") {
+            return (
+              isOpenAt(item.openingHours, "22:00", timeInfo.weekday) ||
+              isOpenAt(item.openingHours, "23:00", timeInfo.weekday)
+            );
+          }
+
+          return false;
+        });
+
+        if (!matchesAnyFilter) return false;
       }
 
       return true;
