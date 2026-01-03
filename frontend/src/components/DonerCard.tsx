@@ -73,8 +73,8 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 
 	return (
 		<Link href={routes.storeDetail(store.slug)} className="block">
-			<article className="flex justify-between border border-primary bg-base-100 hover:bg-base-200 rounded-xl gap-4 p-6">
-				<div className="w-full space-y-2">
+			<article className="flex flex-col md:flex-row justify-between border border-primary bg-base-100 hover:bg-base-200 rounded-xl gap-4 p-6">
+				<div className="w-full space-y-2 order-last md:order-first">
 					{/* Header with name and score */}
 					<div className="flex items-center gap-3">
 						<h3 className="text-lg font-bold">{store.name}</h3>
@@ -140,10 +140,10 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 						loading="eager"
 						width={128}
 						height={128}
-						className="object-cover rounded-lg"
+						className="object-cover w-full h-50 md:size-32 rounded-lg"
 					/>
 				) : (
-					<div className="min-w-24 size-24"></div>
+					<div className="hidden md:block md:min-w-24 md:size-24"></div>
 				)}
 				{/* Image End */}
 			</article>
