@@ -1,7 +1,6 @@
 'use client'
-import type { StoreSummary } from '@/components/DonerCard'
 import { buildStoreQuery, fetchPlaces } from '@/helpers/api'
-import type { FilterParams } from '@/types/store'
+import type { FilterParams, StoreBase } from '@/types/store'
 import { useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -17,7 +16,7 @@ const DEBOUNCE_MS = 300
 
 export function useExplore() {
 	// Data state
-	const [stores, setStores] = useState<StoreSummary[]>([])
+	const [stores, setStores] = useState<StoreBase[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [hasMore, setHasMore] = useState(true)
