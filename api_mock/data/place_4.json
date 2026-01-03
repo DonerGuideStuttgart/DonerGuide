@@ -1,76 +1,38 @@
 {
-    "id": "4",
-    "name": "Sultan Grill",
-    "doner_guide_version": 1,
-    "latitude": 48.776000,
-    "longitude": 9.188000,
-    "openingHours": {
-        "Mo": [
-            660,
-            1500
-        ],
-        "Tu": [
-            660,
-            1500
-        ],
-        "We": [
-            660,
-            1500
-        ],
-        "Th": [
-            660,
-            1500
-        ],
-        "Fr": [
-            660,
-            1530
-        ],
-        "Sa": [
-            720,
-            1530
-        ],
-        "Su": [
-            720,
-            1320
-        ]
+  "slug": "sultan-grill",
+  "imageUrls": ["https://example.com/images/sultan.jpg"],
+  "name": "Sultan Grill",
+  "phone": "+49 711 345678",
+  "district": "Ost",
+  "location": {
+    "coordinates": {
+      "lat": 48.776,
+      "lng": 9.188
     },
     "address": {
-        "postalCode": "70176",
-        "locality": "Stuttgart",
-        "sublocality": "Ost",
-        "streetAddress": "Ostallee 7"
+      "postalCode": "70190",
+      "locality": "Stuttgart",
+      "sublocality": "Ost",
+      "streetAddress": "Ostendstraße 15"
+    }
+  },
+  "aiScore": 92,
+  "price": 6.0,
+  "vegetarian": ["SERVES_VEGETARIAN", "VEGETARIAN_OPTIONS"],
+  "halal": "CERTIFIED_HALAL",
+  "waitingTime": "FAST",
+  "payment": ["CASH", "CREDIT_CARD", "NFC"],
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": "11:00", "end": "00:30" }],
+      "tue": [{ "start": "11:00", "end": "00:30" }],
+      "wed": [{ "start": "11:00", "end": "00:30" }],
+      "thu": [{ "start": "11:00", "end": "00:30" }],
+      "fri": [{ "start": "11:00", "end": "01:00" }],
+      "sat": [{ "start": "11:00", "end": "01:00" }],
+      "sun": [{ "start": "11:00", "end": "00:00" }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p4f1",
-                "photoUrl": "https://example.com/photos/sultan_food1.jpg"
-            }
-        ],
-        "places": [
-            {
-                "id": "p4pl1",
-                "photoUrl": "https://example.com/photos/sultan_place1.jpg"
-            }
-        ]
-    },
-    "ai_analysis": {
-        "score": 92,
-        "meat_ratio": 60,
-        "sauce_amount": 55,
-        "size": 80,
-        "waiting_time": "FAST",
-        "image_URL": "https://example.com/analysis/sultan.jpg",
-        "text": "Sehr gute Qualität und schneller Service."
-    },
-    "paymentMethods": [
-        "CASH",
-        "CREDIT_CARD",
-        "NFC"
-    ],
-    "takeout": true,
-    "delivery": false,
-    "dineIn": true,
-    "servesVegetarianFood": true
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Sultan Grill ist eine Premium-Wahl mit einem herausragenden AI-Score von 92. Zertifiziert halal und mit vielfältigen vegetarischen Optionen. Schneller Service trotz hoher Qualität. Lange Öffnungszeiten bis nach Mitternacht. Alle Zahlungsmethoden werden akzeptiert."
 }

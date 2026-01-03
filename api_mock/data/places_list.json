@@ -1,169 +1,357 @@
 {
-    "items": [
-        {
-            "id": "1",
-            "name": "Hasan's Döner",
-            "ai_score": 87,
-            "closesTodayAt": "22:30",
-            "image": "https://example.com/images/hasan.jpg",
-            "servesVegetarianFood": true,
-            "meat_ratio": 65,
-            "waiting_time": "AVERAGE",
-            "price": 4.5,
-            "paymentMethods": [
-                "CASH",
-                "NFC"
-            ],
-            "district": "Mitte"
+  "items": [
+    {
+      "slug": "hasans-doener",
+      "imageUrls": ["https://example.com/images/hasan.jpg"],
+      "name": "Hasan's Döner",
+      "phone": "+49 711 123456",
+      "district": "Mitte",
+      "location": {
+        "coordinates": {
+          "lat": 48.775845,
+          "lng": 9.182932
         },
-        {
-            "id": "2",
-            "name": "Ali's Imbiss",
-            "ai_score": 74,
-            "closesTodayAt": "21:00",
-            "image": "https://example.com/images/ali.jpg",
-            "servesVegetarianFood": false,
-            "meat_ratio": 80,
-            "waiting_time": "FAST",
-            "price": 3.9,
-            "paymentMethods": [
-                "CASH",
-                "DEBIT_CARD"
-            ],
-            "district": "Bad_Cannstatt"
-        },
-        {
-            "id": "3",
-            "name": "Kebap König",
-            "ai_score": 65,
-            "closesTodayAt": "23:00",
-            "image": "https://example.com/images/kebap-koenig.jpg",
-            "servesVegetarianFood": false,
-            "meat_ratio": 85,
-            "waiting_time": "SLOW",
-            "price": 5.0,
-            "paymentMethods": [
-                "CASH"
-            ],
-            "district": "Nord"
-        },
-        {
-            "id": "4",
-            "name": "Sultan Grill",
-            "ai_score": 92,
-            "closesTodayAt": "00:30",
-            "image": "https://example.com/images/sultan.jpg",
-            "servesVegetarianFood": true,
-            "meat_ratio": 60,
-            "waiting_time": "FAST",
-            "price": 6.0,
-            "paymentMethods": [
-                "CASH",
-                "CREDIT_CARD",
-                "NFC"
-            ],
-            "district": "Ost"
-        },
-        {
-            "id": "5",
-            "name": "Murat's",
-            "ai_score": 55,
-            "closesTodayAt": "20:00",
-            "image": "https://example.com/images/murats.jpg",
-            "servesVegetarianFood": true,
-            "meat_ratio": 50,
-            "waiting_time": "AVERAGE",
-            "price": 4.2,
-            "paymentMethods": [
-                "CASH",
-                "DEBIT_CARD"
-            ],
-            "district": "Vaihingen"
-        },
-        {
-            "id": "6",
-            "name": "Orient Express",
-            "ai_score": 77,
-            "closesTodayAt": "22:00",
-            "image": "https://example.com/images/orient_express.jpg",
-            "servesVegetarianFood": false,
-            "meat_ratio": 70,
-            "waiting_time": "AVERAGE",
-            "price": 5.5,
-            "paymentMethods": [
-                "CASH",
-                "CREDIT_CARD"
-            ],
-            "district": "West"
-        },
-        {
-            "id": "7",
-            "name": "Bosphorus",
-            "ai_score": 69,
-            "closesTodayAt": "21:30",
-            "image": "https://example.com/images/bosphorus.jpg",
-            "servesVegetarianFood": false,
-            "meat_ratio": 75,
-            "waiting_time": "FAST",
-            "price": 4.0,
-            "paymentMethods": [
-                "CASH"
-            ],
-            "district": "Bad_Cannstatt"
-        },
-        {
-            "id": "8",
-            "name": "Tasty Döner",
-            "ai_score": 80,
-            "closesTodayAt": "23:30",
-            "image": "https://example.com/images/tasty.jpg",
-            "servesVegetarianFood": true,
-            "meat_ratio": 55,
-            "waiting_time": "AVERAGE",
-            "price": 4.8,
-            "paymentMethods": [
-                "CASH",
-                "DEBIT_CARD",
-                "NFC"
-            ],
-            "district": "Möhringen"
-        },
-        {
-            "id": "9",
-            "name": "Express Kebap",
-            "ai_score": 50,
-            "closesTodayAt": "19:45",
-            "image": "https://example.com/images/express.jpg",
-            "servesVegetarianFood": false,
-            "meat_ratio": 90,
-            "waiting_time": "FAST",
-            "price": 3.5,
-            "paymentMethods": [
-                "CASH"
-            ],
-            "district": "Feuerbach"
-        },
-        {
-            "id": "10",
-            "name": "Döner Villa",
-            "ai_score": 88,
-            "closesTodayAt": "22:45",
-            "image": "https://example.com/images/villa.jpg",
-            "servesVegetarianFood": true,
-            "meat_ratio": 62,
-            "waiting_time": "AVERAGE",
-            "price": 5.2,
-            "paymentMethods": [
-                "CASH",
-                "CREDIT_CARD"
-            ],
-            "district": "Degerloch"
+        "address": {
+          "postalCode": "70173",
+          "locality": "Stuttgart",
+          "sublocality": "Mitte",
+          "streetAddress": "Marktstraße 1"
         }
-    ],
-    "meta": {
-        "page": 1,
-        "pageSize": 20,
-        "totalItems": 10,
-        "totalPages": 1
+      },
+      "aiScore": 87,
+      "price": 4.5,
+      "vegetarian": ["SERVES_VEGETARIAN"],
+      "waitingTime": "AVERAGE",
+      "payment": ["CASH", "NFC"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "22:30" }],
+          "tue": [{ "start": "11:00", "end": "22:30" }],
+          "wed": [{ "start": "11:00", "end": "22:30" }],
+          "thu": [{ "start": "11:00", "end": "22:30" }],
+          "fri": [{ "start": "11:00", "end": "23:30" }],
+          "sat": [{ "start": "12:00", "end": "23:30" }],
+          "sun": [{ "start": "12:00", "end": "22:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "alis-imbiss",
+      "imageUrls": ["https://example.com/images/ali.jpg"],
+      "name": "Ali's Imbiss",
+      "phone": "+49 711 234567",
+      "district": "Bad_Cannstatt",
+      "location": {
+        "coordinates": {
+          "lat": 48.793,
+          "lng": 9.185
+        },
+        "address": {
+          "postalCode": "70372",
+          "locality": "Stuttgart",
+          "sublocality": "Bad Cannstatt",
+          "streetAddress": "Cannstatter Straße 10"
+        }
+      },
+      "aiScore": 74,
+      "price": 3.9,
+      "waitingTime": "FAST",
+      "payment": ["CASH", "DEBIT_CARD"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "10:00", "end": "21:00" }],
+          "tue": [{ "start": "10:00", "end": "21:00" }],
+          "wed": [{ "start": "10:00", "end": "21:00" }],
+          "thu": [{ "start": "10:00", "end": "21:00" }],
+          "fri": [{ "start": "10:00", "end": "21:00" }],
+          "sat": [{ "start": "11:00", "end": "21:00" }],
+          "sun": [{ "start": "11:00", "end": "20:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "kebap-koenig",
+      "imageUrls": ["https://example.com/images/kebap-koenig.jpg"],
+      "name": "Kebap König",
+      "district": "Nord",
+      "location": {
+        "coordinates": {
+          "lat": 48.789,
+          "lng": 9.178
+        },
+        "address": {
+          "postalCode": "70191",
+          "locality": "Stuttgart",
+          "sublocality": "Nord",
+          "streetAddress": "Nordstraße 3"
+        }
+      },
+      "aiScore": 65,
+      "price": 5.0,
+      "waitingTime": "SLOW",
+      "payment": ["CASH"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "10:00", "end": "23:00" }],
+          "tue": [{ "start": "10:00", "end": "23:00" }],
+          "wed": [{ "start": "10:00", "end": "23:00" }],
+          "thu": [{ "start": "10:00", "end": "23:00" }],
+          "fri": [{ "start": "10:00", "end": "24:00" }],
+          "sat": [{ "start": "11:00", "end": "24:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "sultan-grill",
+      "imageUrls": ["https://example.com/images/sultan.jpg"],
+      "name": "Sultan Grill",
+      "phone": "+49 711 345678",
+      "district": "Ost",
+      "location": {
+        "coordinates": {
+          "lat": 48.776,
+          "lng": 9.188
+        },
+        "address": {
+          "postalCode": "70190",
+          "locality": "Stuttgart",
+          "sublocality": "Ost",
+          "streetAddress": "Ostendstraße 15"
+        }
+      },
+      "aiScore": 92,
+      "price": 6.0,
+      "vegetarian": ["SERVES_VEGETARIAN", "VEGETARIAN_OPTIONS"],
+      "halal": "CERTIFIED_HALAL",
+      "waitingTime": "FAST",
+      "payment": ["CASH", "CREDIT_CARD", "NFC"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "00:30" }],
+          "tue": [{ "start": "11:00", "end": "00:30" }],
+          "wed": [{ "start": "11:00", "end": "00:30" }],
+          "thu": [{ "start": "11:00", "end": "00:30" }],
+          "fri": [{ "start": "11:00", "end": "01:00" }],
+          "sat": [{ "start": "11:00", "end": "01:00" }],
+          "sun": [{ "start": "11:00", "end": "00:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "murats",
+      "imageUrls": ["https://example.com/images/murats.jpg"],
+      "name": "Murat's",
+      "district": "Vaihingen",
+      "location": {
+        "coordinates": {
+          "lat": 48.743,
+          "lng": 9.163
+        },
+        "address": {
+          "postalCode": "70563",
+          "locality": "Stuttgart",
+          "sublocality": "Vaihingen",
+          "streetAddress": "Vaihinger Straße 20"
+        }
+      },
+      "aiScore": 55,
+      "price": 4.2,
+      "vegetarian": ["SERVES_VEGETARIAN"],
+      "waitingTime": "AVERAGE",
+      "payment": ["CASH", "DEBIT_CARD"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "20:00" }],
+          "tue": [{ "start": "11:00", "end": "20:00" }],
+          "wed": [{ "start": "11:00", "end": "20:00" }],
+          "thu": [{ "start": "11:00", "end": "20:00" }],
+          "fri": [{ "start": "11:00", "end": "20:00" }],
+          "sat": [{ "start": "11:00", "end": "20:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "orient-express",
+      "imageUrls": ["https://example.com/images/orient_express.jpg"],
+      "name": "Orient Express",
+      "district": "West",
+      "location": {
+        "coordinates": {
+          "lat": 48.779,
+          "lng": 9.16
+        },
+        "address": {
+          "postalCode": "70176",
+          "locality": "Stuttgart",
+          "sublocality": "West",
+          "streetAddress": "Weststraße 8"
+        }
+      },
+      "aiScore": 77,
+      "price": 5.5,
+      "waitingTime": "AVERAGE",
+      "payment": ["CASH", "CREDIT_CARD"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "22:00" }],
+          "tue": [{ "start": "11:00", "end": "22:00" }],
+          "wed": [{ "start": "11:00", "end": "22:00" }],
+          "thu": [{ "start": "11:00", "end": "22:00" }],
+          "fri": [{ "start": "11:00", "end": "22:00" }],
+          "sat": [{ "start": "11:00", "end": "22:00" }],
+          "sun": [{ "start": "11:00", "end": "22:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "bosphorus",
+      "imageUrls": ["https://example.com/images/bosphorus.jpg"],
+      "name": "Bosphorus",
+      "district": "Bad_Cannstatt",
+      "location": {
+        "coordinates": {
+          "lat": 48.785,
+          "lng": 9.186
+        },
+        "address": {
+          "postalCode": "70374",
+          "locality": "Stuttgart",
+          "sublocality": "Bad Cannstatt",
+          "streetAddress": "Wilhelmstraße 5"
+        }
+      },
+      "aiScore": 69,
+      "price": 4.0,
+      "waitingTime": "FAST",
+      "payment": ["CASH"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "21:30" }],
+          "tue": [{ "start": "11:00", "end": "21:30" }],
+          "wed": [{ "start": "11:00", "end": "21:30" }],
+          "thu": [{ "start": "11:00", "end": "21:30" }],
+          "fri": [{ "start": "11:00", "end": "21:30" }],
+          "sat": [{ "start": "11:00", "end": "21:30" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "tasty-doener",
+      "imageUrls": ["https://example.com/images/tasty.jpg"],
+      "name": "Tasty Döner",
+      "phone": "+49 711 456789",
+      "district": "Möhringen",
+      "location": {
+        "coordinates": {
+          "lat": 48.758,
+          "lng": 9.17
+        },
+        "address": {
+          "postalCode": "70567",
+          "locality": "Stuttgart",
+          "sublocality": "Möhringen",
+          "streetAddress": "Möhringer Landstraße 12"
+        }
+      },
+      "aiScore": 80,
+      "price": 4.8,
+      "vegetarian": ["SERVES_VEGETARIAN"],
+      "waitingTime": "AVERAGE",
+      "payment": ["CASH", "DEBIT_CARD", "NFC"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "23:30" }],
+          "tue": [{ "start": "11:00", "end": "23:30" }],
+          "wed": [{ "start": "11:00", "end": "23:30" }],
+          "thu": [{ "start": "11:00", "end": "23:30" }],
+          "fri": [{ "start": "11:00", "end": "23:30" }],
+          "sat": [{ "start": "11:00", "end": "23:30" }],
+          "sun": [{ "start": "12:00", "end": "23:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "express-kebap",
+      "imageUrls": ["https://example.com/images/express.jpg"],
+      "name": "Express Kebap",
+      "district": "Feuerbach",
+      "location": {
+        "coordinates": {
+          "lat": 48.8,
+          "lng": 9.16
+        },
+        "address": {
+          "postalCode": "70469",
+          "locality": "Stuttgart",
+          "sublocality": "Feuerbach",
+          "streetAddress": "Feuerbacher Weg 25"
+        }
+      },
+      "aiScore": 50,
+      "price": 3.5,
+      "waitingTime": "FAST",
+      "payment": ["CASH"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "19:45" }],
+          "tue": [{ "start": "11:00", "end": "19:45" }],
+          "wed": [{ "start": "11:00", "end": "19:45" }],
+          "thu": [{ "start": "11:00", "end": "19:45" }],
+          "fri": [{ "start": "11:00", "end": "19:45" }],
+          "sat": [{ "start": "11:00", "end": "19:45" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
+    },
+    {
+      "slug": "doener-villa",
+      "imageUrls": ["https://example.com/images/villa.jpg"],
+      "name": "Döner Villa",
+      "phone": "+49 711 567890",
+      "district": "Degerloch",
+      "location": {
+        "coordinates": {
+          "lat": 48.744,
+          "lng": 9.184
+        },
+        "address": {
+          "postalCode": "70597",
+          "locality": "Stuttgart",
+          "sublocality": "Degerloch",
+          "streetAddress": "Degerlocher Hauptstraße 30"
+        }
+      },
+      "aiScore": 88,
+      "price": 5.2,
+      "vegetarian": ["SERVES_VEGETARIAN"],
+      "waitingTime": "AVERAGE",
+      "payment": ["CASH", "CREDIT_CARD"],
+      "openingHours": {
+        "hours": {
+          "mon": [{ "start": "11:00", "end": "22:45" }],
+          "tue": [{ "start": "11:00", "end": "22:45" }],
+          "wed": [{ "start": "11:00", "end": "22:45" }],
+          "thu": [{ "start": "11:00", "end": "22:45" }],
+          "fri": [{ "start": "11:00", "end": "22:45" }],
+          "sat": [{ "start": "11:00", "end": "22:45" }],
+          "sun": [{ "start": "12:00", "end": "22:00" }]
+        },
+        "timezone": "Europe/Berlin"
+      }
     }
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 10,
+    "totalPages": 1
+  }
 }

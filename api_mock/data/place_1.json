@@ -1,76 +1,41 @@
 {
-    "id": "1",
-    "name": "Hasan's Döner",
-    "doner_guide_version": 1,
-    "internationalPhoneNumber": "+49 711 123456",
-    "latitude": 48.775845,
-    "longitude": 9.182932,
-    "openingHours": {
-        "Mo": [
-            660,
-            1350
-        ],
-        "Tu": [
-            660,
-            1350
-        ],
-        "We": [
-            660,
-            1350
-        ],
-        "Th": [
-            660,
-            1350
-        ],
-        "Fr": [
-            660,
-            1410
-        ],
-        "Sa": [
-            720,
-            1410
-        ],
-        "Su": [
-            720,
-            1320
-        ]
+  "slug": "hasans-doener",
+  "imageUrls": [
+    "https://example.com/images/hasan.jpg",
+    "https://example.com/photos/hasan_food1.jpg",
+    "https://example.com/photos/hasan_place1.jpg"
+  ],
+  "name": "Hasan's Döner",
+  "phone": "+49 711 123456",
+  "district": "Mitte",
+  "location": {
+    "coordinates": {
+      "lat": 48.775845,
+      "lng": 9.182932
     },
     "address": {
-        "postalCode": "70173",
-        "locality": "Stuttgart",
-        "sublocality": "Mitte",
-        "streetAddress": "Marktstraße 1"
+      "postalCode": "70173",
+      "locality": "Stuttgart",
+      "sublocality": "Mitte",
+      "streetAddress": "Marktstraße 1"
+    }
+  },
+  "aiScore": 87,
+  "price": 4.5,
+  "vegetarian": ["SERVES_VEGETARIAN"],
+  "waitingTime": "AVERAGE",
+  "payment": ["CASH", "NFC"],
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": "11:00", "end": "22:30" }],
+      "tue": [{ "start": "11:00", "end": "22:30" }],
+      "wed": [{ "start": "11:00", "end": "22:30" }],
+      "thu": [{ "start": "11:00", "end": "22:30" }],
+      "fri": [{ "start": "11:00", "end": "23:30" }],
+      "sat": [{ "start": "12:00", "end": "23:30" }],
+      "sun": [{ "start": "12:00", "end": "22:00" }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p1f1",
-                "photoUrl": "https://example.com/photos/hasan_food1.jpg"
-            }
-        ],
-        "places": [
-            {
-                "id": "p1pl1",
-                "photoUrl": "https://example.com/photos/hasan_place1.jpg"
-            }
-        ]
-    },
-    "ai_analysis": {
-        "score": 87,
-        "meat_ratio": 65,
-        "sauce_amount": 50,
-        "size": 70,
-        "waiting_time": "AVERAGE",
-        "image_URL": "https://example.com/analysis/hasan.jpg",
-        "text": "Gutes Verhältnis, ausreichende Soße."
-    },
-    "paymentMethods": [
-        "CASH",
-        "NFC"
-    ],
-    "takeout": true,
-    "delivery": false,
-    "dineIn": false,
-    "servesVegetarianFood": true
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Hasan's Döner bietet ein ausgezeichnetes Preis-Leistungs-Verhältnis mit einem AI-Score von 87. Das Fleisch-Verhältnis liegt bei 65% und die Soßenmenge ist ausreichend. Die Wartezeit ist durchschnittlich. Vegetarische Optionen sind verfügbar. Zahlung mit Bargeld und kontaktlos möglich."
 }

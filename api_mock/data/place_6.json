@@ -1,66 +1,35 @@
 {
-    "id": "6",
-    "name": "Orient Express",
-    "doner_guide_version": 1,
-    "latitude": 48.779000,
-    "longitude": 9.160000,
-    "openingHours": {
-        "Mo": [
-            660,
-            1320
-        ],
-        "Tu": [
-            660,
-            1320
-        ],
-        "We": [
-            660,
-            1320
-        ],
-        "Th": [
-            660,
-            1320
-        ],
-        "Fr": [
-            660,
-            1380
-        ],
-        "Sa": [
-            720,
-            1380
-        ]
+  "slug": "orient-express",
+  "imageUrls": ["https://example.com/images/orient_express.jpg"],
+  "name": "Orient Express",
+  "district": "West",
+  "location": {
+    "coordinates": {
+      "lat": 48.779,
+      "lng": 9.16
     },
     "address": {
-        "postalCode": "70184",
-        "locality": "Stuttgart",
-        "sublocality": "West",
-        "streetAddress": "Westplatz 2"
+      "postalCode": "70176",
+      "locality": "Stuttgart",
+      "sublocality": "West",
+      "streetAddress": "Weststraße 8"
+    }
+  },
+  "aiScore": 77,
+  "price": 5.5,
+  "waitingTime": "AVERAGE",
+  "payment": ["CASH", "CREDIT_CARD"],
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": "11:00", "end": "22:00" }],
+      "tue": [{ "start": "11:00", "end": "22:00" }],
+      "wed": [{ "start": "11:00", "end": "22:00" }],
+      "thu": [{ "start": "11:00", "end": "22:00" }],
+      "fri": [{ "start": "11:00", "end": "22:00" }],
+      "sat": [{ "start": "11:00", "end": "22:00" }],
+      "sun": [{ "start": "11:00", "end": "22:00" }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p6f1",
-                "photoUrl": "https://example.com/photos/orient_food1.jpg"
-            }
-        ],
-        "places": []
-    },
-    "ai_analysis": {
-        "score": 77,
-        "meat_ratio": 70,
-        "sauce_amount": 60,
-        "size": 68,
-        "waiting_time": "AVERAGE",
-        "image_URL": "https://example.com/analysis/orient.jpg",
-        "text": "Gutes Preis-Leistungs-Verhältnis."
-    },
-    "paymentMethods": [
-        "CASH",
-        "CREDIT_CARD"
-    ],
-    "takeout": true,
-    "delivery": true,
-    "dineIn": true,
-    "servesVegetarianFood": false
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Orient Express bietet einen guten AI-Score von 77 bei einem fairen Preis. Täglich geöffnet mit konstanten Öffnungszeiten. Zahlung mit Bargeld oder Kreditkarte möglich."
 }
