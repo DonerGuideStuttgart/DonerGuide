@@ -21,7 +21,9 @@
   "aiScore": 65,
   "price": 5.0,
   "waitingTime": "SLOW",
-  "payment": ["CASH"],
+  "paymentMethods": ["CASH"],
+  "sauceAmount": 45,
+  "meatRatio": 55,
   "openingHours": {
     "hours": {
       "mon": [{ "start": "10:00", "end": "23:00" }],

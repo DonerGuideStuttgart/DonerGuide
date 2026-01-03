@@ -154,12 +154,21 @@ app.get("/places", (req, res) => {
     const meatMin = parseNumber(req.query.meat_ratio_min);
     const meatMax = parseNumber(req.query.meat_ratio_max);
 
-    // - vegetarian: boolean-like mapping to servesVegetarianFood
-    const vegetarian = parseBoolean(req.query.vegetarian);
+    // - vegetarian: array filter for vegetarian options
+    // Accepts: meat, vegetarian, vegan
+    const ALLOWED_VEGETARIAN = new Set(["VEGETARIAN", "VEGAN"]);
+    const vegetarianFilters = normalizeUpperFrom(
+      parseMulti(req.query, "vegetarian"),
+      ALLOWED_VEGETARIAN
+    );
 
-    // - halal: boolean-like; only apply if dataset has 'halal' field
-    const halal = parseBoolean(req.query.halal);
-    const applyHalal = datasetHasHalal && halal !== null;
+    // - halal: array filter for halal options
+    // Accepts: HALAL, NOT_HALAL
+    const ALLOWED_HALAL = new Set(["HALAL", "NOT_HALAL"]);
+    const halalFilters = normalizeUpperFrom(
+      parseMulti(req.query, "halal"),
+      ALLOWED_HALAL
+    );
 
     // - waiting_time: enum FAST | AVERAGE | SLOW
     const ALLOWED_WAITING = new Set(["FAST", "AVERAGE", "SLOW"]);
@@ -168,8 +177,8 @@ app.get("/places", (req, res) => {
       ALLOWED_WAITING
     );
 
-    // - payment_methods: enum CASH | CREDIT_CARD | DEBIT_CARD | NFC (ANY match)
-    const ALLOWED_PM = new Set(["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]);
+    // - payment_methods: enum CASH | CREDIT_CARD (Kartenzahlung)
+    const ALLOWED_PM = new Set(["CASH", "CREDIT_CARD"]);
     const paymentFilters = normalizeUpperFrom(
       parseMulti(req.query, "payment_methods"),
       ALLOWED_PM
@@ -251,21 +260,24 @@ app.get("/places", (req, res) => {
           return false;
       }
 
-      // vegetarian exact match
-      if (vegetarian !== null) {
-        if (
-          typeof item.servesVegetarianFood !== "boolean" ||
-          item.servesVegetarianFood !== vegetarian
-        ) {
-          return false;
-        }
+      // vegetarian: ANY match from item.vegetarian array
+      if (vegetarianFilters && vegetarianFilters.length) {
+        const vegOptions = Array.isArray(item.vegetarian)
+          ? item.vegetarian
+          : [];
+        const normalized = vegOptions.map((v) => String(v).toUpperCase());
+        const anyMatch = vegetarianFilters.some((vf) =>
+          normalized.includes(vf)
+        );
+        if (!anyMatch) return false;
       }
 
-      // halal exact match (only if dataset contains halal)
-      if (applyHalal) {
-        if (typeof item.halal !== "boolean" || item.halal !== halal) {
-          return false;
-        }
+      // halal: ANY match from item.halal array
+      if (halalFilters && halalFilters.length) {
+        const halalOptions = Array.isArray(item.halal) ? item.halal : [];
+        const normalized = halalOptions.map((h) => String(h).toUpperCase());
+        const anyMatch = halalFilters.some((hf) => normalized.includes(hf));
+        if (!anyMatch) return false;
       }
 
       // waiting_time exact enum match (ANY of provided)

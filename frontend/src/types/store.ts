@@ -36,9 +36,11 @@ export type StoreBase = {
 	aiScore: number
 	price?: number
 	vegetarian?: string[]
-	halal?: string
+	halal?: string[]
 	waitingTime?: string
-	payment?: string[]
+	paymentMethods?: string[]
+	sauceAmount?: number
+	meatRatio?: number
 	openingHours: OpeningHours
 }
 

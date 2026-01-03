@@ -2,7 +2,11 @@
   "items": [
     {
       "slug": "hasans-doener",
-      "imageUrls": ["https://example.com/images/hasan.jpg"],
+      "imageUrls": [
+        "https://fastly.picsum.photos/id/972/200/200.jpg?hmac=TeAvfwW2T9YMpPW-sWWTeAiseERb12wSeR3mYzuG6TE",
+        "https://fastly.picsum.photos/id/27/3264/1836.jpg?hmac=p3BVIgKKQpHhfGRRCbsi2MCAzw8mWBCayBsKxxtWO8g",
+        "https://fastly.picsum.photos/id/29/4000/2670.jpg?hmac=rCbRAl24FzrSzwlR5tL-Aqzyu5tX_PA95VJtnUXegGU"
+      ],
       "name": "Hasan's Döner",
       "phone": "+49 711 123456",
       "district": "Mitte",
@@ -20,9 +24,11 @@
       },
       "aiScore": 87,
       "price": 4.5,
-      "vegetarian": ["SERVES_VEGETARIAN"],
+      "vegetarian": ["VEGETARIAN", "VEGAN"],
       "waitingTime": "AVERAGE",
-      "payment": ["CASH", "NFC"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 65,
+      "meatRatio": 70,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "22:30" }],
@@ -57,7 +63,9 @@
       "aiScore": 74,
       "price": 3.9,
       "waitingTime": "FAST",
-      "payment": ["CASH", "DEBIT_CARD"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 55,
+      "meatRatio": 80,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "10:00", "end": "21:00" }],
@@ -91,7 +99,9 @@
       "aiScore": 65,
       "price": 5.0,
       "waitingTime": "SLOW",
-      "payment": ["CASH"],
+      "paymentMethods": ["CASH"],
+      "sauceAmount": 45,
+      "meatRatio": 55,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "10:00", "end": "23:00" }],
@@ -124,10 +134,12 @@
       },
       "aiScore": 92,
       "price": 6.0,
-      "vegetarian": ["SERVES_VEGETARIAN", "VEGETARIAN_OPTIONS"],
-      "halal": "CERTIFIED_HALAL",
+      "vegetarian": ["VEGETARIAN"],
+      "halal": ["HALAL"],
       "waitingTime": "FAST",
-      "payment": ["CASH", "CREDIT_CARD", "NFC"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 75,
+      "meatRatio": 85,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "00:30" }],
@@ -160,9 +172,11 @@
       },
       "aiScore": 55,
       "price": 4.2,
-      "vegetarian": ["SERVES_VEGETARIAN"],
+      "vegetarian": ["VEGETARIAN"],
       "waitingTime": "AVERAGE",
-      "payment": ["CASH", "DEBIT_CARD"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 50,
+      "meatRatio": 60,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "20:00" }],
@@ -194,8 +208,10 @@
       },
       "aiScore": 77,
       "price": 5.5,
-      "waitingTime": "AVERAGE",
-      "payment": ["CASH", "CREDIT_CARD"],
+      "waitingTime": "SLOW",
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 60,
+      "meatRatio": 65,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "22:00" }],
@@ -229,7 +245,9 @@
       "aiScore": 69,
       "price": 4.0,
       "waitingTime": "FAST",
-      "payment": ["CASH"],
+      "paymentMethods": ["CASH"],
+      "sauceAmount": 40,
+      "meatRatio": 75,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "21:30" }],
@@ -262,9 +280,11 @@
       },
       "aiScore": 80,
       "price": 4.8,
-      "vegetarian": ["SERVES_VEGETARIAN"],
+      "vegetarian": ["VEGETARIAN"],
       "waitingTime": "AVERAGE",
-      "payment": ["CASH", "DEBIT_CARD", "NFC"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 70,
+      "meatRatio": 68,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "23:30" }],
@@ -297,8 +317,10 @@
       },
       "aiScore": 50,
       "price": 3.5,
-      "waitingTime": "FAST",
-      "payment": ["CASH"],
+      "waitingTime": "SLOW",
+      "paymentMethods": ["CASH"],
+      "sauceAmount": 35,
+      "meatRatio": 50,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "19:45" }],
@@ -331,9 +353,11 @@
       },
       "aiScore": 88,
       "price": 5.2,
-      "vegetarian": ["SERVES_VEGETARIAN"],
+      "vegetarian": ["VEGETARIAN"],
       "waitingTime": "AVERAGE",
-      "payment": ["CASH", "CREDIT_CARD"],
+      "paymentMethods": ["CASH", "CREDIT_CARD"],
+      "sauceAmount": 80,
+      "meatRatio": 72,
       "openingHours": {
         "hours": {
           "mon": [{ "start": "11:00", "end": "22:45" }],

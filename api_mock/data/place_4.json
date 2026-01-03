@@ -18,10 +18,12 @@
   },
   "aiScore": 92,
   "price": 6.0,
-  "vegetarian": ["SERVES_VEGETARIAN", "VEGETARIAN_OPTIONS"],
-  "halal": "CERTIFIED_HALAL",
+  "vegetarian": ["VEGETARIAN"],
+  "halal": ["HALAL"],
   "waitingTime": "FAST",
-  "payment": ["CASH", "CREDIT_CARD", "NFC"],
+  "paymentMethods": ["CASH", "CREDIT_CARD"],
+  "sauceAmount": 75,
+  "meatRatio": 85,
   "openingHours": {
     "hours": {
       "mon": [{ "start": "11:00", "end": "00:30" }],
