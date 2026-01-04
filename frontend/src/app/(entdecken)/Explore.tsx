@@ -63,7 +63,7 @@ export default function Explore() {
 							className="lg:hidden flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4 lg:mb-3"
 							aria-label="Open filters"
 						>
-							<Filter className="size-5" />
+							<Filter className="size-5 fill-base-300" />
 						</button>
 						{/* Filter Mobile Button End */}
 

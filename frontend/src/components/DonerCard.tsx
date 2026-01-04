@@ -35,7 +35,7 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 								icon={<Aistars className="size-4 fill-secondary" />}
 								className="badge-secondary"
 							/>
-							<InfoCircle className="size-4" />
+							<InfoCircle className="size-4 fill-neutral" />
 						</div>
 					</div>
 					{/* Header with name and score End */}
