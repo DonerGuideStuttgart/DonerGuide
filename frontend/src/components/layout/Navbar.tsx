@@ -1,6 +1,6 @@
 import Menu from '@/assets/icons/menu.svg'
+import Logo from '@/assets/logo/logo.svg'
 import { routes } from '@/helpers/routes'
-import Image from 'next/image'
 import Link from 'next/link'
 import NavLinks from './NavLinks'
 
@@ -32,13 +32,7 @@ export default function Navbar() {
 					href={routes.explore}
 					className="flex items-center gap-3 lg:mr-12 mr-auto"
 				>
-					<Image
-						src="/logo/logo.svg"
-						alt="Dönerguide Logo"
-						priority
-						width={20}
-						height={20}
-					/>
+					<Logo className="h-10 w-auto" />
 					<span className="text-lg sm:text-xl font-bold">
 						Dönerguide Stuttgart
 					</span>
