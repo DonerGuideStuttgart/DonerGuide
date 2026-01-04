@@ -1,16 +1,16 @@
-import { routes } from '@/helpers/routes'
-import { StoreBase } from '@/types/store'
-import { badgeConfig } from './badge/badgeConfig'
-import Badge from './badge/Badge'
-import Link from 'next/link'
-import Image from 'next/image'
 import Aistars from '@/assets/icons/aistars.svg'
-import InfoCircle from '@/assets/icons/infocircle.svg'
 import CircleSolid from '@/assets/icons/circlesolid.svg'
+import InfoCircle from '@/assets/icons/infocircle.svg'
 import Location from '@/assets/icons/location.svg'
 import { getOpeningStatusText } from '@/helpers/openingHours'
-import { DISTRICT_LABELS } from '@/types/records'
+import { routes } from '@/helpers/routes'
 import { getStoreBadges } from '@/helpers/storeBadges'
+import { DISTRICT_LABELS } from '@/types/records'
+import { StoreBase } from '@/types/store'
+import Image from 'next/image'
+import Link from 'next/link'
+import Badge from './badge/Badge'
+import { badgeConfig } from './badge/badgeConfig'
 
 export default function DonerCard({ store }: { store: StoreBase }) {
 	const mainImage =
@@ -101,14 +101,38 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 
 export function DonerCardSkeleton() {
 	return (
-		<article className="border rounded-lg p-4 shadow-sm animate-pulse mt-3">
-			<div className="h-6 bg-neutral-content/30 rounded w-3/4 mb-2"></div>
-			<div className="h-4 bg-neutral-content/30 rounded w-1/4 mb-4"></div>
-			<div className="flex items-center justify-between mb-4">
-				<div className="h-4 bg-neutral-content/30 rounded w-20"></div>
-				<div className="h-4 bg-neutral-content/30 rounded w-16"></div>
+		<article className="flex flex-col md:flex-row justify-between border border-primary bg-base-100 rounded-xl gap-4 p-6 animate-pulse mt-4">
+			<div className="w-full space-y-2 order-last md:order-first">
+				{/* Header with name and score */}
+				<div className="flex items-center gap-3">
+					<div className="h-7 bg-neutral-content/30 rounded w-48"></div>
+					<div className="h-6 w-12 bg-neutral-content/30 rounded-full"></div>
+				</div>
+
+				{/* Opening hours and price */}
+				<div className="flex items-center gap-2">
+					<div className="h-4 bg-neutral-content/30 rounded w-32"></div>
+					<div className="size-1 bg-neutral-content/30 rounded-full"></div>
+					<div className="h-4 bg-neutral-content/30 rounded w-24"></div>
+				</div>
+
+				{/* District */}
+				<div className="flex items-center gap-2 mb-4">
+					<div className="size-4 bg-neutral-content/30 rounded"></div>
+					<div className="h-4 bg-neutral-content/30 rounded w-28"></div>
+				</div>
+
+				{/* Badges */}
+				<div className="flex flex-wrap gap-2">
+					<div className="h-6 bg-neutral-content/30 rounded-full w-20"></div>
+					<div className="h-6 bg-neutral-content/30 rounded-full w-24"></div>
+					<div className="h-6 bg-neutral-content/30 rounded-full w-16"></div>
+					<div className="h-6 bg-neutral-content/30 rounded-full w-20"></div>
+				</div>
 			</div>
-			<div className="h-4 bg-neutral-content/30 rounded w-5/6"></div>
+
+			{/* Image skeleton */}
+			<div className="w-full h-50 md:size-32 bg-neutral-content/30 rounded-lg shrink-0"></div>
 		</article>
 	)
 }
