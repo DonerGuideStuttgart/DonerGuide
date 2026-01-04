@@ -6,7 +6,9 @@ type Props = {
 
 export default function Badge({ text, icon, className }: Props) {
 	return (
-		<div className={`badge badge-outline ${className} rounded-full space-x-1`}>
+		<div
+			className={`badge badge-outline ${className} rounded-full -space-x-0.5`}
+		>
 			{icon && <span>{icon}</span>}
 			<span>{text}</span>
 		</div>
