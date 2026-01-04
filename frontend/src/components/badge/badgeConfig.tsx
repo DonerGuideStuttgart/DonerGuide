@@ -1,10 +1,10 @@
-import Clock from '@/assets/icons/clock.svg'
-import Vegetarian from '@/assets/icons/vegetarian.svg'
-import Vegan from '@/assets/icons/vegan.svg'
-import Run from '@/assets/icons/run.svg'
-import XCircle from '@/assets/icons/xcircle.svg'
-import CreditCard from '@/assets/icons/creditcard.svg'
 import Cash from '@/assets/icons/cash.svg'
+import Clock from '@/assets/icons/clock.svg'
+import CreditCard from '@/assets/icons/creditcard.svg'
+import Run from '@/assets/icons/run.svg'
+import Vegan from '@/assets/icons/vegan.svg'
+import Vegetarian from '@/assets/icons/vegetarian.svg'
+import XCircle from '@/assets/icons/xcircle.svg'
 
 export enum BadgeType {
 	HALAL = 'halal',
@@ -52,7 +52,7 @@ export const badgeConfig: Record<
 	},
 	[BadgeType.GEOEFFNET]: {
 		text: 'Geöffnet',
-		icon: <Clock className="size-4" />,
+		icon: <Clock className="size-4 fill-success" />,
 		colorClass: 'badge-success',
 	},
 	[BadgeType.GESCHLOSSEN]: {

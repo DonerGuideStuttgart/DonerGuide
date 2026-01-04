@@ -47,3 +47,13 @@ export const PAYMENT_LABELS: Record<string, string> = {
 	CREDIT_CARD: 'Kartenzahlung',
 	CASH_ONLY: 'Nur Cash',
 }
+
+export const WEEKDAY_LABELS: Record<string, string> = {
+	mon: 'Montag',
+	tue: 'Dienstag',
+	wed: 'Mittwoch',
+	thu: 'Donnerstag',
+	fri: 'Freitag',
+	sat: 'Samstag',
+	sun: 'Sonntag',
+}
