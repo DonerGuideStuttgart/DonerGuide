@@ -45,6 +45,7 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
 				</button>
 				<Link
 					href={routes.explore}
+					prefetch={false}
 					className="link link-primary link-hover text-center w-full sm:w-auto"
 				>
 					Zurück zur Startseite

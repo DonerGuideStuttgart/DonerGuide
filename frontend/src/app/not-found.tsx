@@ -37,6 +37,7 @@ export default function NotFound() {
 			<div className="pt-4">
 				<Link
 					href={routes.explore}
+					prefetch={false}
 					className="flex items-center justify-center cursor-pointer bg-secondary text-white rounded-full shadow-[0_3px_0px_#b54615] active:shadow-none active:translate-y-0.5 py-1.5 px-6 md:max-w-max"
 				>
 					Zurück zur Startseite

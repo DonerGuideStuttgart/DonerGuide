@@ -5,6 +5,7 @@
   "phone": "+49 711 345678",
   "district": "Ost",
   "location": {
+    "googlePlaceId": "ChIJXcA8RzKuEmsRGHk7iOM2ElQ",
     "coordinates": {
       "lat": 48.776,
       "lng": 9.188

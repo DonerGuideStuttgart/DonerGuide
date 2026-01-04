@@ -25,6 +25,7 @@ export default function NavLinks({
 						<li key={link.href} className="mb-1">
 							<Link
 								href={link.href}
+								prefetch={false}
 								aria-current={active ? 'page' : undefined}
 								className={
 									active
@@ -49,6 +50,7 @@ export default function NavLinks({
 					<li key={link.href}>
 						<Link
 							href={link.href}
+							prefetch={false}
 							aria-current={active ? 'page' : undefined}
 							className={`hover:text-secondary-content ${
 								active ? 'text-secondary-content pointer-events-none' : ''

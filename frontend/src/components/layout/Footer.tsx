@@ -17,7 +17,12 @@ export default function Footer() {
 
 				<nav className="flex flex-col items-center md:flex-row gap-2 lg:gap-4">
 					{links.map((link) => (
-						<Link key={link.href} href={link.href} className="link link-hover">
+						<Link
+							key={link.href}
+							href={link.href}
+							prefetch={false}
+							className="link link-hover"
+						>
 							{link.label}
 						</Link>
 					))}
