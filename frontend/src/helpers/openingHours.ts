@@ -93,8 +93,7 @@ export function getCurrentTimeInfo(timezone: string): {
  * @param currentMinutes - Current time in minutes since midnight (0-1439)
  * @param start - Range start time in minutes since midnight (0-1440+)
  * @param end - Range end time in minutes since midnight (0-1440+), inclusive
- * @returns true if currentMinutes is within the range [start, end]
- * @throws Returns false for invalid ranges where start === end
+ * @returns true if currentMinutes is within the range [start, end], false for invalid ranges where start === end
  * @example
  * isTimeInRange(900, 600, 1200) // true (15:00 is between 10:00-20:00)
  * isTimeInRange(100, 1380, 60) // true (01:40 is between 23:00-01:00, crosses midnight)

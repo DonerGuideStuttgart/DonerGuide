@@ -43,11 +43,13 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 					{/* Closing/Opening Hour Today & Price */}
 					<div className="flex items-center">
 						<div className="text-neutral text-sm">{openClosingText}</div>
-						<CircleSolid className="size-1 fill-neutral mx-2" />
 						{store.price && (
-							<div className="text-neutral text-sm">
-								Döner Preis: {store.price}€
-							</div>
+							<>
+								<CircleSolid className="size-1 fill-neutral mx-2" />
+								<div className="text-neutral text-sm">
+									Döner Preis: {store.price}€
+								</div>
+							</>
 						)}
 					</div>
 					{/* Closing/Opening Hour Today & Price End */}
