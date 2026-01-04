@@ -38,7 +38,7 @@ export function subdivideCell(parent: GridPointMessage): GridPointMessage[] {
       id: `${parent.id}_${index}_L${childDepth}`,
       coordinates: [center.longitude, center.latitude],
       cellSideKm: childCellSize,
-      searchRectangle: rect, // Exaktes Rechteck, kein Overlap
+      searchRectangle: rect, // Exact rectangle, no overlap
       subdivisionDepth: childDepth,
       parentId: parent.id,
     };
