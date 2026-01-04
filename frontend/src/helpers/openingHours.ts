@@ -56,7 +56,6 @@ export function isStoreOpen(openingHours?: OpeningHours): boolean {
 	const currentMinutes = timeToMinutes(currentTime)
 
 	// Check if current time is within any of today's time ranges
-	// range.start and range.end are already in minutes
 	return todayHours.some((range) => {
 		// Handle times that cross midnight
 		if (range.end < range.start) {
@@ -106,7 +105,6 @@ export function getOpeningStatusText(openingHours?: OpeningHours): string {
 	const currentMinutes = timeToMinutes(currentTime)
 
 	// Check if currently open in any time range
-	// range.start and range.end are already in minutes
 	for (const range of todayHours) {
 		const crossesMidnight = range.end < range.start
 		const isCurrentlyOpen = crossesMidnight
