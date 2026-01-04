@@ -10,13 +10,13 @@ export interface Place {
   latitude: number;
   longitude: number;
   openingHours: {
-    Mo?: [number, number];
-    Tu?: [number, number];
-    We?: [number, number];
-    Th?: [number, number];
-    Fr?: [number, number];
-    Sa?: [number, number];
-    Su?: [number, number];
+    Mo?: [number, number][];
+    Tu?: [number, number][];
+    We?: [number, number][];
+    Th?: [number, number][];
+    Fr?: [number, number][];
+    Sa?: [number, number][];
+    Su?: [number, number][];
   };
   address: {
     postalCode?: string;

@@ -12,6 +12,9 @@
                     },
                     {
                         "Name": "reviews-generated"
+                    },
+                    {
+                        "Name": "grid-points"
                     }
                 ],
                 "Topics": []

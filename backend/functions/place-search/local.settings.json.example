@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=http;AccountName=test_account_place_search_timer_trigger;AccountKey=secure_key;BlobEndpoint=http://azurite:10000;QueueEndpoint=http://azurite:10001;TableEndpoint=http://azurite:10002;",
+    "GOOGLE_PLACES_API_KEY": "YOUR_GOOGLE_PLACES_API_KEY_HERE",
+    "PLACE_SEARCH_CRON": "0 */3 * * * *"
+  },
+  "ConnectionStrings": {}
+}

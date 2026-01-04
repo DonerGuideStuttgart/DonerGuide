@@ -57,6 +57,13 @@ export default tseslint.config(
       "@typescript-eslint/strict-boolean-expressions": "warn",
       "@typescript-eslint/prefer-nullish-coalescing": "warn",
       "@typescript-eslint/prefer-optional-chain": "warn",
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          allowNumber: true,
+          allowBoolean: true,
+        },
+      ],
     },
   },
 
