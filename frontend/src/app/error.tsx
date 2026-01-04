@@ -5,12 +5,7 @@ import XCircle from '@/assets/icons/xcircle.svg'
 import { routes } from '@/helpers/routes'
 import Link from 'next/link'
 
-export default function ErrorPage({
-	reset,
-}: {
-	error: Error & { digest?: string }
-	reset: () => void
-}) {
+export default function ErrorPage({ reset }: { reset: () => void }) {
 	return (
 		<main className="container mt-10 md:mt-20">
 			{/* Icon */}
