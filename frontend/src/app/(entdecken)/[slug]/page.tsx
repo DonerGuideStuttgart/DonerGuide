@@ -108,7 +108,7 @@ export default async function StoreDetail({ params }: Props) {
 									icon={<Aistars className="size-4 fill-secondary" />}
 									className="badge-secondary"
 								/>
-								<InfoCircle className="size-4" />
+								<InfoCircle className="size-4 fill-neutral" />
 							</div>
 						</div>
 
