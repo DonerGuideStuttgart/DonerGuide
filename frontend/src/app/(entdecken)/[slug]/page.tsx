@@ -10,15 +10,16 @@ import { badgeConfig } from '@/components/badge/badgeConfig'
 import ImageCarousel from '@/components/ImageCarousel'
 import { fetchPlaceBySlug, fetchPlaces } from '@/helpers/api'
 import {
+	formatTimeRange,
 	getCurrentTimeInfo,
 	getOpeningStatusText,
 	isStoreOpen,
-	minutesToTime,
 	WEEKDAYS,
 } from '@/helpers/openingHours'
 import { routes } from '@/helpers/routes'
 import { getStoreBadges } from '@/helpers/storeBadges'
 import { Store } from '@/types/store'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -26,11 +27,37 @@ type Props = {
 	params: Promise<{ slug: string }>
 }
 
-/**
- * Format time range from minutes
- */
-function formatTimeRange(start: number, end: number): string {
-	return `${minutesToTime(start)}-${minutesToTime(end)}`
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const { slug } = await params
+	const store: Store = await fetchPlaceBySlug(slug)
+
+	if (!store) {
+		return {
+			title: 'Store nicht gefunden',
+		}
+	}
+
+	const mainImage = store.imageUrls?.[0]
+	const description =
+		store.aiSummary ||
+		`${store.name} - Döner in Stuttgart. ${store.price ? `Preis: ${store.price}€` : ''} AI Score: ${store.aiScore}/100`
+
+	return {
+		title: store.name,
+		description: description,
+		openGraph: {
+			title: store.name,
+			description: description,
+			images: mainImage ? [{ url: mainImage, alt: store.name }] : [],
+			type: 'website',
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: store.name,
+			description: description,
+			images: mainImage ? [mainImage] : [],
+		},
+	}
 }
 
 export async function generateStaticParams() {
@@ -88,7 +115,7 @@ export default async function StoreDetail({ params }: Props) {
 						{/* Price */}
 						<div className="flex items-center mb-4">
 							{store.price && (
-								<div className="text-neutral">Döner Preis {store.price}€</div>
+								<div className="text-neutral">Döner Preis: {store.price}€</div>
 							)}
 						</div>
 

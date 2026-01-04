@@ -46,7 +46,7 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 						<CircleSolid className="size-1 fill-neutral mx-2" />
 						{store.price && (
 							<div className="text-neutral text-sm">
-								Döner Preis {store.price}€
+								Döner Preis: {store.price}€
 							</div>
 						)}
 					</div>

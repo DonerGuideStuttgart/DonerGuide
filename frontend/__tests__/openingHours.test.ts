@@ -1,4 +1,10 @@
-import { isStoreOpen, getOpeningStatusText } from '@/helpers/openingHours'
+import {
+	formatTimeRange,
+	getCurrentTimeInfo,
+	getOpeningStatusText,
+	isStoreOpen,
+	WEEKDAYS,
+} from '@/helpers/openingHours'
 import type { OpeningHours } from '@/types/store'
 
 describe('openingHours', () => {
@@ -255,6 +261,65 @@ describe('openingHours', () => {
 			expect(getOpeningStatusText(midnightCrossing)).toBe(
 				'Schließt um 00:30 Uhr',
 			)
+		})
+	})
+
+	describe('formatTimeRange', () => {
+		it('should format time range correctly', () => {
+			expect(formatTimeRange(660, 1350)).toBe('11:00-22:30')
+		})
+
+		it('should format midnight crossing time range', () => {
+			expect(formatTimeRange(660, 30)).toBe('11:00-00:30')
+		})
+
+		it('should format lunch break ranges', () => {
+			expect(formatTimeRange(600, 840)).toBe('10:00-14:00')
+			expect(formatTimeRange(1020, 1320)).toBe('17:00-22:00')
+		})
+
+		it('should format early morning times', () => {
+			expect(formatTimeRange(0, 360)).toBe('00:00-06:00')
+		})
+	})
+
+	describe('getCurrentTimeInfo', () => {
+		it('should return current time and weekday', () => {
+			mockTime('15:30', 'Mon')
+			const result = getCurrentTimeInfo('Europe/Berlin')
+			expect(result.currentTime).toBe('15:30')
+			expect(result.weekday).toBe('mon')
+		})
+
+		it('should handle different weekdays', () => {
+			mockTime('12:00', 'Fri')
+			const result = getCurrentTimeInfo('Europe/Berlin')
+			expect(result.weekday).toBe('fri')
+		})
+	})
+
+	describe('WEEKDAYS', () => {
+		it('should have all 7 weekdays', () => {
+			expect(WEEKDAYS).toHaveLength(7)
+		})
+
+		it('should have correct structure', () => {
+			WEEKDAYS.forEach((day) => {
+				expect(day).toHaveProperty('key')
+				expect(day).toHaveProperty('label')
+				expect(typeof day.key).toBe('string')
+				expect(typeof day.label).toBe('string')
+			})
+		})
+
+		it('should contain all weekdays in correct order', () => {
+			const keys = WEEKDAYS.map((d) => d.key)
+			expect(keys).toEqual(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])
+		})
+
+		it('should have German labels', () => {
+			expect(WEEKDAYS[0].label).toBe('Montag')
+			expect(WEEKDAYS[6].label).toBe('Sonntag')
 		})
 	})
 })
