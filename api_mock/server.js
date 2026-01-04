@@ -101,12 +101,88 @@ function normalizeUpperFrom(arr, allowedSet) {
 
 /**
  * Get numeric "rating" for sorting:
- * - Prefer 'rating' if present, otherwise use 'ai_score'.
+ * - Prefer 'aiScore' if present, otherwise use 'ai_score', otherwise 'rating'.
  */
 function ratingValueForSort(item) {
-  if (typeof item.rating === "number") return item.rating;
+  if (typeof item.aiScore === "number") return item.aiScore;
   if (typeof item.ai_score === "number") return item.ai_score;
+  if (typeof item.rating === "number") return item.rating;
   return -Infinity;
+}
+
+/**
+ * Convert time string (HH:MM) to minutes since midnight
+ */
+function timeToMinutes(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Check if a store is open at a specific time
+ * @param {Object} openingHours - Opening hours object with hours as minutes since midnight
+ * @param {string} checkTime - Time in format "HH:MM"
+ * @param {string} weekday - Weekday (mon, tue, wed, thu, fri, sat, sun)
+ * @returns {boolean}
+ */
+function isOpenAt(openingHours, checkTime, weekday) {
+  if (!openingHours || !openingHours.hours) return false;
+  const todayHours = openingHours.hours[weekday];
+  if (!todayHours || todayHours.length === 0) return false;
+
+  const checkMinutes = timeToMinutes(checkTime);
+
+  const result = todayHours.some((range) => {
+    // range.start and range.end are in minutes
+    // Handle times that cross midnight
+    if (range.end < range.start) {
+      // If end time is earlier than start (e.g., 660 - 30 for 11:00 - 00:30), it crosses midnight
+      return checkMinutes >= range.start || checkMinutes <= range.end;
+    }
+    return checkMinutes >= range.start && checkMinutes <= range.end;
+  });
+
+  // Debug logging
+  if (openingHours.hours[weekday] && openingHours.hours[weekday].length > 1) {
+    console.log(
+      `[DEBUG] isOpenAt(${checkTime}, ${weekday}): ${checkMinutes} minutes, ranges:`,
+      todayHours,
+      "=> result:",
+      result
+    );
+  }
+
+  return result;
+}
+
+/**
+ * Get current time info in Europe/Berlin timezone
+ */
+function getCurrentTimeInfo() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString("de-DE", {
+    timeZone: "Europe/Berlin",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const weekdayShort = now.toLocaleDateString("en-US", {
+    timeZone: "Europe/Berlin",
+    weekday: "short",
+  });
+  const weekdayMap = {
+    Mon: "mon",
+    Tue: "tue",
+    Wed: "wed",
+    Thu: "thu",
+    Fri: "fri",
+    Sat: "sat",
+    Sun: "sun",
+  };
+  return {
+    currentTime: timeStr,
+    weekday: weekdayMap[weekdayShort] || "mon",
+  };
 }
 
 app.get("/places", (req, res) => {
@@ -154,26 +230,49 @@ app.get("/places", (req, res) => {
     const meatMin = parseNumber(req.query.meat_ratio_min);
     const meatMax = parseNumber(req.query.meat_ratio_max);
 
-    // - vegetarian: boolean-like mapping to servesVegetarianFood
-    const vegetarian = parseBoolean(req.query.vegetarian);
+    // - vegetarian: array filter for vegetarian options
+    // Accepts: meat, vegetarian, vegan
+    const ALLOWED_VEGETARIAN = new Set(["VEGETARIAN", "VEGAN"]);
+    const vegetarianFilters = normalizeUpperFrom(
+      parseMulti(req.query, "vegetarian"),
+      ALLOWED_VEGETARIAN
+    );
 
-    // - halal: boolean-like; only apply if dataset has 'halal' field
-    const halal = parseBoolean(req.query.halal);
-    const applyHalal = datasetHasHalal && halal !== null;
+    // - halal: array filter for halal options
+    // Accepts: HALAL, NOT_HALAL
+    const ALLOWED_HALAL = new Set(["HALAL", "NOT_HALAL"]);
+    const halalFilters = normalizeUpperFrom(
+      parseMulti(req.query, "halal"),
+      ALLOWED_HALAL
+    );
 
-    // - waiting_time: enum FAST | AVERAGE | SLOW
-    const ALLOWED_WAITING = new Set(["FAST", "AVERAGE", "SLOW"]);
+    // - waiting_time: enum FAST | SLOW
+    const ALLOWED_WAITING = new Set(["FAST", "SLOW"]);
     const waitingFilters = normalizeUpperFrom(
       parseMulti(req.query, "waiting_time"),
       ALLOWED_WAITING
     );
 
-    // - payment_methods: enum CASH | CREDIT_CARD | DEBIT_CARD | NFC (ANY match)
-    const ALLOWED_PM = new Set(["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]);
+    // - payment_methods: enum CASH_ONLY | CREDIT_CARD (Kartenzahlung)
+    const ALLOWED_PM = new Set(["CASH_ONLY", "CREDIT_CARD"]);
     const paymentFilters = normalizeUpperFrom(
       parseMulti(req.query, "payment_methods"),
       ALLOWED_PM
     );
+
+    // - open_hours: enum open_now | open_this_evening | open_late
+    const ALLOWED_OPEN_HOURS = new Set([
+      "OPEN_NOW",
+      "OPEN_THIS_EVENING",
+      "OPEN_LATE",
+    ]);
+    const openHoursFilters = normalizeUpperFrom(
+      parseMulti(req.query, "open_hours"),
+      ALLOWED_OPEN_HOURS
+    );
+
+    // Get current time info for opening hours filtering
+    const timeInfo = openHoursFilters ? getCurrentTimeInfo() : null;
 
     // 2) Apply filtering
     let filtered = originalItems.filter((item) => {
@@ -220,59 +319,56 @@ app.get("/places", (req, res) => {
       // sauce_amount_min
       if (sauceMin !== null) {
         if (
-          typeof item.sauce_amount !== "number" ||
-          !(item.sauce_amount >= sauceMin)
+          typeof item.sauceAmount !== "number" ||
+          !(item.sauceAmount >= sauceMin)
         )
           return false;
       }
       // sauce_amount_max
       if (sauceMax !== null) {
         if (
-          typeof item.sauce_amount !== "number" ||
-          !(item.sauce_amount <= sauceMax)
+          typeof item.sauceAmount !== "number" ||
+          !(item.sauceAmount <= sauceMax)
         )
           return false;
       }
 
       // meat_ratio_min
       if (meatMin !== null) {
-        if (
-          typeof item.meat_ratio !== "number" ||
-          !(item.meat_ratio >= meatMin)
-        )
+        if (typeof item.meatRatio !== "number" || !(item.meatRatio >= meatMin))
           return false;
       }
       // meat_ratio_max
       if (meatMax !== null) {
-        if (
-          typeof item.meat_ratio !== "number" ||
-          !(item.meat_ratio <= meatMax)
-        )
+        if (typeof item.meatRatio !== "number" || !(item.meatRatio <= meatMax))
           return false;
       }
 
-      // vegetarian exact match
-      if (vegetarian !== null) {
-        if (
-          typeof item.servesVegetarianFood !== "boolean" ||
-          item.servesVegetarianFood !== vegetarian
-        ) {
-          return false;
-        }
+      // vegetarian: ANY match from item.vegetarian array
+      if (vegetarianFilters && vegetarianFilters.length) {
+        const vegOptions = Array.isArray(item.vegetarian)
+          ? item.vegetarian
+          : [];
+        const normalized = vegOptions.map((v) => String(v).toUpperCase());
+        const anyMatch = vegetarianFilters.some((vf) =>
+          normalized.includes(vf)
+        );
+        if (!anyMatch) return false;
       }
 
-      // halal exact match (only if dataset contains halal)
-      if (applyHalal) {
-        if (typeof item.halal !== "boolean" || item.halal !== halal) {
-          return false;
-        }
+      // halal: ANY match from item.halal array
+      if (halalFilters && halalFilters.length) {
+        const halalOptions = Array.isArray(item.halal) ? item.halal : [];
+        const normalized = halalOptions.map((h) => String(h).toUpperCase());
+        const anyMatch = halalFilters.some((hf) => normalized.includes(hf));
+        if (!anyMatch) return false;
       }
 
       // waiting_time exact enum match (ANY of provided)
       if (waitingFilters && waitingFilters.length) {
         const wt =
-          typeof item.waiting_time === "string"
-            ? item.waiting_time.toUpperCase()
+          typeof item.waitingTime === "string"
+            ? item.waitingTime.toUpperCase()
             : "";
         if (!waitingFilters.includes(wt)) return false;
       }
@@ -287,6 +383,44 @@ app.get("/places", (req, res) => {
         if (!anyMatch) return false;
       }
 
+      // open_hours: check if store matches any of the requested opening hour filters
+      if (openHoursFilters && openHoursFilters.length && timeInfo) {
+        const matchesAnyFilter = openHoursFilters.some((filter) => {
+          const filterUpper = filter.toUpperCase();
+
+          // open_now: currently open
+          if (filterUpper === "OPEN_NOW") {
+            const isOpen = isOpenAt(
+              item.openingHours,
+              timeInfo.currentTime,
+              timeInfo.weekday
+            );
+            return isOpen;
+          }
+
+          // open_this_evening: open between 18:00 and 23:59
+          if (filterUpper === "OPEN_THIS_EVENING") {
+            // Check if open at 18:00 or 20:00
+            return (
+              isOpenAt(item.openingHours, "18:00", timeInfo.weekday) ||
+              isOpenAt(item.openingHours, "20:00", timeInfo.weekday)
+            );
+          }
+
+          // open_late: open after 22:00
+          if (filterUpper === "OPEN_LATE") {
+            return (
+              isOpenAt(item.openingHours, "22:00", timeInfo.weekday) ||
+              isOpenAt(item.openingHours, "23:00", timeInfo.weekday)
+            );
+          }
+
+          return false;
+        });
+
+        if (!matchesAnyFilter) return false;
+      }
+
       return true;
     });
 
@@ -294,12 +428,19 @@ app.get("/places", (req, res) => {
     // Default: preserve original order (no sorting) to match current behavior when 'sort' not provided.
     const sortParam =
       typeof req.query.sort === "string" ? req.query.sort : null;
-    if (sortParam === "rating_desc" || sortParam === "rating_asc") {
+    if (
+      sortParam === "rating_desc" ||
+      sortParam === "rating_asc" ||
+      sortParam === "score_desc" ||
+      sortParam === "score_asc"
+    ) {
       filtered = [...filtered].sort((a, b) => {
         const av = ratingValueForSort(a);
         const bv = ratingValueForSort(b);
         // When dataset lacks 'rating', av/bv will be ai_score; otherwise rating
-        return sortParam === "rating_desc" ? bv - av : av - bv;
+        return sortParam === "rating_desc" || sortParam === "score_desc"
+          ? bv - av
+          : av - bv;
       });
     } else if (sortParam === "price_asc" || sortParam === "price_desc") {
       filtered = [...filtered].sort((a, b) => {
@@ -342,6 +483,21 @@ app.get("/places", (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: "Unexpected error" });
   }
+});
+
+app.get("/places/by-slug/:slug", (req, res) => {
+  const slug = req.params.slug;
+
+  // Read all place files and find the one matching the slug
+  for (let i = 1; i <= 10; i++) {
+    const file = `place_${i}.json`;
+    const place = readJson(file);
+    if (place && place.slug === slug) {
+      return res.json(place);
+    }
+  }
+
+  return res.status(404).json({ message: "Place not found" });
 });
 
 app.get("/places/:id", (req, res) => {

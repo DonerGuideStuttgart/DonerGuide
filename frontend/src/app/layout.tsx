@@ -25,10 +25,12 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="de">
-			<body className={`${rubikSans.className} antialiased bg-base-300`}>
+			<body
+				className={`${rubikSans.className} antialiased bg-base-300 min-h-screen flex flex-col`}
+			>
 				<NuqsAdapter>
 					<Navbar />
-					{children}
+					<div className="flex-1">{children}</div>
 					<Footer />
 				</NuqsAdapter>
 			</body>

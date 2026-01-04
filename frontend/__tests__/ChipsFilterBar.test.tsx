@@ -80,32 +80,6 @@ describe('ChipsFilterBar Component', () => {
 		expect(container.firstChild).toBeNull()
 	})
 
-	it('renders chip for score filter', () => {
-		const filters = createFilters({
-			min_score: 20,
-			max_score: 80,
-		})
-
-		mockUseExplore.mockReturnValue({
-			stores: [],
-			error: null,
-			loading: false,
-			uiFilters: filters,
-			uiSort: '',
-			hasMore: true,
-			handleFiltersChange: mockHandleFiltersChange,
-			handleSortChange: mockHandleSortChange,
-			handleLoadMore: mockHandleLoadMore,
-			handleRemoveFilter: mockHandleRemoveFilter,
-			handleResetAllFilters: mockHandleResetAllFilters,
-		})
-
-		render(<FilterChips />)
-
-		expect(screen.getByText('20', { exact: false })).toBeInTheDocument()
-		expect(screen.getByText('80', { exact: false })).toBeInTheDocument()
-	})
-
 	it('renders chip for price filter', () => {
 		const filters = createFilters({
 			price_min: 5,

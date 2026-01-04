@@ -55,3 +55,11 @@ export async function fetchPlaceById(id: string) {
 	if (!res.ok) throw new Error('Failed to fetch place')
 	return await res.json()
 }
+
+export async function fetchPlaceBySlug(slug: string) {
+	const base = process.env.NEXT_PUBLIC_API_URL || '/api'
+	const res = await fetch(`${base}/places/by-slug/${slug}`)
+	if (res.status === 404) return null
+	if (!res.ok) throw new Error('Failed to fetch place')
+	return await res.json()
+}

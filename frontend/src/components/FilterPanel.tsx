@@ -67,35 +67,14 @@ export default function FilterPanel({ isMobile }: Props) {
 	)
 
 	// Get slider values with defaults
-	const {
-		scoreMin,
-		scoreMax,
-		priceMin,
-		priceMax,
-		sauceMin,
-		sauceMax,
-		meatMin,
-		meatMax,
-	} = getSliderValues(uiFilters, UI_DEFAULTS)
+	const { priceMin, priceMax, sauceMin, sauceMax, meatMin, meatMax } =
+		getSliderValues(uiFilters, UI_DEFAULTS)
 
 	return (
 		<section
 			className={`bg-base-100 ${isMobile ? '' : 'border rounded-md'} px-5 py-6`}
 		>
 			<div className="grid gap-6">
-				{/* Bewertung */}
-				<RangeSlider
-					label="Bewertung"
-					minValue={0}
-					maxValue={100}
-					currentMin={scoreMin}
-					currentMax={scoreMax}
-					step={1}
-					onChange={(min, max) =>
-						handleRangeChange({ min_score: min, max_score: max })
-					}
-				/>
-
 				{/* Preis */}
 				<RangeSlider
 					label="Preis"

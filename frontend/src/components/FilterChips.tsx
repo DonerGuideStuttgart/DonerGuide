@@ -1,6 +1,5 @@
 'use client'
 import { useExplore } from '@/app/(entdecken)/useExplore'
-import Aistars from '@/assets/icons/aistars.svg'
 import Close from '@/assets/icons/close.svg'
 import type { FilterParams } from '@/types/store'
 import type { ReactNode } from 'react'
@@ -43,19 +42,6 @@ type FilterConfig =
 	| SingleFilterConfig<keyof FilterParams>
 
 const FILTER_CONFIGS: FilterConfig[] = [
-	{
-		type: 'range',
-		minKey: 'min_score',
-		maxKey: 'max_score',
-		defaultMin: 0,
-		defaultMax: 100,
-		formatLabel: (min, max) => (
-			<span className="flex items-center gap-1">
-				{min} - {max}
-				<Aistars className="size-4" />
-			</span>
-		),
-	},
 	{
 		type: 'range',
 		minKey: 'price_min',

@@ -12,46 +12,42 @@ export interface Location {
 		lat: number
 		lng: number
 	}
-	google_place_id: string
-	address: string
-	plus_code: string
-	maps_url: string
+	address: {
+		postalCode: string
+		locality: string
+		sublocality: string
+		streetAddress: string
+	}
 }
 
-export interface OpeningHours {
-	monday: string
-	tuesday: string
-	wednesday: string
-	thursday: string
-	friday: string
-	saturday: string
-	sunday: string
+export type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+export type OpeningHours = {
+	// start and end are minutes since midnight (0-1439)
+	// Example: 10:00 = 600, 14:30 = 870, 23:45 = 1425
+	hours: Partial<Record<Weekday, { start: number; end: number }[]>>
+	timezone?: string // z.B. "Europe/Berlin"
 }
 
-export interface Review {
-	id: string
-	user: string
-	date: string
-	rating: number
-	text: string
-}
-
-export interface Store {
-	id: string
+export type StoreBase = {
+	slug: string
+	imageUrls: string[]
 	name: string
-	district: string
+	phone?: string
+	district?: string
 	location: Location
-	rating: number
-	price: number
-	vegetarian: string[]
-	halal: string
-	waiting_time: string
-	payment: string[]
-	open_hours: string
-	distance_from_me: number
-	ai_summary: string
-	opening_hours: OpeningHours
-	ai_reviews: Review[]
+	aiScore: number
+	price?: number
+	vegetarian?: string[]
+	halal?: string[]
+	waitingTime?: string
+	paymentMethods?: string[]
+	sauceAmount?: number
+	meatRatio?: number
+	openingHours: OpeningHours
+}
+
+export type Store = StoreBase & {
+	aiSummary: string
 }
 
 // Filter Types

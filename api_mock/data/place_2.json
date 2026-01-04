@@ -1,66 +1,39 @@
 {
-    "id": "2",
-    "name": "Ali's Imbiss",
-    "doner_guide_version": 1,
-    "latitude": 48.793000,
-    "longitude": 9.185000,
-    "openingHours": {
-        "Mo": [
-            600,
-            1260
-        ],
-        "Tu": [
-            600,
-            1260
-        ],
-        "We": [
-            600,
-            1260
-        ],
-        "Th": [
-            600,
-            1260
-        ],
-        "Fr": [
-            600,
-            1320
-        ],
-        "Sa": [
-            660,
-            1320
-        ]
+  "slug": "alis-imbiss",
+  "imageUrls": [],
+  "name": "Ali's Imbiss",
+  "phone": "+49 711 234567",
+  "district": "Bad_Cannstatt",
+  "location": {
+    "coordinates": {
+      "lat": 48.793,
+      "lng": 9.185
     },
     "address": {
-        "postalCode": "70327",
-        "locality": "Stuttgart",
-        "sublocality": "Bad_Cannstatt",
-        "streetAddress": "Hauptstraße 5"
+      "postalCode": "70372",
+      "locality": "Stuttgart",
+      "sublocality": "Bad Cannstatt",
+      "streetAddress": "Cannstatter Straße 10"
+    }
+  },
+  "aiScore": 74,
+  "price": 3.9,
+  "halal": ["NOT_HALAL"],
+  "waitingTime": "FAST",
+  "paymentMethods": ["CASH_ONLY"],
+  "sauceAmount": 55,
+  "meatRatio": 80,
+  "openingHours": {
+    "hours": {
+      "mon": [{ "start": 600, "end": 1260 }],
+      "tue": [{ "start": 600, "end": 1260 }],
+      "wed": [{ "start": 600, "end": 1260 }],
+      "thu": [{ "start": 600, "end": 1260 }],
+      "fri": [{ "start": 600, "end": 1260 }],
+      "sat": [{ "start": 660, "end": 1260 }],
+      "sun": [{ "start": 660, "end": 1200 }]
     },
-    "photos": {
-        "uncategorized": [],
-        "food": [
-            {
-                "id": "p2f1",
-                "photoUrl": "https://example.com/photos/ali_food1.jpg"
-            }
-        ],
-        "places": []
-    },
-    "ai_analysis": {
-        "score": 74,
-        "meat_ratio": 80,
-        "sauce_amount": 40,
-        "size": 60,
-        "waiting_time": "FAST",
-        "image_URL": "https://example.com/analysis/ali.jpg",
-        "text": "Schneller Service, ordentliche Portionen."
-    },
-    "paymentMethods": [
-        "CASH",
-        "DEBIT_CARD"
-    ],
-    "takeout": true,
-    "delivery": true,
-    "dineIn": true,
-    "servesVegetarianFood": false
+    "timezone": "Europe/Berlin"
+  },
+  "aiSummary": "Ali's Imbiss punktet mit schnellem Service und einem günstigen Preis von 3.90€. Der AI-Score liegt bei 74. Hoher Fleischanteil von 80%. Keine vegetarischen Optionen verfügbar."
 }

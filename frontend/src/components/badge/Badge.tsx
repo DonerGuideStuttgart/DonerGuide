@@ -1,0 +1,16 @@
+type Props = {
+	text: string
+	icon?: React.ReactNode
+	className?: string
+}
+
+export default function Badge({ text, icon, className }: Props) {
+	return (
+		<div
+			className={`badge badge-outline ${className} rounded-full -space-x-0.5`}
+		>
+			{icon && <span>{icon}</span>}
+			<span>{text}</span>
+		</div>
+	)
+}
