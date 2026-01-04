@@ -30,6 +30,7 @@ export default function Navbar() {
 				{/* Logo */}
 				<Link
 					href={routes.explore}
+					prefetch={false}
 					className="flex items-center gap-3 lg:mr-12 mr-auto"
 				>
 					<Image

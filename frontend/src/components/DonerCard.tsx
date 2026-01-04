@@ -20,7 +20,11 @@ export default function DonerCard({ store }: { store: StoreBase }) {
 	const openClosingText = getOpeningStatusText(store.openingHours)
 
 	return (
-		<Link href={routes.storeDetail(store.slug)} className="block">
+		<Link
+			href={routes.storeDetail(store.slug)}
+			prefetch={false}
+			className="block"
+		>
 			<article className="flex flex-col md:flex-row justify-between border border-primary bg-base-100 hover:bg-base-200 rounded-xl gap-4 p-6">
 				<div className="w-full space-y-2 order-last md:order-first">
 					{/* Header with name and score */}

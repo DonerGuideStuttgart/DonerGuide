@@ -153,6 +153,7 @@ export default function Ueberuns() {
 					</p>
 					<Link
 						href={routes.explore}
+						prefetch={false}
 						className="flex items-center justify-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000] active:shadow-none active:translate-y-0.5 py-1.5 px-6 md:max-w-max"
 					>
 						Döner entdecken

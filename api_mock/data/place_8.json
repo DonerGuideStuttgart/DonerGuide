@@ -5,6 +5,7 @@
   "phone": "+49 711 456789",
   "district": "Möhringen",
   "location": {
+    "googlePlaceId": "ChIJCWLuDp-vEmsRzwSxeGJ9AQ4",
     "coordinates": {
       "lat": 48.758,
       "lng": 9.17

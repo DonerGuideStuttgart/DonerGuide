@@ -5,6 +5,7 @@
   "phone": "+49 711 567890",
   "district": "Degerloch",
   "location": {
+    "googlePlaceId": "ChIJeR2KQ7GuEmsRIQvQz8xFKWg",
     "coordinates": {
       "lat": 48.744,
       "lng": 9.184

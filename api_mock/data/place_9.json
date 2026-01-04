@@ -4,6 +4,7 @@
   "name": "Express Kebap",
   "district": "Feuerbach",
   "location": {
+    "googlePlaceId": "ChIJY8u0gXKtEmsRxPHEGdwPLnk",
     "coordinates": {
       "lat": 48.8,
       "lng": 9.16
