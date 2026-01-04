@@ -47,6 +47,9 @@ export class GoogleMapsService {
       "places.regularOpeningHours",
       "places.addressComponents",
       "places.photos.name",
+      "places.photos.widthPx",
+      "places.photos.heightPx",
+      "places.photos.authorAttributions",
       "places.takeout",
       "places.delivery",
       "places.dineIn",
@@ -187,6 +190,9 @@ export class GoogleMapsService {
     return googlePhotos.slice(0, 10).map((photo) => ({
       id: photo.name, // Format is "places/PLACE_ID/photos/PHOTO_ID"
       photoUrl: `https://places.googleapis.com/v1/${photo.name}/media?key=${this.apiKey}&maxHeightPx=1000`,
+      widthPx: photo.widthPx,
+      heightPx: photo.heightPx,
+      authorAttributions: photo.authorAttributions,
     }));
   }
 
@@ -247,6 +253,15 @@ export class GoogleMapsService {
         photos: [
           {
             name: `places/${id}/photos/mock_p1`,
+            widthPx: 1000,
+            heightPx: 1000,
+            authorAttributions: [
+              {
+                displayName: "Mock Author",
+                uri: "https://example.com/author",
+                photoUri: "https://example.com/author-photo",
+              },
+            ],
           },
         ],
       };
