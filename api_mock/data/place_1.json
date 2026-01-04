@@ -29,14 +29,8 @@
   "meatRatio": 70,
   "openingHours": {
     "hours": {
-      "mon": [
-        { "start": 660, "end": 1350 },
-        { "start": 1500, "end": 1380 }
-      ],
-      "tue": [
-        { "start": 660, "end": 1350 },
-        { "start": 1500, "end": 1380 }
-      ],
+      "mon": [{ "start": 660, "end": 1350 }],
+      "tue": [{ "start": 660, "end": 1350 }],
       "wed": [{ "start": 660, "end": 1350 }],
       "thu": [{ "start": 660, "end": 1350 }],
       "fri": [{ "start": 660, "end": 1410 }],
