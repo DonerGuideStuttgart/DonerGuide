@@ -1,6 +1,6 @@
 import { routes } from '@/helpers/routes'
 import { StoreBase } from '@/types/store'
-import { BadgeType, badgeConfig } from './badge/badgeConfig'
+import { badgeConfig } from './badge/badgeConfig'
 import Badge from './badge/Badge'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -8,67 +8,15 @@ import Aistars from '@/assets/icons/aistars.svg'
 import InfoCircle from '@/assets/icons/infocircle.svg'
 import CircleSolid from '@/assets/icons/circlesolid.svg'
 import Location from '@/assets/icons/location.svg'
-import { getOpeningStatusText, isStoreOpen } from '@/helpers/openingHours'
+import { getOpeningStatusText } from '@/helpers/openingHours'
 import { DISTRICT_LABELS } from '@/types/records'
+import { getStoreBadges } from '@/helpers/storeBadges'
 
 export default function DonerCard({ store }: { store: StoreBase }) {
 	const mainImage =
 		store.imageUrls && store.imageUrls.length > 0 ? store.imageUrls[0] : null
 
-	const isOpen = () => isStoreOpen(store.openingHours)
-
-	// Helper to get badges based on store data
-	const getBadges = () => {
-		const badges: BadgeType[] = []
-
-		// Opening status
-		if (isOpen()) {
-			badges.push(BadgeType.GEOEFFNET)
-		} else {
-			badges.push(BadgeType.GESCHLOSSEN)
-		}
-
-		// Vegetarian options
-		if (store.vegetarian && store.vegetarian.includes('VEGAN')) {
-			badges.push(BadgeType.VEGAN)
-		}
-		if (store.vegetarian && store.vegetarian.includes('VEGETARIAN')) {
-			badges.push(BadgeType.VEGETARISCH)
-		}
-
-		// Halal
-		if (store.halal && store.halal.includes('HALAL')) {
-			badges.push(BadgeType.HALAL)
-		} else if (store.halal && store.halal.includes('NOT_HALAL')) {
-			badges.push(BadgeType.NICHT_HALAL)
-		}
-
-		// Waiting time
-		if (store.waitingTime === 'FAST') {
-			badges.push(BadgeType.SCHNELL)
-		} else if (store.waitingTime === 'SLOW') {
-			badges.push(BadgeType.LANGSAM)
-		}
-
-		// Payment methods
-		if (store.paymentMethods) {
-			if (
-				store.paymentMethods.includes('CREDIT_CARD') ||
-				store.paymentMethods.length > 1
-			) {
-				badges.push(BadgeType.KARTENZAHLUNG)
-			} else if (
-				store.paymentMethods.length === 1 &&
-				store.paymentMethods[0] === 'CASH_ONLY'
-			) {
-				badges.push(BadgeType.NUR_CASH)
-			}
-		}
-
-		return badges
-	}
-
-	const badges = getBadges()
+	const badges = getStoreBadges(store)
 	const openClosingText = getOpeningStatusText(store.openingHours)
 
 	return (
