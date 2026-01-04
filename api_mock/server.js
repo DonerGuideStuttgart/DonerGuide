@@ -133,7 +133,7 @@ function isOpenAt(openingHours, checkTime, weekday) {
   const checkMinutes = timeToMinutes(checkTime);
 
   const result = todayHours.some((range) => {
-    // range.start and range.end are already in minutes
+    // range.start and range.end are in minutes
     // Handle times that cross midnight
     if (range.end < range.start) {
       // If end time is earlier than start (e.g., 660 - 30 for 11:00 - 00:30), it crosses midnight
@@ -262,9 +262,9 @@ app.get("/places", (req, res) => {
 
     // - open_hours: enum open_now | open_this_evening | open_late
     const ALLOWED_OPEN_HOURS = new Set([
-      "open_now",
-      "open_this_evening",
-      "open_late",
+      "OPEN_NOW",
+      "OPEN_THIS_EVENING",
+      "OPEN_LATE",
     ]);
     const openHoursFilters = normalizeUpperFrom(
       parseMulti(req.query, "open_hours"),
@@ -395,15 +395,6 @@ app.get("/places", (req, res) => {
               timeInfo.currentTime,
               timeInfo.weekday
             );
-            // Debug for stores with lunch breaks
-            if (
-              item.slug === "ali-baba-grill" ||
-              item.slug === "orient-express"
-            ) {
-              console.log(
-                `[FILTER] ${item.name} (${item.slug}): time=${timeInfo.currentTime}, day=${timeInfo.weekday}, isOpen=${isOpen}`
-              );
-            }
             return isOpen;
           }
 
