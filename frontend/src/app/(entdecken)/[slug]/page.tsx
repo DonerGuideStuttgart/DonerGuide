@@ -7,6 +7,7 @@ import Location from '@/assets/icons/location.svg'
 import Phone from '@/assets/icons/phone.svg'
 import Badge from '@/components/badge/Badge'
 import { badgeConfig } from '@/components/badge/badgeConfig'
+import ImageCarousel from '@/components/ImageCarousel'
 import { fetchPlaceBySlug, fetchPlaces } from '@/helpers/api'
 import {
 	getCurrentTimeInfo,
@@ -18,7 +19,6 @@ import {
 import { routes } from '@/helpers/routes'
 import { getStoreBadges } from '@/helpers/storeBadges'
 import { Store } from '@/types/store'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -51,8 +51,6 @@ export default async function StoreDetail({ params }: Props) {
 		return notFound()
 	}
 
-	const mainImage =
-		store.imageUrls && store.imageUrls.length > 0 ? store.imageUrls[0] : null
 	const badges = getStoreBadges(store)
 	const openClosingText = getOpeningStatusText(store.openingHours)
 
@@ -122,21 +120,13 @@ export default async function StoreDetail({ params }: Props) {
 				</section>
 				{/* Info Section End */}
 
-				{/* Image */}
-				{mainImage && (
+				{/* Image Carousel */}
+				{store.imageUrls && store.imageUrls.length > 0 && (
 					<section className="lg:w-1/3">
-						<div className="relative w-full h-64 lg:h-full">
-							<Image
-								src={mainImage}
-								alt={store.name}
-								fill
-								loading="eager"
-								className="object-cover rounded-xl border border-primary"
-							/>
-						</div>
+						<ImageCarousel images={store.imageUrls} storeName={store.name} />
 					</section>
 				)}
-				{/* Image End */}
+				{/* Image Carousel End */}
 			</section>
 			{/* Info and Image Section End */}
 
