@@ -57,7 +57,7 @@ export default async function StoreDetail({ params }: Props) {
 	const openClosingText = getOpeningStatusText(store.openingHours)
 
 	return (
-		<main className="container my-4 space-y-4">
+		<main className="container space-y-4">
 			<Link
 				href={routes.explore}
 				className="flex items-center text-neutral hover:text-primary fill-neutral hover:fill-primary mb-2 md:mb-4"
