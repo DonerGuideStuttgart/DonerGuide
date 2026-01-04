@@ -18,7 +18,7 @@ import {
 } from '@/helpers/openingHours'
 import { routes } from '@/helpers/routes'
 import { getStoreBadges } from '@/helpers/storeBadges'
-import { Store } from '@/types/store'
+import { Store, StoreBase } from '@/types/store'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -29,7 +29,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { slug } = await params
-	const store: Store = await fetchPlaceBySlug(slug)
+	const store = await fetchPlaceBySlug(slug)
 
 	if (!store) {
 		return {
@@ -64,7 +64,7 @@ export async function generateStaticParams() {
 	const data = await fetchPlaces('')
 	const places = data.items || []
 
-	return places.map((place: Store) => ({
+	return places.map((place: StoreBase) => ({
 		slug: place.slug,
 	}))
 }
@@ -231,6 +231,7 @@ export default async function StoreDetail({ params }: Props) {
 					<Link
 						href={`https://www.google.com/maps/search/?api=1&query=${store.location.coordinates.lat},${store.location.coordinates.lng}`}
 						target="_blank"
+						rel="noopener noreferrer"
 					>
 						<div className="flex items-center gap-3 md:mb-4 hover:underline">
 							<Location className="size-5 fill-primary" />

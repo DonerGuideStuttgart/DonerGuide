@@ -1,5 +1,5 @@
-import { StoreBase } from '@/types/store'
 import { BadgeType } from '@/components/badge/badgeConfig'
+import { StoreBase } from '@/types/store'
 import { isStoreOpen } from './openingHours'
 
 /**
@@ -40,10 +40,7 @@ export function getStoreBadges(store: StoreBase): BadgeType[] {
 
 	// Payment methods
 	if (store.paymentMethods) {
-		if (
-			store.paymentMethods.includes('CREDIT_CARD') ||
-			store.paymentMethods.length > 1
-		) {
+		if (store.paymentMethods.includes('CREDIT_CARD')) {
 			badges.push(BadgeType.KARTENZAHLUNG)
 		} else if (
 			store.paymentMethods.length === 1 &&

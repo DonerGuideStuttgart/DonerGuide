@@ -48,15 +48,15 @@ export default function ImageCarousel({
 				ref={carouselRef}
 				className="carousel w-full h-full rounded-xl border border-primary"
 			>
-				{images.map((imageUrl, idx) => (
+				{images.map((imageUrl, index) => (
 					<div
-						key={idx}
-						id={`slide${idx}`}
+						key={imageUrl}
+						id={`slide${index}`}
 						className="carousel-item relative w-full h-full"
 					>
 						<Image
 							src={imageUrl}
-							alt={`${storeName} - Bild ${idx + 1}`}
+							alt={`${storeName} - Bild ${index + 1}`}
 							fill
 							loading="eager"
 							className="object-cover"
