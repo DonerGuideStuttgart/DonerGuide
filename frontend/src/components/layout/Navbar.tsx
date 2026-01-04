@@ -11,7 +11,7 @@ export default function Navbar() {
 	]
 
 	return (
-		<nav className="navbar bg-base-300">
+		<nav className="navbar bg-base-300 py-5">
 			<div className="container navbar-start">
 				{/* Mobile Dropdown */}
 				<div className="lg:hidden dropdown mr-auto">
