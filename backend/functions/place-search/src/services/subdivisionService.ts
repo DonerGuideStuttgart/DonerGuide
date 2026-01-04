@@ -3,7 +3,7 @@
  *
  * Handles recursive subdivision of grid cells when result density is too high.
  * Uses binary subdivision: splits a rectangle into 2 equal halves.
- *.
+ *
  */
 
 import type { GridPointMessage } from "../types/grid.types";
