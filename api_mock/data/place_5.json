@@ -4,6 +4,7 @@
   "name": "Murat's",
   "district": "Vaihingen",
   "location": {
+    "googlePlaceId": "ChIJmZ8xvH6vEmsRQJ7D2VuPCHQ",
     "coordinates": {
       "lat": 48.743,
       "lng": 9.163

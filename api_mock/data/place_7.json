@@ -4,6 +4,7 @@
   "name": "Bosphorus",
   "district": "Bad_Cannstatt",
   "location": {
+    "googlePlaceId": "ChIJ9UHqLvmuEmsRvUA2gHbV8jE",
     "coordinates": {
       "lat": 48.785,
       "lng": 9.186

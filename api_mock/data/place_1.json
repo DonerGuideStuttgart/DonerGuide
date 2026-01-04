@@ -9,6 +9,7 @@
   "phone": "+49 711 123456",
   "district": "Mitte",
   "location": {
+    "googlePlaceId": "ChIJN1t_tDeuEmsRUsoyG83frY4",
     "coordinates": {
       "lat": 48.775845,
       "lng": 9.182932

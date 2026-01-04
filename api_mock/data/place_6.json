@@ -4,6 +4,7 @@
   "name": "Orient Express",
   "district": "West",
   "location": {
+    "googlePlaceId": "ChIJBdX2Qq2uEmsRmRB5axRqRzk",
     "coordinates": {
       "lat": 48.779,
       "lng": 9.16

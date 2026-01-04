@@ -7,6 +7,7 @@
   "name": "Kebap König",
   "district": "Nord",
   "location": {
+    "googlePlaceId": "ChIJrTLr-GyuEmsRBfy61i59si0",
     "coordinates": {
       "lat": 48.789,
       "lng": 9.178

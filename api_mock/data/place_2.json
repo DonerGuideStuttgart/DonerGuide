@@ -5,6 +5,7 @@
   "phone": "+49 711 234567",
   "district": "Bad_Cannstatt",
   "location": {
+    "googlePlaceId": "ChIJ5YQQf1WuEmsR9Qs0aYLWCD4",
     "coordinates": {
       "lat": 48.793,
       "lng": 9.185

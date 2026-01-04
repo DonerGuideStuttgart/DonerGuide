@@ -8,6 +8,7 @@ import {
 } from './records'
 
 export interface Location {
+	googlePlaceId?: string
 	coordinates: {
 		lat: number
 		lng: number

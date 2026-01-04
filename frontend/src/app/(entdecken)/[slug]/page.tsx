@@ -85,6 +85,7 @@ export default async function StoreDetail({ params }: Props) {
 		<main className="container space-y-4">
 			<Link
 				href={routes.explore}
+				prefetch={false}
 				className="flex items-center text-neutral hover:text-primary fill-neutral hover:fill-primary mb-2 md:mb-4"
 			>
 				<ChevronLeft className=" size-4 mr-1" />
@@ -229,7 +230,11 @@ export default async function StoreDetail({ params }: Props) {
 				<div className="order-1 lg:order-2 bg-base-300 lg:bg-white border-0 lg:border lg:border-primary lg:rounded-xl lg:px-6 lg:py-5 space-y-3">
 					<h2 className="hidden md:block text-lg font-bold">Adresse</h2>
 					<Link
-						href={`https://www.google.com/maps/search/?api=1&query=${store.location.coordinates.lat},${store.location.coordinates.lng}`}
+						href={
+							store.location.googlePlaceId
+								? `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${store.location.googlePlaceId}`
+								: `https://www.google.com/maps/search/?api=1&query=${store.location.coordinates.lat},${store.location.coordinates.lng}`
+						}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
