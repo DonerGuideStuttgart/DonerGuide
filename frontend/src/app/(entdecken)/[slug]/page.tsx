@@ -1,5 +1,6 @@
 import { fetchPlaceBySlug, fetchPlaces } from '@/helpers/api'
 import { Store } from '@/types/store'
+import { notFound } from 'next/navigation'
 
 type Props = {
 	params: Promise<{ slug: string }>
@@ -16,10 +17,11 @@ export async function generateStaticParams() {
 
 export default async function StoreDetail({ params }: Props) {
 	const { slug } = await params
+
 	const store: Store = await fetchPlaceBySlug(slug)
 
 	if (!store) {
-		return <main className="max-w-5xl mx-auto p-4">Store not found.</main>
+		return notFound()
 	}
 
 	return (

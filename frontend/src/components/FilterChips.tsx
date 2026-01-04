@@ -1,6 +1,5 @@
 'use client'
 import { useExplore } from '@/app/(entdecken)/useExplore'
-import Aistars from '@/assets/icons/aistars.svg'
 import Close from '@/assets/icons/close.svg'
 import type { FilterParams } from '@/types/store'
 import type { ReactNode } from 'react'
