@@ -46,19 +46,17 @@ export interface GridProcessingResult {
   needsSubdivision: boolean;
 }
 
-/**
- * Core business logic for processing a grid point
-
-*
- * Shared between production handler and test workflow
- *
- * This function encapsulates the pure business logic without
- * production-specific concerns (Service Bus, Cosmos DB, logging).
- *
- * @param gridPoint - Grid cell to process
- * @returns Processed places and child cells for subdivision
- */
-export async function processGridPointLogic(gridPoint: GridPointMessage): Promise<GridProcessingResult> {
+ /**
+  * Core business logic for processing a grid point
+  * Shared between production handler and test workflow
+  *
+  * This function encapsulates the pure business logic without
+  * production-specific concerns (Service Bus, Cosmos DB, logging).
+  *
+  * @param gridPoint - Grid cell to process
+  * @returns Processed places and child cells for subdivision
+  */
+ export async function processGridPointLogic(gridPoint: GridPointMessage): Promise<GridProcessingResult> {
   const queryResults: QueryResult[] = [];
   const placeMap = new Map<string, PlaceSearchResult>(); // Dedupe across queries and map to PlaceSearchResult objects
 
