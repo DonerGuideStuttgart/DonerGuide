@@ -1,3 +1,4 @@
+import { WEEKDAY_LABELS } from '@/types/records'
 import type { OpeningHours, Weekday } from '@/types/store'
 
 /** Weekday mapping */
@@ -10,6 +11,14 @@ const WEEKDAY_MAP: Record<string, Weekday> = {
 	Sat: 'sat',
 	Sun: 'sun',
 }
+
+/** Weekdays with labels for display */
+export const WEEKDAYS = (Object.keys(WEEKDAY_LABELS) as Weekday[]).map(
+	(key) => ({
+		key,
+		label: WEEKDAY_LABELS[key],
+	}),
+)
 
 /** Default timezone for opening hours */
 const DEFAULT_TIMEZONE = 'Europe/Berlin'
@@ -25,7 +34,7 @@ function timeToMinutes(timeStr: string): number {
 /**
  * Convert minutes since midnight to time string (HH:MM)
  */
-function minutesToTime(minutes: number): string {
+export function minutesToTime(minutes: number): string {
 	// Handle values over 24 hours (next day)
 	const normalizedMinutes = minutes % 1440
 	const hours = Math.floor(normalizedMinutes / 60)
@@ -36,7 +45,7 @@ function minutesToTime(minutes: number): string {
 /**
  * Get current time info for a given timezone
  */
-function getCurrentTimeInfo(timezone: string): {
+export function getCurrentTimeInfo(timezone: string): {
 	currentTime: string
 	weekday: Weekday
 } {

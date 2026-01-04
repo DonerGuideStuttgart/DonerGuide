@@ -67,16 +67,8 @@ export default function FilterPanel({ isMobile }: Props) {
 	)
 
 	// Get slider values with defaults
-	const {
-		scoreMin,
-		scoreMax,
-		priceMin,
-		priceMax,
-		sauceMin,
-		sauceMax,
-		meatMin,
-		meatMax,
-	} = getSliderValues(uiFilters, UI_DEFAULTS)
+	const { priceMin, priceMax, sauceMin, sauceMax, meatMin, meatMax } =
+		getSliderValues(uiFilters, UI_DEFAULTS)
 
 	return (
 		<section
