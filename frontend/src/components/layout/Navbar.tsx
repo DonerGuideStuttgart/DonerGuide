@@ -1,8 +1,8 @@
-import { routes } from '@/helpers/routes'
-import Link from 'next/link'
-import Image from 'next/image'
-import NavLinks from './NavLinks'
 import Menu from '@/assets/icons/menu.svg'
+import { routes } from '@/helpers/routes'
+import Image from 'next/image'
+import Link from 'next/link'
+import NavLinks from './NavLinks'
 
 export default function Navbar() {
 	const links = [
@@ -11,7 +11,7 @@ export default function Navbar() {
 	]
 
 	return (
-		<nav className="navbar bg-base-300 py-5">
+		<nav className="navbar bg-base-300 py-5 mb-4">
 			<div className="container navbar-start">
 				{/* Mobile Dropdown */}
 				<div className="lg:hidden dropdown mr-auto">
