@@ -9,15 +9,19 @@ export const metadata: Metadata = {
 export default function Datenschutz() {
 	return (
 		<main className="container py-12">
-			<h1 className="mb-8 text-4xl font-bold">Datenschutzerklärung</h1>
+			<h1 className="mb-8 text-2xl md:text-4xl text-wrap font-bold">
+				Datenschutzerklärung
+			</h1>
 
 			<section className="space-y-8 md:w-2/3">
 				<div>
-					<h2 className="text-2xl font-semibold">
+					<h2 className="text-xl md:text-2xl font-semibold">
 						1. Datenschutz auf einen Blick
 					</h2>
 
-					<h3 className="mt-4 text-xl font-medium">Allgemeine Hinweise</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
+						Allgemeine Hinweise
+					</h3>
 					<p>
 						Die folgenden Hinweise geben einen einfachen Überblick darüber, was
 						mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website
@@ -25,7 +29,7 @@ export default function Datenschutz() {
 						persönlich identifiziert werden können.
 					</p>
 
-					<h3 className="mt-4 text-xl font-medium">
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
 						Datenerfassung auf dieser Website
 					</h3>
 					<p>
@@ -38,7 +42,7 @@ export default function Datenschutz() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">2. Hosting</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">2. Hosting</h2>
 					<p>
 						Wir hosten die Inhalte unserer Website bei Microsoft Azure. Die
 						Server befinden sich in Deutschland/Europa. Details entnehmen Sie
@@ -55,11 +59,11 @@ export default function Datenschutz() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">
+					<h2 className="text-xl md:text-2xl font-semibold">
 						3. Allgemeine Hinweise und Pflichtinformationen
 					</h2>
 
-					<h3 className="mt-4 text-xl font-medium">Datenschutz</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">Datenschutz</h3>
 					<p>
 						Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen
 						Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten
@@ -67,7 +71,7 @@ export default function Datenschutz() {
 						Datenschutzvorschriften sowie dieser Datenschutzerklärung.
 					</p>
 
-					<h3 className="mt-4 text-xl font-medium">
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
 						Hinweis zur verantwortlichen Stelle
 					</h3>
 					<p>
@@ -92,11 +96,13 @@ export default function Datenschutz() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">
+					<h2 className="text-xl md:text-2xl font-semibold">
 						4. Datenerfassung auf dieser Website
 					</h2>
 
-					<h3 className="mt-4 text-xl font-medium">Server-Log-Dateien</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
+						Server-Log-Dateien
+					</h3>
 					<p>
 						Der Provider der Seiten erhebt und speichert automatisch
 						Informationen in so genannten Server-Log-Dateien, die Ihr Browser
@@ -115,7 +121,7 @@ export default function Datenschutz() {
 						nicht vorgenommen.
 					</p>
 
-					<h3 className="mt-4 text-xl font-medium">Cookies</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">Cookies</h3>
 					<p>
 						Unsere Website verwendet derzeit keine Cookies für Tracking-Zwecke.
 						Sollten wir in Zukunft Cookies einsetzen, werden wir Sie darüber
@@ -124,7 +130,7 @@ export default function Datenschutz() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">5. Ihre Rechte</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">5. Ihre Rechte</h2>
 					<p>Sie haben jederzeit das Recht:</p>
 					<ul className="list-disc pl-6">
 						<li>
@@ -140,7 +146,9 @@ export default function Datenschutz() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">6. Externe Links</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">
+						6. Externe Links
+					</h2>
 					<p>
 						Unsere Website enthält Links zu externen Websites (z.B. Google Maps
 						für Standortinformationen). Für die Datenschutzpraktiken dieser

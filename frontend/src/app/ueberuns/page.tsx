@@ -11,7 +11,9 @@ export const metadata: Metadata = {
 export default function Ueberuns() {
 	return (
 		<main className="container py-4">
-			<h1 className="text-4xl font-bold mb-8">Über uns</h1>
+			<h1 className="text-2xl md:text-4xl text-wrap font-bold mb-8">
+				Über uns
+			</h1>
 
 			<section className="space-y-8 md:w-2/3">
 				{/* Hero Section */}
@@ -30,7 +32,9 @@ export default function Ueberuns() {
 
 				{/* Mission */}
 				<div>
-					<h2 className="text-2xl font-semibold mb-2">🎯 Unsere Mission</h2>
+					<h2 className="text-xl md:text-2xl font-semibold mb-2">
+						🎯 Unsere Mission
+					</h2>
 					<p>
 						Wir wollten mehr wissen: Wie ist das{' '}
 						<strong>Fleisch-Salat-Verhältnis</strong>? Wie großzügig ist die{' '}
@@ -42,7 +46,7 @@ export default function Ueberuns() {
 
 				{/* How it works */}
 				<div>
-					<h2 className="flex items-center gap-2 text-2xl font-semibold">
+					<h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold">
 						⚙️ Wie funktioniert DönerGuide?
 					</h2>
 
@@ -96,7 +100,7 @@ export default function Ueberuns() {
 
 				{/* What we analyze */}
 				<div>
-					<h2 className="text-2xl font-semibold mb-4">
+					<h2 className="text-xl md:text-2xl font-semibold mb-4">
 						🔍 Was wir analysieren
 					</h2>
 					<div className="flex flex-wrap gap-3">
@@ -120,7 +124,9 @@ export default function Ueberuns() {
 
 				{/* Team */}
 				<div>
-					<h2 className="text-2xl font-semibold mb-4">👥 Das Team</h2>
+					<h2 className="text-xl md:text-2xl font-semibold mb-4">
+						👥 Das Team
+					</h2>
 					<p>
 						Wir sind 7 Computer Science and Media Studenten aus Stuttgart, die
 						ihre Leidenschaft für gutes Essen mit ihrem technischen Know-how
@@ -144,7 +150,7 @@ export default function Ueberuns() {
 
 				{/* CTA */}
 				<div className="flex flex-col items-center rounded-xl bg-base-200 p-8 text-center gap-2">
-					<h2 className="text-2xl font-semibold">
+					<h2 className="text-xl md:text-2xl font-semibold">
 						🚀 Bereit für den besten Döner?
 					</h2>
 					<p className="mb-2">

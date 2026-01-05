@@ -9,11 +9,15 @@ export const metadata: Metadata = {
 export default function Imprint() {
 	return (
 		<main className="container py-12">
-			<h1 className="mb-8 text-4xl font-bold">Impressum</h1>
+			<h1 className="mb-8 text-2xl md:text-4xl text-wrap font-bold">
+				Impressum
+			</h1>
 
 			<section className="space-y-8 md:w-2/3">
 				<div>
-					<h2 className="text-2xl font-semibold">Angaben gemäß § 5 TMG</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">
+						Angaben gemäß § 5 TMG
+					</h2>
 					<p>
 						Hochschule der Medien Stuttgart
 						<br />
@@ -24,7 +28,7 @@ export default function Imprint() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">Kontakt</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">Kontakt</h2>
 					<p>
 						E-Mail:{' '}
 						<a
@@ -37,7 +41,7 @@ export default function Imprint() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">
+					<h2 className="text-xl md:text-2xl font-semibold">
 						Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV
 					</h2>
 					<p>
@@ -50,9 +54,13 @@ export default function Imprint() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">Haftungsausschluss</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">
+						Haftungsausschluss
+					</h2>
 
-					<h3 className="mt-4 text-xl font-medium">Haftung für Inhalte</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
+						Haftung für Inhalte
+					</h3>
 					<p>
 						Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für
 						die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können
@@ -64,7 +72,9 @@ export default function Imprint() {
 						zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
 					</p>
 
-					<h3 className="mt-4 text-xl font-medium">Haftung für Links</h3>
+					<h3 className="mt-4 text-lg md:text-xl font-medium">
+						Haftung für Links
+					</h3>
 					<p>
 						Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren
 						Inhalte wir keinen Einfluss haben. Deshalb können wir für diese
@@ -75,7 +85,7 @@ export default function Imprint() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">Urheberrecht</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">Urheberrecht</h2>
 					<p>
 						Die durch die Seitenbetreiber erstellten Inhalte und Werke auf
 						diesen Seiten unterliegen dem deutschen Urheberrecht. Die
@@ -86,7 +96,9 @@ export default function Imprint() {
 				</div>
 
 				<div>
-					<h2 className="text-2xl font-semibold">Streitschlichtung</h2>
+					<h2 className="text-xl md:text-2xl font-semibold">
+						Streitschlichtung
+					</h2>
 					<p>
 						Die Europäische Kommission stellt eine Plattform zur
 						Online-Streitbeilegung (OS) bereit:{' '}
