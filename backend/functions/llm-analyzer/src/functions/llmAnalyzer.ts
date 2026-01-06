@@ -7,10 +7,12 @@ const COSMOSDB_DATABASE_NAME = process.env.LLM_ANALYZER_COSMOSDB_DATABASE_NAME ?
 const COSMOSDB_CONTAINER_NAME = process.env.LLM_ANALYZER_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
+// Type Definitions
 interface StoreData {
-  id: string;
+  id?: string;
   image_URL?: string;
   ai_analysis?: AnalysisResult;
+  [key: string]: unknown; // Allow additional fields from other functions
 }
 
 interface AnalysisResult {
@@ -51,7 +53,7 @@ export async function llmAnalyzer(storeId: string, context: InvocationContext): 
   const { resource } = await item.read<StoreData>();
   const imageUrl = resource?.image_URL;
 
-  if (!imageUrl || imageUrl.trim() === "") {
+  if (typeof imageUrl !== "string" || imageUrl.trim() === "") {
     context.error("No image URL found for store:", storeId);
     throw new Error("Image URL missing");
   }
@@ -175,6 +177,7 @@ async function analyzeImage(image_URL: string, context: InvocationContext): Prom
 
     const analysis = JSON.parse(content) as AnalysisResult;
 
+    // Validate the response has all required fields
     if (
       typeof analysis.bewertungstext !== "string" ||
       typeof analysis.score_geschmack !== "number" ||
