@@ -39,14 +39,17 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "api_token=$TOKEN" >> $GITHUB_OUTPUT
 
+      - name: Build Frontend
+        working-directory: frontend
+        run: |
+          npm --prefix ../api_mock ci && npm ci --ignore-scripts
+          npm --prefix ../api_mock run start & npm run build
+
       - name: Build and Deploy Frontend
         uses: Azure/static-web-apps-deploy@v1
-        env:
-          CUSTOM_BUILD_COMMAND: "npm --prefix ../api_mock ci && npm ci --ignore-scripts"
-          RUN_BUILD_COMMAND: "npm --prefix ../api_mock run start & npm run build"
         with:
           azure_static_web_apps_api_token: ${{ steps.export-token.outputs.api_token }}
           action: "upload"
-          app_location: "frontend"
-          output_location: "out"
+          app_location: "frontend/out"
           skip_api_build: true
+          skip_app_build: true
