@@ -29,12 +29,15 @@ jobs:
 
       - name: Terraform Init
         id: init
+        working-directory: infrastructure
         run: terraform init -input=false
 
       - name: Terraform Plan
+        working-directory: infrastructure
         id: plan
-        run: terraform -chdir=infrastructure plan -input=false -out=tfplan
+        run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        working-directory: infrastructure
         id: apply
-        run: terraform -chdir=infrastructure apply -auto-approve -input=false tfplan
+        run: terraform apply -auto-approve -input=false tfplan
