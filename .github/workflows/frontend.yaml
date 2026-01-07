@@ -43,7 +43,7 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         env:
           CUSTOM_BUILD_COMMAND: "npm --prefix ../api_mock ci && npm ci --ignore-scripts"
-          CUSTOM_RUN_BUILD_COMMAND: "npm --prefix ../api_mock run start & npm run build"
+          RUN_BUILD_COMMAND: "npm --prefix ../api_mock run start & npm run build"
         with:
           azure_static_web_apps_api_token: ${{ steps.export-token.outputs.api_token }}
           action: "upload"
