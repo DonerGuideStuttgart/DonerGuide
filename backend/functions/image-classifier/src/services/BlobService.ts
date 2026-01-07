@@ -25,9 +25,9 @@ export class BlobService {
      * Downloads an image from the given URL and uploads it to Blob Storage.
      * @param url The Google Places photo URL.
      * @param photoId The ID to use as the blob name.
-     * @returns The mime type of the uploaded image.
+     * @returns The mime type and the image buffer.
      */
-    public async downloadAndUploadImage(url: string, photoId: string): Promise<string> {
+    public async downloadAndUploadImage(url: string, photoId: string): Promise<{ contentType: string, buffer: Buffer }> {
         try {
             const response = await axios.get(url, { 
                 responseType: 'arraybuffer',
@@ -44,7 +44,7 @@ export class BlobService {
                 blobHTTPHeaders: { blobContentType: contentType }
             });
 
-            return contentType;
+            return { contentType, buffer };
         } catch (error) {
             console.error(`Failed to process photo ${photoId} from ${url}:`, error);
             throw error;
