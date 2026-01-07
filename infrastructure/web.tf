@@ -25,4 +25,7 @@ resource "cloudflare_dns_record" "frontend_verification" {
   type    = "TXT"
   ttl     = 1
   content = azurerm_static_web_app_custom_domain.frontend_domain.validation_token
+
+  depends_on = [azurerm_static_web_app_custom_domain.frontend_domain]
+  count      = azurerm_static_web_app_custom_domain.frontend_domain.validation_token != "" ? 1 : 0
 }
