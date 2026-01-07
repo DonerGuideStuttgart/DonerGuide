@@ -42,11 +42,11 @@ jobs:
       - name: Build and Deploy Frontend
         uses: Azure/static-web-apps-deploy@v1
         env:
-          CUSTOM_BUILD_COMMAND: ""
+          CUSTOM_BUILD_COMMAND: "npm --prefix ../api_mock ci && npm ci --ignore-scripts"
         with:
           azure_static_web_apps_api_token: ${{ steps.export-token.outputs.api_token }}
           action: "upload"
           app_location: "frontend"
           output_location: "out"
-          app_build_command: "npm --prefix ../api_mock ci && npm --prefix ../api_mock run start & npm ci --ignore-scripts && npm run build"
+          app_build_command: "npm --prefix ../api_mock run start & npm run build"
           skip_api_build: true
