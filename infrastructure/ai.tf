@@ -27,12 +27,13 @@ resource "azurerm_cognitive_deployment" "deployment_llm" {
   cognitive_account_id = azurerm_cognitive_account.account_llm.id
 
   sku {
-    name = "GlobalStandard"
+    name     = "GlobalStandard"
+    capacity = 100
   }
 
   model {
-    format  = "xAI"
-    name    = "grok-4-fast-reasoning"
-    version = "1"
+    format  = "OpenAI"
+    name    = "gpt-5-mini"
+    version = "2025-08-07"
   }
 }
