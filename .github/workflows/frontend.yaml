@@ -1,3 +1,5 @@
+name: Frontend CI/CD
+
 on:
   push:
     branches:
@@ -44,5 +46,5 @@ jobs:
           action: "upload"
           app_location: "frontend"
           output_location: "out"
-          app_build_command: "npm --prefix ../api_mock ci && npm --prefix ../api_mock run start & npm ci && npm run build"
+          app_build_command: "npm --prefix ../api_mock ci && npm --prefix ../api_mock run start & npm ci --ignore-scripts && npm run build"
           skip_api_build: true
