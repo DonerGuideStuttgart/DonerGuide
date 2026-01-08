@@ -9,7 +9,9 @@
     "clean": "rimraf dist",
     "start": "func start --port 7072",
     "dev": "concurrently --raw 'npm run watch' 'npm run start'",
-    "test": "echo \"No tests yet...\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,10 +22,13 @@
     "doner_types": "file:../shared/doner_types"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.0",
     "@types/node": "^22.0.0",
     "azure-functions-core-tools": "^4.x",
     "concurrently": "^9.2.1",
+    "jest": "^29.5.0",
     "rimraf": "^6.1.2",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.9.3"
   }
 }
