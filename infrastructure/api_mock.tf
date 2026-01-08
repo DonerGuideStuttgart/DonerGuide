@@ -8,7 +8,6 @@ resource "azurerm_container_app_environment" "api_mock_env" {
 resource "azurerm_container_app" "api_mock" {
   container_app_environment_id = azurerm_container_app_environment.api_mock_env.id
   name                         = "api-mock"
-  location                     = azurerm_resource_group.rg.location
   resource_group_name          = azurerm_resource_group.rg.name
   revision_mode                = "Single"
 
