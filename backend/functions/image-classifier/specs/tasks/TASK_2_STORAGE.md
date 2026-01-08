@@ -1,9 +1,11 @@
 # Task 2: Infrastructure & Blob Storage
 
 ## Ziel
+
 Anbindung an Azure Blob Storage zum Speichern der heruntergeladenen Bilder.
 
 ## Details
+
 - [ ] Installiere `@azure/storage-blob` im `image-classifier` Projekt.
 - [ ] Implementiere einen `BlobService` oder Helper zum:
   - Download eines Bildes von einer URL (Google).

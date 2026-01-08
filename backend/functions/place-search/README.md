@@ -3,12 +3,14 @@
 Diese Azure Function ist der zentrale Crawler des DönerGuides. Sie erfasst systematisch Dönerläden in einem definierten Bereich über die Google Places API und hält die Daten in der CosmosDB aktuell.
 
 ## Funktion
+
 - **Automatisches Crawling**: Die Funktion läuft zeitgesteuert (Timer Trigger, standardmäßig alle 15 Minuten).
 - **Daten-Aggregation**: Suche nach Dönerläden mittels Google Places API (New).
 - **Persistence**: Speicherung und Aktualisierung der Läden (`Places`) und des Such-Status (`GridCells`) in Azure CosmosDB.
 - **Downstream Integration**: Benachrichtigung des `image-classifier` via Service Bus Queue (`places`), wenn neue Fotos oder Datenänderungen vorliegen.
 
 ## Algorithmus: Dynamic Binary Spatial Grid
+
 Um das Limit der Google API (max. 60 Ergebnisse pro Suche) zu umgehen und eine flächendeckende Erfassung zu garantieren, nutzt der Crawler ein dynamisches Grid-System:
 
 1. **Initialisierung**: Das Zielgebiet wird in ein Start-Grid (z. B. 4x4 Zellen) unterteilt.
@@ -23,7 +25,9 @@ Um das Limit der Google API (max. 60 Ergebnisse pro Suche) zu umgehen und eine f
    - Neue Foto-Referenzen werden dedupliziert angehängt.
 
 ## Inputs
+
 ### Umgebungsvariablen (Environment Variables)
+
 - `PLACE_SEARCH_GRID_VERSION`: Version des Grids (erzwingt Re-Initialisierung bei Änderung).
 - `GOOGLE_PLACES_API_KEY`: API-Schlüssel für die Google Maps Platform.
 - `PLACE_SEARCH_COSMOSDB_CONNECTION_STRING`: Verbindung zur CosmosDB.
@@ -31,10 +35,12 @@ Um das Limit der Google API (max. 60 Ergebnisse pro Suche) zu umgehen und eine f
 - `PLACE_SEARCH_DRY_RUN`: Wenn `true`, werden API-Aufrufe simuliert (Mock-Modus).
 
 ### Datenquellen
+
 - **Google Places API (New)**: `searchText` Endpoint mit `locationRestriction`.
 - **CosmosDB**: Container `GridCells` (Grid-Status) und `Places` (Stammdaten).
 
 ## Outputs
+
 - **Azure CosmosDB**:
   - Aktualisierte Geometrien und Status in `GridCells`.
   - Neue oder aktualisierte Dokumente in `Places`.

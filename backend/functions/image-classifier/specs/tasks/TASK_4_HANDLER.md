@@ -1,9 +1,11 @@
 # Task 4: Main Handler & Database Sync
 
 ## Ziel
+
 Zusammenführung der Komponenten und Aktualisierung der CosmosDB.
 
 ## Details
+
 - [ ] Implementiere den Service Bus Trigger Handler in `src/functions/imageClassifier.ts`.
 - [ ] Implementiere die Verarbeitung der Bilder:
   - **Wichtig:** Nutze **`Promise.allSettled`**, um alle Bilder (max. 10) **parallel** herunterzuladen und zu analysieren.

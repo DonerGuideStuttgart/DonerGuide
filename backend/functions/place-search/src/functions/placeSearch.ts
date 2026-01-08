@@ -30,7 +30,7 @@ app.timer("placeSearch", {
 export async function placeSearch(myTimer: Timer, context: InvocationContext): Promise<string | undefined> {
   try {
     const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
-    
+
     // Initialize Places container
     const placesContainer = (
       await database.containers.createIfNotExists({
@@ -74,88 +74,87 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     // 1. Initialize Grid
     await gridService.initializeGrid(GRID_VERSION);
 
-  // 2. Get Next Cell
-  const cell = await gridService.getNextCell(GRID_VERSION);
-  if (!cell) {
-    context.log("No cell to process.");
-    return;
-  }
-
-  context.log(`Processing cell ${cell.id} at level ${cell.level}`);
-
-  // 3. Mark as processing
-  await gridService.markAsProcessing(cell);
-
-  const googleMapsService = new GoogleMapsService(
-    process.env.GOOGLE_PLACES_API_KEY ?? "",
-    process.env.PLACE_SEARCH_DRY_RUN === "true"
-  );
-
-  context.log(`Searching for places in cell ${cell.id}...`);
-  let googlePlaces: any[] = [];
-  try {
-    googlePlaces = await googleMapsService.searchAllPages(
-      cell.boundaryBox.minLat,
-      cell.boundaryBox.minLon,
-      cell.boundaryBox.maxLat,
-      cell.boundaryBox.maxLon
-    );
-  } catch (error: any) {
-    context.error(`Error searching places for cell ${cell.id}: ${error.message}`);
-    // If it's a quota error, we might want to stop or just fail this cell
-    if (error.message.includes("429")) {
-      context.log("Quota exceeded. Stopping search for this run.");
+    // 2. Get Next Cell
+    const cell = await gridService.getNextCell(GRID_VERSION);
+    if (!cell) {
+      context.log("No cell to process.");
       return;
     }
-    // For other errors, we might want to retry later (keep status PENDING via timeout)
-    throw error;
-  }
 
-  context.log(`Found ${googlePlaces.length} places in Google Maps.`);
+    context.log(`Processing cell ${cell.id} at level ${cell.level}`);
 
-  let newPlacesCount = 0;
-  let updatedPlacesCount = 0;
-  const messages: any[] = [];
+    // 3. Mark as processing
+    await gridService.markAsProcessing(cell);
 
-  for (const googlePlace of googlePlaces) {
+    const googleMapsService = new GoogleMapsService(
+      process.env.GOOGLE_PLACES_API_KEY ?? "",
+      process.env.PLACE_SEARCH_DRY_RUN === "true"
+    );
+
+    context.log(`Searching for places in cell ${cell.id}...`);
+    let googlePlaces: any[] = [];
     try {
-      const place = googleMapsService.mapGooglePlaceToPlace(googlePlace);
-      const { created, updated } = await createOrUpdateItem(placesContainer, place);
-      
-      if (created || updated) {
-        if (created) newPlacesCount++;
-        if (updated) updatedPlacesCount++;
-
-        messages.push({
-          id: place.id,
-          photos: place.photos,
-        });
-      }
+      googlePlaces = await googleMapsService.searchAllPages(
+        cell.boundaryBox.minLat,
+        cell.boundaryBox.minLon,
+        cell.boundaryBox.maxLat,
+        cell.boundaryBox.maxLon
+      );
     } catch (error: any) {
-      context.error(`Error processing place ${googlePlace.id}: ${error.message}`);
+      context.error(`Error searching places for cell ${cell.id}: ${error.message}`);
+      // If it's a quota error, we might want to stop or just fail this cell
+      if (error.message.includes("429")) {
+        context.log("Quota exceeded. Stopping search for this run.");
+        return;
+      }
+      // For other errors, we might want to retry later (keep status PENDING via timeout)
+      throw error;
     }
-  }
 
-  context.log(`Results: ${googlePlaces.length} total, ${newPlacesCount} new, ${updatedPlacesCount} updated.`);
+    context.log(`Found ${googlePlaces.length} places in Google Maps.`);
 
-  // Update cell results and determine if split is needed
-  cell.resultsCount = googlePlaces.length;
-  cell.foundPlaceIds = googlePlaces.map(p => p.id);
+    let newPlacesCount = 0;
+    let updatedPlacesCount = 0;
+    const messages: any[] = [];
 
-  if (googlePlaces.length >= 60) {
-    context.log(`Cell ${cell.id} has ${googlePlaces.length} results. Splitting...`);
-    await gridService.splitCell(cell);
-  } else {
-    context.log(`Cell ${cell.id} search completed.`);
-    cell.status = "COMPLETED";
-    await gridCellsContainer.items.upsert(cell);
-  }
+    for (const googlePlace of googlePlaces) {
+      try {
+        const place = googleMapsService.mapGooglePlaceToPlace(googlePlace);
+        const { created, updated } = await createOrUpdateItem(placesContainer, place);
+
+        if (created || updated) {
+          if (created) newPlacesCount++;
+          if (updated) updatedPlacesCount++;
+
+          messages.push({
+            id: place.id,
+            photos: place.photos,
+          });
+        }
+      } catch (error: any) {
+        context.error(`Error processing place ${googlePlace.id}: ${error.message}`);
+      }
+    }
+
+    context.log(`Results: ${googlePlaces.length} total, ${newPlacesCount} new, ${updatedPlacesCount} updated.`);
+
+    // Update cell results and determine if split is needed
+    cell.resultsCount = googlePlaces.length;
+    cell.foundPlaceIds = googlePlaces.map((p) => p.id);
+
+    if (googlePlaces.length >= 60) {
+      context.log(`Cell ${cell.id} has ${googlePlaces.length} results. Splitting...`);
+      await gridService.splitCell(cell);
+    } else {
+      context.log(`Cell ${cell.id} search completed.`);
+      cell.status = "COMPLETED";
+      await gridCellsContainer.items.upsert(cell);
+    }
 
     if (messages.length > 0) {
       context.extraOutputs.set(serviceBusOutput, messages);
       context.log(`Sent ${messages.length} places to Service Bus for photo processing.`);
     }
-
   } catch (error: any) {
     context.error(`Error in placeSearch handler: ${error.message}`);
   }
@@ -163,7 +162,10 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
   return;
 }
 
-async function createOrUpdateItem(container: Container, itemBody: Place): Promise<{ created: boolean; updated: boolean }> {
+async function createOrUpdateItem(
+  container: Container,
+  itemBody: Place
+): Promise<{ created: boolean; updated: boolean }> {
   const { resource: existingItem } = await container.item(itemBody.id, itemBody.id).read<Place>();
 
   if (!existingItem) {
@@ -173,17 +175,14 @@ async function createOrUpdateItem(container: Container, itemBody: Place): Promis
   }
 
   // Merge photos with deduplication, preserving existing classifications
-  const mergedPhotos = [
-    ...(existingItem.photos ?? []),
-    ...itemBody.photos
-  ].filter(
+  const mergedPhotos = [...(existingItem.photos ?? []), ...itemBody.photos].filter(
     (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
   );
 
   // Check if anything meaningful changed
   const hasNewPhotos = (mergedPhotos.length ?? 0) > (existingItem.photos?.length ?? 0);
-  
-  const hasDataChanges = 
+
+  const hasDataChanges =
     existingItem.name !== itemBody.name ||
     existingItem.internationalPhoneNumber !== itemBody.internationalPhoneNumber ||
     JSON.stringify(existingItem.address) !== JSON.stringify(itemBody.address) ||

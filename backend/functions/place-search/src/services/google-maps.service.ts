@@ -73,12 +73,7 @@ export class GoogleMapsService {
     return (await response.json()) as GooglePlaceResponse;
   }
 
-  async searchAllPages(
-    minLat: number,
-    minLon: number,
-    maxLat: number,
-    maxLon: number
-  ): Promise<any[]> {
+  async searchAllPages(minLat: number, minLon: number, maxLat: number, maxLon: number): Promise<any[]> {
     const allPlaces: any[] = [];
     let pageToken: string | undefined = undefined;
     let pageCount = 0;
@@ -145,8 +140,8 @@ export class GoogleMapsService {
       } else if (component.types.includes("route")) {
         address.streetAddress = component.longText;
       } else if (component.types.includes("street_number")) {
-        address.streetAddress = address.streetAddress 
-          ? `${address.streetAddress} ${component.longText}` 
+        address.streetAddress = address.streetAddress
+          ? `${address.streetAddress} ${component.longText}`
           : component.longText;
       }
     }
@@ -167,9 +162,10 @@ export class GoogleMapsService {
 
       const dayKey = days[open.day];
       const openMinutes = open.hour * 60 + open.minute;
-      const closeMinutes = (close.day !== open.day) 
-        ? (24 * 60 + close.hour * 60 + close.minute) // Handle over-midnight
-        : (close.hour * 60 + close.minute);
+      const closeMinutes =
+        close.day !== open.day
+          ? 24 * 60 + close.hour * 60 + close.minute // Handle over-midnight
+          : close.hour * 60 + close.minute;
 
       // Simple implementation: override with last period if multiple exist (interface limitation)
       openingHours[dayKey] = [openMinutes, closeMinutes];
@@ -210,7 +206,9 @@ export class GoogleMapsService {
   ): GooglePlaceResponse {
     if (pageToken === "end") return { places: [] };
 
-    console.log(`[GoogleMapsService] MOCK: Searching in [${minLat}, ${minLon}] to [${maxLat}, ${maxLon}], pageToken: ${pageToken}`);
+    console.log(
+      `[GoogleMapsService] MOCK: Searching in [${minLat}, ${minLon}] to [${maxLat}, ${maxLon}], pageToken: ${pageToken}`
+    );
 
     // Generate 5 mock places within the bounding box
     const places = Array.from({ length: 5 }).map((_, i) => {
@@ -219,7 +217,7 @@ export class GoogleMapsService {
       const id = `mock_place_${Date.now()}_${i}`;
       return {
         id,
-        displayName: { text: `Mock Doner ${i + 1} (${pageToken || 'p1'})`, languageCode: "de" },
+        displayName: { text: `Mock Doner ${i + 1} (${pageToken || "p1"})`, languageCode: "de" },
         location: { latitude: lat, longitude: lon },
         internationalPhoneNumber: "+49 711 1234567",
         addressComponents: [
@@ -233,7 +231,7 @@ export class GoogleMapsService {
             {
               open: { day: 1, hour: 10, minute: 0 },
               close: { day: 1, hour: 22, minute: 0 },
-            }
+            },
           ],
         },
         paymentOptions: {
@@ -255,9 +253,9 @@ export class GoogleMapsService {
     if (!pageToken) nextPageToken = "token_2";
     else if (pageToken === "token_2") nextPageToken = "end";
 
-    return { 
-      places, 
-      nextPageToken
+    return {
+      places,
+      nextPageToken,
     };
   }
 }

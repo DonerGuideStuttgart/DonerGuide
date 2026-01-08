@@ -1,9 +1,11 @@
 # Task 1: Foundation & Models
 
 ## Ziel
+
 Definition der Datenstrukturen und Vorbereitung der Infrastruktur-Anbindung.
 
 ## Details
+
 - [ ] Erstelle das `GridCell` Interface in `src/types/grid.ts`.
 - [ ] Stelle sicher, dass `doner_types` korrekt eingebunden ist.
 - [ ] Erweitere `local.settings.json` um die benötigten Variablen:

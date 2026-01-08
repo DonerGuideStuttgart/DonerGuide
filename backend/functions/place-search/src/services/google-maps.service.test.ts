@@ -59,7 +59,8 @@ describe("GoogleMapsService", () => {
 
     it("should fetch up to 3 pages in searchAllPages", async () => {
       // Mock global fetch
-      const mockFetch = jest.fn()
+      const mockFetch = jest
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ places: [{ id: "p1" }], nextPageToken: "token2" }),
@@ -115,7 +116,7 @@ describe("GoogleMapsService", () => {
         dineIn: true,
         servesVegetarianFood: true,
         photos: [
-          { 
+          {
             name: "places/ch_123/photos/p1",
           },
           { name: "places/ch_123/photos/p2" },

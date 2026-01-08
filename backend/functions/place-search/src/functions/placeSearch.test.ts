@@ -11,7 +11,7 @@ jest.mock("@azure/cosmos", () => {
                   items: {
                     create: jest.fn().mockResolvedValue({}),
                     upsert: jest.fn().mockResolvedValue({}),
-                  }
+                  },
                 },
               }),
             },
@@ -20,7 +20,7 @@ jest.mock("@azure/cosmos", () => {
       },
     })),
     PartitionKeyKind: { Hash: "Hash" },
-    SpatialType: { Polygon: "Polygon" }
+    SpatialType: { Polygon: "Polygon" },
   };
 });
 jest.mock("../services/grid.service");
@@ -61,7 +61,7 @@ describe("placeSearch function", () => {
       boundaryBox: { minLat: 48, minLon: 9, maxLat: 49, maxLon: 10 },
       gridVersion: "v1",
       status: "PENDING",
-      lastProcessedAt: new Date().toISOString()
+      lastProcessedAt: new Date().toISOString(),
     };
 
     mockGridService.getNextCell.mockResolvedValue(mockCell as any);
@@ -69,11 +69,14 @@ describe("placeSearch function", () => {
       { id: "place-1", displayName: { text: "Place 1" } },
       { id: "place-2", displayName: { text: "Place 2" } },
     ]);
-    mockGoogleMapsService.mapGooglePlaceToPlace.mockImplementation((gp: any) => ({
-      id: gp.id,
-      name: gp.displayName.text,
-      photos: { uncategorized: [] }
-    } as any));
+    mockGoogleMapsService.mapGooglePlaceToPlace.mockImplementation(
+      (gp: any) =>
+        ({
+          id: gp.id,
+          name: gp.displayName.text,
+          photos: { uncategorized: [] },
+        }) as any
+    );
 
     await placeSearch(timer, context);
 
@@ -88,7 +91,7 @@ describe("placeSearch function", () => {
       level: 0,
       boundaryBox: { minLat: 48, minLon: 9, maxLat: 49, maxLon: 10 },
       gridVersion: "v1",
-      status: "PENDING"
+      status: "PENDING",
     };
 
     mockGridService.getNextCell.mockResolvedValue(mockCell as any);
@@ -96,7 +99,9 @@ describe("placeSearch function", () => {
 
     await placeSearch(timer, context);
 
-    expect(context.error).toHaveBeenCalledWith(expect.stringContaining("Error searching places for cell cell-1: Google Places API error: 429 Too Many Requests"));
+    expect(context.error).toHaveBeenCalledWith(
+      expect.stringContaining("Error searching places for cell cell-1: Google Places API error: 429 Too Many Requests")
+    );
     expect(context.log).toHaveBeenCalledWith(expect.stringContaining("Quota exceeded. Stopping search for this run."));
   });
 });

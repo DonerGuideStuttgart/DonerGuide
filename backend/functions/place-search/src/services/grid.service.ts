@@ -11,9 +11,7 @@ export class GridService {
    */
   async initializeGrid(gridVersion: string): Promise<void> {
     const query = `SELECT VALUE COUNT(c.id) FROM c WHERE c.gridVersion = '${gridVersion}'`;
-    const { resources: existing } = await this.container.items
-      .query({ query })
-      .fetchAll();
+    const { resources: existing } = await this.container.items.query({ query }).fetchAll();
 
     if (existing[0] > 0) {
       return;
@@ -88,12 +86,12 @@ export class GridService {
         ORDER BY c.lastProcessedAt ASC
       `;
 
-    const { resources: cells } = await this.container.items
-      .query<GridCell>({ query })
-      .fetchAll();
+    const { resources: cells } = await this.container.items.query<GridCell>({ query }).fetchAll();
 
     if (cells.length > 0 && cells[0].status === "PROCESSING") {
-      console.log(`[GridService] Zombie-Reset: Picking up stale cell ${cells[0].id} (Last processed: ${cells[0].lastProcessedAt})`);
+      console.log(
+        `[GridService] Zombie-Reset: Picking up stale cell ${cells[0].id} (Last processed: ${cells[0].lastProcessedAt})`
+      );
     }
 
     return cells.length > 0 ? cells[0] : null;
@@ -133,7 +131,7 @@ export class GridService {
     if (latDiff >= lonDiff) {
       // Split Latitude
       const midLat = minLat + latDiff / 2;
-      
+
       childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, maxLat: midLat }, newLevel));
       childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, minLat: midLat }, newLevel));
     } else {
@@ -155,7 +153,9 @@ export class GridService {
     }
     await this.container.items.upsert(cell);
 
-    console.log(`[GridService] Cell ${cell.id} split into ${childCells[0].id} and ${childCells[1].id} (Level ${newLevel})`);
+    console.log(
+      `[GridService] Cell ${cell.id} split into ${childCells[0].id} and ${childCells[1].id} (Level ${newLevel})`
+    );
   }
 
   private createChildCell(parent: GridCell, bbox: GridCell["boundaryBox"], level: number): GridCell {

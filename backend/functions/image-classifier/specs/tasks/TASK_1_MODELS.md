@@ -1,9 +1,11 @@
 # Task 1: Data Model Refactoring
 
 ## Ziel
+
 Anpassung der zentralen Typen für die flache Bildstruktur und zusätzliche Metadaten.
 
 ## Details
+
 - [ ] Modifiziere `@backend/functions/shared/doner_types/src/Photo.ts`:
   - `url`: Bleibt die Original-URL (Google).
   - Füge `mimeType`, `category` ('food'|'place'|'uncategorized') und `confidence` (number) hinzu.
