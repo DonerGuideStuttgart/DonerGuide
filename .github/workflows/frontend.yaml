@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Export Azure Static Web Apps API Token
+      - name: Export Azure Static Web Apps API Token and Backend Mock URL
         id: export-token
         working-directory: infrastructure
         run: |
@@ -38,9 +38,13 @@ jobs:
           TOKEN=$(terraform output -raw static_web_app_api_token)
           echo "::add-mask::$TOKEN"
           echo "api_token=$TOKEN" >> $GITHUB_OUTPUT
+          MOCK_URL=$(terraform output -raw api_mock_url)
+          echo "api_mock_url=$MOCK_URL" >> $GITHUB_OUTPUT
 
       - name: Build Frontend
         working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: ${{ steps.export-token.outputs.api_mock_url }}
         run: |
           npm --prefix ../api_mock ci && npm ci --ignore-scripts
           npm --prefix ../api_mock run start & npm run build
