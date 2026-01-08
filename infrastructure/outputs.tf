@@ -5,6 +5,6 @@ output "static_web_app_api_token" {
 }
 
 output "api_mock_url" {
-  value       = azurerm_container_app_environment.api_mock_env.default_domain
+  value       = "https://${azurerm_container_app.api_mock.latest_revision_fqdn}"
   description = "The default domain of the API mock container app environment."
 }
