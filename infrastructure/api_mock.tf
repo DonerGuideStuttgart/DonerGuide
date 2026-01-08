@@ -1,15 +1,15 @@
 resource "azurerm_container_app_environment" "api_mock_env" {
   name                  = "api-mock-env"
-  location              = azurerm_resource_group.main.location
-  resource_group_name   = azurerm_resource_group.main.resource_group_name
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
   public_network_access = "Enabled"
 }
 
 resource "azurerm_container_app" "api_mock" {
   container_app_environment_id = azurerm_container_app_environment.api_mock_env.id
   name                         = "api-mock"
-  location                     = azurerm_resource_group.main.location
-  resource_group_name          = azurerm_resource_group.main.resource_group_name
+  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = azurerm_resource_group.rg.name
   revision_mode                = "Single"
 
   template {
