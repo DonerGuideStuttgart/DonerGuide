@@ -7,7 +7,7 @@ export class BlobService {
 
   constructor() {
     const connectionString = process.env.IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING;
-    if (!connectionString) {
+    if (connectionString === undefined || connectionString === "") {
       throw new Error("IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING is not defined");
     }
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
@@ -37,8 +37,8 @@ export class BlobService {
         },
       });
 
-      const contentType = response.headers["content-type"] || "image/jpeg";
-      const buffer = Buffer.from(response.data);
+      const contentType = (response.headers["content-type"] as string | undefined) ?? "image/jpeg";
+      const buffer = Buffer.from(response.data as ArrayBufferLike);
 
       const blockBlobClient = this.containerClient.getBlockBlobClient(photoId);
       await blockBlobClient.uploadData(buffer, {

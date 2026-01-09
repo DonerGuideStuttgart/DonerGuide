@@ -6,14 +6,11 @@
 import { Container, CosmosClient, PartitionKeyKind, SpatialType } from "@azure/cosmos";
 import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Place } from "doner_types";
-import { PaymentMethods } from "doner_types";
 import { GridService } from "../services/grid.service";
-import { GridCell } from "../types/grid";
 import { GoogleMapsService } from "../services/google-maps.service";
 
 const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.PLACE_SEARCH_COSMOSDB_CONNECTION_STRING ?? "";
 const COSMOSDB_DATABASE_NAME = process.env.PLACE_SEARCH_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
-const COSMOSDB_CONTAINER_NAME = process.env.PLACE_SEARCH_COSMOSDB_CONTAINER_NAME ?? "Places";
 const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
 
 const serviceBusOutput = output.serviceBusQueue({
@@ -62,7 +59,11 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
             {
               path: "/geometry/*",
               types: ["Polygon"] as SpatialType[],
-            } as any,
+            } as {
+              path: string;
+              types: SpatialType[];
+              boundingBox: { xmin: number; ymin: number; xmax: number; ymax: number };
+            },
           ],
         },
       })
@@ -81,7 +82,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
       return;
     }
 
-    context.log(`Processing cell ${cell.id} at level ${cell.level}`);
+    context.log(`Processing cell ${cell.id} at level ${String(cell.level)}`);
 
     // 3. Mark as processing
     await gridService.markAsProcessing(cell);
@@ -92,7 +93,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     );
 
     context.log(`Searching for places in cell ${cell.id}...`);
-    let googlePlaces: any[] = [];
+    let googlePlaces: unknown[] = [];
     try {
       googlePlaces = await googleMapsService.searchAllPages(
         cell.boundaryBox.minLat,
@@ -100,10 +101,11 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
         cell.boundaryBox.maxLat,
         cell.boundaryBox.maxLon
       );
-    } catch (error: any) {
-      context.error(`Error searching places for cell ${cell.id}: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      context.error(`Error searching places for cell ${cell.id}: ${errorMessage}`);
       // If it's a quota error, we might want to stop or just fail this cell
-      if (error.message.includes("429")) {
+      if (errorMessage.includes("429")) {
         context.log("Quota exceeded. Stopping search for this run.");
         return;
       }
@@ -111,15 +113,18 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
       throw error;
     }
 
-    context.log(`Found ${googlePlaces.length} places in Google Maps.`);
+    context.log(`Found ${String(googlePlaces.length)} places in Google Maps.`);
 
     let newPlacesCount = 0;
     let updatedPlacesCount = 0;
-    const messages: any[] = [];
+    const messages: { id: string; photos: unknown[] }[] = [];
 
     for (const googlePlace of googlePlaces) {
       try {
-        const place = googleMapsService.mapGooglePlaceToPlace(googlePlace);
+        if (typeof googlePlace !== "object" || googlePlace === null) {
+          continue;
+        }
+        const place = googleMapsService.mapGooglePlaceToPlace(googlePlace as Record<string, unknown>);
         const { created, updated } = await createOrUpdateItem(placesContainer, place);
 
         if (created || updated) {
@@ -131,19 +136,33 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
             photos: place.photos,
           });
         }
-      } catch (error: any) {
-        context.error(`Error processing place ${googlePlace.id}: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const placeId =
+          typeof googlePlace === "object" && googlePlace !== null && "id" in googlePlace
+            ? String((googlePlace as { id: unknown }).id)
+            : "unknown";
+        context.error(`Error processing place ${placeId}: ${errorMessage}`);
       }
     }
 
-    context.log(`Results: ${googlePlaces.length} total, ${newPlacesCount} new, ${updatedPlacesCount} updated.`);
+    context.log(
+      `Results: ${String(googlePlaces.length)} total, ${String(newPlacesCount)} new, ${String(updatedPlacesCount)} updated.`
+    );
 
     // Update cell results and determine if split is needed
     cell.resultsCount = googlePlaces.length;
-    cell.foundPlaceIds = googlePlaces.map((p) => p.id);
+    cell.foundPlaceIds = googlePlaces
+      .map((p) => {
+        if (typeof p === "object" && p !== null && "id" in p) {
+          return (p as { id: string }).id;
+        }
+        return "";
+      })
+      .filter((id) => id !== "");
 
     if (googlePlaces.length >= 60) {
-      context.log(`Cell ${cell.id} has ${googlePlaces.length} results. Splitting...`);
+      context.log(`Cell ${cell.id} has ${String(googlePlaces.length)} results. Splitting...`);
       await gridService.splitCell(cell);
     } else {
       context.log(`Cell ${cell.id} search completed.`);
@@ -153,10 +172,11 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
     if (messages.length > 0) {
       context.extraOutputs.set(serviceBusOutput, messages);
-      context.log(`Sent ${messages.length} places to Service Bus for photo processing.`);
+      context.log(`Sent ${String(messages.length)} places to Service Bus for photo processing.`);
     }
-  } catch (error: any) {
-    context.error(`Error in placeSearch handler: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    context.error(`Error in placeSearch handler: ${errorMessage}`);
   }
 
   return;
@@ -175,12 +195,12 @@ async function createOrUpdateItem(
   }
 
   // Merge photos with deduplication, preserving existing classifications
-  const mergedPhotos = [...(existingItem.photos ?? []), ...itemBody.photos].filter(
+  const mergedPhotos = [...existingItem.photos, ...itemBody.photos].filter(
     (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
   );
 
   // Check if anything meaningful changed
-  const hasNewPhotos = (mergedPhotos.length ?? 0) > (existingItem.photos?.length ?? 0);
+  const hasNewPhotos = mergedPhotos.length > existingItem.photos.length;
 
   const hasDataChanges =
     existingItem.name !== itemBody.name ||

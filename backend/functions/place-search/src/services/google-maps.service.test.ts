@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { GoogleMapsService } from "./google-maps.service";
 import { PaymentMethods } from "doner_types";
 
@@ -134,8 +135,8 @@ describe("GoogleMapsService", () => {
       expect(place.openingHours.Mo).toEqual([630, 1320]);
       expect(place.paymentMethods).toContain(PaymentMethods.CREDIT_CARD);
       expect(place.paymentMethods).toContain(PaymentMethods.NFC);
-      expect(place.photos.uncategorized).toHaveLength(2);
-      expect(place.photos.uncategorized?.[0].id).toBe("places/ch_123/photos/p1");
+      expect(place.photos).toHaveLength(2);
+      expect(place.photos[0].id).toBe("places/ch_123/photos/p1");
       expect(place.takeout).toBe(true);
       expect(place.delivery).toBe(false);
     });

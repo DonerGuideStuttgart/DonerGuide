@@ -2,15 +2,40 @@ import type { Place, Photo } from "doner_types";
 import { PaymentMethods } from "doner_types";
 
 export interface GooglePlaceResponse {
-  places?: any[];
+  places?: Record<string, unknown>[];
   nextPageToken?: string;
+}
+
+export interface GooglePlace {
+  id: string;
+  displayName?: { text: string; languageCode: string };
+  internationalPhoneNumber?: string;
+  location?: { latitude: number; longitude: number };
+  addressComponents?: { longText: string; types: string[] }[];
+  regularOpeningHours?: {
+    periods: {
+      open: { day: number; hour: number; minute: number };
+      close?: { day: number; hour: number; minute: number };
+    }[];
+  };
+  photos?: { name: string }[];
+  takeout?: boolean;
+  delivery?: boolean;
+  dineIn?: boolean;
+  servesVegetarianFood?: boolean;
+  paymentOptions?: {
+    acceptsCashOnly?: boolean;
+    acceptsCreditCards?: boolean;
+    acceptsDebitCards?: boolean;
+    acceptsNfc?: boolean;
+  };
 }
 
 export class GoogleMapsService {
   private apiKey: string;
   private isDryRun: boolean;
 
-  constructor(apiKey: string, isDryRun: boolean = false) {
+  constructor(apiKey: string, isDryRun = false) {
     this.apiKey = apiKey;
     this.isDryRun = isDryRun;
   }
@@ -67,14 +92,19 @@ export class GoogleMapsService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Google Places API error: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(`Google Places API error: ${String(response.status)} ${response.statusText} - ${errorText}`);
     }
 
     return (await response.json()) as GooglePlaceResponse;
   }
 
-  async searchAllPages(minLat: number, minLon: number, maxLat: number, maxLon: number): Promise<any[]> {
-    const allPlaces: any[] = [];
+  async searchAllPages(
+    minLat: number,
+    minLon: number,
+    maxLat: number,
+    maxLon: number
+  ): Promise<Record<string, unknown>[]> {
+    const allPlaces: Record<string, unknown>[] = [];
     let pageToken: string | undefined = undefined;
     let pageCount = 0;
 
@@ -85,12 +115,12 @@ export class GoogleMapsService {
       }
       pageToken = response.nextPageToken;
       pageCount++;
-    } while (pageToken && pageCount < 3);
+    } while (pageToken !== undefined && pageCount < 3);
 
     return allPlaces;
   }
 
-  mapGooglePlaceToPlace(googlePlace: any): Place {
+  mapGooglePlaceToPlace(googlePlace: Record<string, unknown>): Place {
     const {
       id,
       displayName,
@@ -107,65 +137,82 @@ export class GoogleMapsService {
     } = googlePlace;
 
     const place: Place = {
-      id,
-      name: displayName?.text || "Unknown",
+      id: id as string,
+      name:
+        typeof displayName === "object" && displayName !== null && "text" in displayName
+          ? (displayName as { text: string }).text
+          : "Unknown",
       doner_guide_version: 1,
-      internationalPhoneNumber,
-      latitude: location?.latitude,
-      longitude: location?.longitude,
-      address: this.parseAddressComponents(addressComponents),
-      openingHours: this.mapOpeningHours(regularOpeningHours),
-      photos: this.mapPhotos(photos, id),
-      paymentMethods: this.mapPaymentOptions(paymentOptions),
-      takeout,
-      delivery,
-      dineIn,
-      servesVegetarianFood,
+      internationalPhoneNumber: internationalPhoneNumber as string | undefined,
+      latitude:
+        typeof location === "object" && location !== null && "latitude" in location
+          ? (location as { latitude: number }).latitude
+          : 0,
+      longitude:
+        typeof location === "object" && location !== null && "longitude" in location
+          ? (location as { longitude: number }).longitude
+          : 0,
+      address: this.parseAddressComponents(addressComponents as Record<string, unknown>[] | undefined),
+      openingHours: this.mapOpeningHours(regularOpeningHours as Record<string, unknown> | undefined),
+      photos: this.mapPhotos(photos as Record<string, unknown>[] | undefined),
+      paymentMethods: this.mapPaymentOptions(paymentOptions as Record<string, unknown> | undefined),
+      takeout: takeout as boolean | undefined,
+      delivery: delivery as boolean | undefined,
+      dineIn: dineIn as boolean | undefined,
+      servesVegetarianFood: servesVegetarianFood as boolean | undefined,
     };
 
     return place;
   }
 
-  private parseAddressComponents(components: any[]): Place["address"] {
+  private parseAddressComponents(components?: Record<string, unknown>[]): Place["address"] {
     const address: Place["address"] = {};
     if (!components) return address;
 
     for (const component of components) {
-      if (component.types.includes("postal_code")) {
-        address.postalCode = component.longText;
-      } else if (component.types.includes("locality")) {
-        address.locality = component.longText;
-      } else if (component.types.includes("sublocality") || component.types.includes("sublocality_level_1")) {
-        address.sublocality = component.longText;
-      } else if (component.types.includes("route")) {
-        address.streetAddress = component.longText;
-      } else if (component.types.includes("street_number")) {
-        address.streetAddress = address.streetAddress
-          ? `${address.streetAddress} ${component.longText}`
-          : component.longText;
+      const types = Array.isArray(component.types) ? component.types : [];
+      const longText = typeof component.longText === "string" ? component.longText : "";
+      if (types.includes("postal_code")) {
+        address.postalCode = longText;
+      } else if (types.includes("locality")) {
+        address.locality = longText;
+      } else if (types.includes("sublocality") || types.includes("sublocality_level_1")) {
+        address.sublocality = longText;
+      } else if (types.includes("route")) {
+        address.streetAddress = longText;
+      } else if (types.includes("street_number") && address.streetAddress !== undefined) {
+        address.streetAddress = `${address.streetAddress} ${longText}`;
       }
     }
     return address;
   }
 
-  private mapOpeningHours(googleHours: any): Place["openingHours"] {
+  private mapOpeningHours(googleHours: unknown): Place["openingHours"] {
     const openingHours: Place["openingHours"] = {};
-    if (!googleHours?.periods) return openingHours;
+    if (typeof googleHours !== "object" || googleHours === null) {
+      return openingHours;
+    }
+    const hoursRecord = googleHours as Record<string, unknown>;
+    if (!("periods" in hoursRecord) || !Array.isArray(hoursRecord.periods)) {
+      return openingHours;
+    }
 
     const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
-
-    for (const period of googleHours.periods) {
+    const periods = hoursRecord.periods as {
+      open: { day: number; hour: number; minute: number };
+      close?: { day: number; hour: number; minute: number };
+    }[];
+    for (const period of periods) {
       const open = period.open;
       const close = period.close;
 
-      if (!open || !close) continue;
-
       const dayKey = days[open.day];
       const openMinutes = open.hour * 60 + open.minute;
-      const closeMinutes =
-        close.day !== open.day
+      const closeMinutes = close
+        ? close.day !== open.day
           ? 24 * 60 + close.hour * 60 + close.minute // Handle over-midnight
-          : close.hour * 60 + close.minute;
+          : close.hour * 60 + close.minute
+        : 24 * 60; // Default to midnight if no close time
 
       // Simple implementation: override with last period if multiple exist (interface limitation)
       openingHours[dayKey] = [openMinutes, closeMinutes];
@@ -174,57 +221,57 @@ export class GoogleMapsService {
     return openingHours;
   }
 
-  private mapPhotos(googlePhotos: any[], placeId: string): Photo[] {
+  private mapPhotos(googlePhotos?: Record<string, unknown>[]): Photo[] {
     if (!googlePhotos) return [];
     return googlePhotos.slice(0, 10).map((photo) => ({
-      id: photo.name, // Format is "places/PLACE_ID/photos/PHOTO_ID"
-      url: `https://places.googleapis.com/v1/${photo.name}/media?key=${this.apiKey}&maxHeightPx=1000`,
+      id: photo.name as string, // Format is "places/PLACE_ID/photos/PHOTO_ID"
+      url: `https://places.googleapis.com/v1/${String(photo.name)}/media?key=${this.apiKey}&maxHeightPx=1000`,
       mimeType: "unknown",
       category: "uncategorized",
       confidence: 0,
     }));
   }
 
-  private mapPaymentOptions(paymentOptions: any): PaymentMethods[] {
+  private mapPaymentOptions(paymentOptions?: Record<string, unknown>): PaymentMethods[] {
     const methods: PaymentMethods[] = [];
-    if (!paymentOptions) return methods;
+    if (!paymentOptions || typeof paymentOptions !== "object") return methods;
 
-    if (paymentOptions.acceptsCashOnly) methods.push(PaymentMethods.CASH);
-    if (paymentOptions.acceptsCreditCards) methods.push(PaymentMethods.CREDIT_CARD);
-    if (paymentOptions.acceptsDebitCards) methods.push(PaymentMethods.DEBIT_CARD);
-    if (paymentOptions.acceptsNfc) methods.push(PaymentMethods.NFC);
+    if (paymentOptions.acceptsCashOnly === true) methods.push(PaymentMethods.CASH);
+    if (paymentOptions.acceptsCreditCards === true) methods.push(PaymentMethods.CREDIT_CARD);
+    if (paymentOptions.acceptsDebitCards === true) methods.push(PaymentMethods.DEBIT_CARD);
+    if (paymentOptions.acceptsNfc === true) methods.push(PaymentMethods.NFC);
 
     return methods;
   }
 
   private getMockData(
-    minLat: number,
-    minLon: number,
-    maxLat: number,
-    maxLon: number,
+    _minLat: number,
+    _minLon: number,
+    _maxLat: number,
+    _maxLon: number,
     pageToken?: string
   ): GooglePlaceResponse {
     if (pageToken === "end") return { places: [] };
 
     console.log(
-      `[GoogleMapsService] MOCK: Searching in [${minLat}, ${minLon}] to [${maxLat}, ${maxLon}], pageToken: ${pageToken}`
+      `[GoogleMapsService] MOCK: Searching in [${String(_minLat)}, ${String(_minLon)}] to [${String(_maxLat)}, ${String(_maxLon)}], pageToken: ${pageToken ?? ""}`
     );
 
     // Generate 5 mock places within the bounding box
     const places = Array.from({ length: 5 }).map((_, i) => {
-      const lat = minLat + Math.random() * (maxLat - minLat);
-      const lon = minLon + Math.random() * (maxLon - minLon);
-      const id = `mock_place_${Date.now()}_${i}`;
+      const lat = _minLat + Math.random() * (_maxLat - _minLat);
+      const lon = _minLon + Math.random() * (_maxLon - _minLon);
+      const id = `mock_place_${String(Date.now())}_${String(i)}`;
       return {
         id,
-        displayName: { text: `Mock Doner ${i + 1} (${pageToken || "p1"})`, languageCode: "de" },
+        displayName: { text: `Mock Doner ${String(i + 1)} (${pageToken ?? "p1"})`, languageCode: "de" },
         location: { latitude: lat, longitude: lon },
         internationalPhoneNumber: "+49 711 1234567",
         addressComponents: [
           { longText: "70173", types: ["postal_code"] },
           { longText: "Stuttgart", types: ["locality"] },
           { longText: "Mockstraße", types: ["route"] },
-          { longText: `${i + 1}`, types: ["street_number"] },
+          { longText: String(i + 1), types: ["street_number"] },
         ],
         regularOpeningHours: {
           periods: [
@@ -250,11 +297,11 @@ export class GoogleMapsService {
     });
 
     let nextPageToken: string | undefined = undefined;
-    if (!pageToken) nextPageToken = "token_2";
+    if (pageToken === undefined || pageToken === "") nextPageToken = "token_2";
     else if (pageToken === "token_2") nextPageToken = "end";
 
     return {
-      places,
+      places: places as unknown as Record<string, unknown>[],
       nextPageToken,
     };
   }

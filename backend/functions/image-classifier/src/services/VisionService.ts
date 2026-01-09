@@ -36,19 +36,19 @@ export class VisionService {
   private retryDelay: number;
 
   constructor(config?: Partial<VisionServiceConfig>) {
-    this.endpoint = config?.endpoint || process.env.IMAGE_CLASSIFIER_VISION_ENDPOINT || "";
-    this.key = config?.key || process.env.IMAGE_CLASSIFIER_VISION_KEY || "";
-    this.isMockMode = config?.enableMockMode ?? !this.key;
+    this.endpoint = config?.endpoint ?? process.env.IMAGE_CLASSIFIER_VISION_ENDPOINT ?? "";
+    this.key = config?.key ?? process.env.IMAGE_CLASSIFIER_VISION_KEY ?? "";
+    this.isMockMode = config?.enableMockMode ?? this.key === "";
     this.maxRetries = config?.maxRetries ?? DEFAULT_MAX_RETRIES;
     this.retryDelay = config?.retryDelay ?? DEFAULT_RETRY_DELAY;
 
-    if (this.isMockMode && !config?.enableMockMode) {
+    if (this.isMockMode && config?.enableMockMode !== true) {
       console.warn("VisionService: No API key found. Running in MOCK mode.");
     }
 
     // Initialize axios instance with timeout and interceptors
     this.axiosInstance = axios.create({
-      timeout: config?.timeout || DEFAULT_TIMEOUT,
+      timeout: config?.timeout ?? DEFAULT_TIMEOUT,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
     });
@@ -76,9 +76,9 @@ export class VisionService {
         });
         return config;
       },
-      (error) => {
+      (error: unknown) => {
         console.error("VisionService: Request error:", error);
-        return Promise.reject(error);
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
       }
     );
 
@@ -90,14 +90,17 @@ export class VisionService {
         });
         return response;
       },
-      (error) => {
-        if (error.response) {
-          console.error("VisionService: API response error:", {
-            status: error.response.status,
-            data: error.response.data,
-          });
+      (error: unknown) => {
+        if (typeof error === "object" && error !== null && "response" in error) {
+          const err = error as { response?: { status: number; data: unknown } };
+          if (err.response) {
+            console.error("VisionService: API response error:", {
+              status: err.response.status,
+              data: err.response.data,
+            });
+          }
         }
-        return Promise.reject(error);
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
       }
     );
   }
@@ -108,18 +111,19 @@ export class VisionService {
    * @throws Error if the buffer is invalid
    */
   private validateImageBuffer(buffer: Buffer): void {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!buffer || buffer.length === 0) {
       throw new Error("Image buffer is empty or undefined");
     }
 
     // Minimum reasonable image size (100 bytes)
     if (buffer.length < 100) {
-      throw new Error(`Image buffer too small (${buffer.length} bytes)`);
+      throw new Error(`Image buffer too small (${String(buffer.length)} bytes)`);
     }
 
     // Maximum reasonable image size (10 MB)
     if (buffer.length > 10 * 1024 * 1024) {
-      throw new Error(`Image buffer too large (${buffer.length} bytes)`);
+      throw new Error(`Image buffer too large (${String(buffer.length)} bytes)`);
     }
 
     // Check for common image signatures (magic numbers)
@@ -149,37 +153,43 @@ export class VisionService {
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
         return await operation();
-      } catch (error: any) {
-        lastError = error;
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error));
 
         // Don't retry on certain errors
-        if (error.response?.status === 401) {
-          throw new Error("Azure Vision API authentication failed. Check your API key.");
-        }
-        if (error.response?.status === 403) {
-          throw new Error("Azure Vision API access forbidden. Check your permissions.");
-        }
-        if (error.response?.status === 400) {
-          throw new Error(`Azure Vision API bad request: ${error.response.data?.message || error.message}`);
-        }
+        if (typeof error === "object" && error !== null && "response" in error) {
+          const err = error as { response?: { status: number; data?: { message?: string } } };
+          if (err.response?.status === 401) {
+            throw new Error("Azure Vision API authentication failed. Check your API key.");
+          }
+          if (err.response?.status === 403) {
+            throw new Error("Azure Vision API access forbidden. Check your permissions.");
+          }
+          if (err.response?.status === 400) {
+            throw new Error(`Azure Vision API bad request: ${err.response.data?.message ?? lastError.message}`);
+          }
 
-        // Retry on rate limiting (429) and server errors (5xx)
-        const isRetryable =
-          !error.response ||
-          error.response?.status === 429 ||
-          (error.response?.status >= 500 && error.response?.status < 600);
+          // Retry on rate limiting (429) and server errors (5xx)
+          const isRetryable =
+            err.response === undefined ||
+            err.response.status === 429 ||
+            (err.response.status >= 500 && err.response.status < 600);
 
-        if (!isRetryable || attempt === this.maxRetries) {
-          throw error;
+          if (!isRetryable || attempt === this.maxRetries) {
+            throw error;
+          }
+
+          const delay = this.retryDelay * Math.pow(2, attempt - 1);
+          console.warn(
+            `VisionService: Attempt ${String(attempt)} failed, retrying in ${String(delay)}ms...`,
+            lastError.message
+          );
+          await this.sleep(delay);
         }
-
-        const delay = this.retryDelay * Math.pow(2, attempt - 1);
-        console.warn(`VisionService: Attempt ${attempt} failed, retrying in ${delay}ms...`, error.message);
-        await this.sleep(delay);
       }
     }
 
-    throw lastError || new Error("Unknown error during retry");
+    throw lastError ?? new Error("Unknown error during retry");
   }
 
   /**
@@ -195,12 +205,13 @@ export class VisionService {
    * @param response The response data to validate
    * @throws Error if the response is invalid
    */
-  private validateResponse(response: any): AzureVisionResponse {
-    if (!response || typeof response !== "object") {
+  private validateResponse(response: unknown): AzureVisionResponse {
+    if (typeof response !== "object" || response === null) {
       throw new Error("Invalid response: response is not an object");
     }
 
-    if (!Array.isArray(response.categories)) {
+    const resp = response as Record<string, unknown>;
+    if (!Array.isArray(resp.categories)) {
       console.warn("VisionService: Response does not contain categories array, using empty array");
       return { categories: [] };
     }
@@ -236,7 +247,7 @@ export class VisionService {
         });
 
         const validatedResponse = this.validateResponse(response.data);
-        return this.mapCategoriesToResult(validatedResponse.categories || []);
+        return this.mapCategoriesToResult(validatedResponse.categories ?? []);
       });
 
       console.info("VisionService: Image analysis completed successfully", {
@@ -245,9 +256,9 @@ export class VisionService {
       });
 
       return result;
-    } catch (error: any) {
-      const errorMessage = `Vision analysis failed: ${error.message}`;
-      console.error("VisionService:", errorMessage, error);
+    } catch (error: unknown) {
+      const errorMessage = `Vision analysis failed: ${error instanceof Error ? error.message : String(error)}`;
+      console.error("VisionService:", errorMessage);
       throw new Error(errorMessage);
     }
   }
@@ -258,7 +269,7 @@ export class VisionService {
    * @returns The mapped classification result
    */
   private mapCategoriesToResult(categories: AzureVisionCategory[]): VisionAnalysisResult {
-    if (!categories || categories.length === 0) {
+    if (categories.length === 0) {
       console.debug("VisionService: No categories returned, classifying as discard");
       return { category: "discard", confidence: 0 };
     }
@@ -272,13 +283,13 @@ export class VisionService {
 
       // Food classification
       if (name.startsWith("food_")) {
-        console.debug(`VisionService: Classified as food (${name}) with confidence ${confidence}`);
+        console.debug(`VisionService: Classified as food (${name}) with confidence ${String(confidence)}`);
         return { category: "food", confidence };
       }
 
       // Place classification
       if (name.startsWith("building_") || name.startsWith("indoor_") || name.startsWith("outdoor_")) {
-        console.debug(`VisionService: Classified as place (${name}) with confidence ${confidence}`);
+        console.debug(`VisionService: Classified as place (${name}) with confidence ${String(confidence)}`);
         return { category: "place", confidence };
       }
     }
@@ -325,7 +336,7 @@ export class VisionService {
         validateStatus: (status) => status === 405 || status < 500, // Accept 405 Method Not Allowed for HEAD requests
       });
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("VisionService: Health check failed", error);
       return false;
     }

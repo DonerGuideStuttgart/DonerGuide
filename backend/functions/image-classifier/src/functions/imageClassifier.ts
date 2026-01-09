@@ -44,7 +44,7 @@ export async function imageClassifier(
   const storeId = message.id;
   const startTime = Date.now();
 
-  context.log(`Image Classifier: Processing ${message.photos.length} photos for store ${storeId}`);
+  context.log(`Image Classifier: Processing ${String(message.photos.length)} photos for store ${storeId}`);
   context.log(`VisionService config: ${JSON.stringify(visionService.getConfig())}`);
 
   try {
@@ -54,7 +54,7 @@ export async function imageClassifier(
       return undefined;
     }
 
-    if (!message.photos || !Array.isArray(message.photos) || message.photos.length === 0) {
+    if (!Array.isArray(message.photos) || message.photos.length === 0) {
       context.warn("No photos in message, skipping");
       return undefined;
     }
@@ -77,7 +77,7 @@ export async function imageClassifier(
     // Process each photo
     const processedPhotos: Photo[] = [];
     const photoIdsToDiscard: string[] = [];
-    const errors: Array<{ photoId: string; error: string }> = [];
+    const errors: { photoId: string; error: string }[] = [];
 
     for (const photoMsg of message.photos) {
       try {
@@ -95,11 +95,13 @@ export async function imageClassifier(
         const analysis = await visionService.analyzeImage(buffer);
 
         if (analysis.category === "discard") {
-          context.log(`Photo ${photoMsg.id} discarded by vision analysis (confidence: ${analysis.confidence})`);
+          context.log(`Photo ${photoMsg.id} discarded by vision analysis (confidence: ${String(analysis.confidence)})`);
           await blobService.deleteImage(photoMsg.id);
           photoIdsToDiscard.push(photoMsg.id);
         } else {
-          context.log(`Photo ${photoMsg.id} classified as ${analysis.category} with confidence ${analysis.confidence}`);
+          context.log(
+            `Photo ${photoMsg.id} classified as ${analysis.category} with confidence ${String(analysis.confidence)}`
+          );
           processedPhotos.push({
             id: photoMsg.id,
             url: photoMsg.url,
@@ -108,7 +110,7 @@ export async function imageClassifier(
             confidence: analysis.confidence,
           });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         const error = err as Error;
         context.error(`Failed to process photo ${photoMsg.id}:`, error.message);
         errors.push({ photoId: photoMsg.id, error: error.message });
@@ -129,7 +131,7 @@ export async function imageClassifier(
 
     place.photos = place.photos.map((p) => {
       const processed = processedPhotos.find((pp) => pp.id === p.id);
-      return processed ? processed : p;
+      return processed ?? p;
     });
 
     // Save back to CosmosDB
@@ -141,18 +143,18 @@ export async function imageClassifier(
       processed: processedPhotos.length,
       discarded: photoIdsToDiscard.length,
       errors: errors.length,
-      duration: `${duration}ms`,
+      duration: `${String(duration)}ms`,
     });
 
     // Log errors if any occurred
     if (errors.length > 0) {
-      context.warn(`Encountered ${errors.length} errors during processing:`, errors);
+      context.warn(`Encountered ${String(errors.length)} errors during processing:`, errors);
     }
 
     return { storeId };
   } catch (error) {
     const duration = Date.now() - startTime;
-    context.error(`Error in imageClassifier for store ${storeId} after ${duration}ms:`, error);
+    context.error(`Error in imageClassifier for store ${storeId} after ${String(duration)}ms:`, error);
     throw error;
   }
 }

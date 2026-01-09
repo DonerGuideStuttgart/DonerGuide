@@ -1,13 +1,23 @@
-import { VisionService, VisionAnalysisResult, VisionServiceConfig } from "../VisionService";
-import axios from "axios";
+import { VisionService, VisionServiceConfig } from "../VisionService";
+import axios, { AxiosInstance } from "axios";
 
 // Mock axios
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+interface MockAxiosInstance {
+  post: jest.Mock;
+  get: jest.Mock;
+  head: jest.Mock;
+  interceptors: {
+    request: { use: jest.Mock };
+    response: { use: jest.Mock };
+  };
+}
+
 describe("VisionService", () => {
   let visionService: VisionService;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: MockAxiosInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -23,7 +33,7 @@ describe("VisionService", () => {
       },
     };
 
-    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+    mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as AxiosInstance);
   });
 
   describe("Constructor", () => {

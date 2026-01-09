@@ -17,10 +17,10 @@ export class GridService {
       return;
     }
 
-    const minLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LAT || "48.692");
-    const minLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LON || "9.038");
-    const maxLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LAT || "48.866");
-    const maxLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LON || "9.315");
+    const minLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LAT ?? "48.692");
+    const minLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LON ?? "9.038");
+    const maxLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LAT ?? "48.866");
+    const maxLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LON ?? "9.315");
 
     const latStep = (maxLat - minLat) / 4;
     const lonStep = (maxLon - minLon) / 4;
@@ -154,7 +154,7 @@ export class GridService {
     await this.container.items.upsert(cell);
 
     console.log(
-      `[GridService] Cell ${cell.id} split into ${childCells[0].id} and ${childCells[1].id} (Level ${newLevel})`
+      `[GridService] Cell ${cell.id} split into ${childCells[0]?.id ?? "unknown"} and ${childCells[1]?.id ?? "unknown"} (Level ${String(newLevel)})`
     );
   }
 
