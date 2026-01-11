@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { GoogleMapsService } from "./google-maps.service";
 import { PaymentMethods } from "doner_types";
 

@@ -22,12 +22,8 @@ function initializeServices() {
     }
     client = new CosmosClient(connectionString);
   }
-  if (!blobService) {
-    blobService = new BlobService();
-  }
-  if (!visionService) {
-    visionService = new VisionService();
-  }
+  blobService ??= new BlobService();
+  visionService ??= new VisionService();
   return { client, blobService, visionService };
 }
 

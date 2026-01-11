@@ -3,7 +3,7 @@ import { CosmosClient } from "@azure/cosmos";
 import { imageClassifier, resetServices } from "../imageClassifier";
 import { BlobService } from "../../services/BlobService";
 import { VisionService } from "../../services/VisionService";
-import type { NewPhotosMessage, Place, Photo } from "doner_types";
+import type { NewPhotosMessage, Place } from "doner_types";
 
 // Mock dependencies
 jest.mock("@azure/cosmos");
@@ -148,7 +148,7 @@ describe("imageClassifier Handler", () => {
   });
 
   it("should return undefined if storeId is missing", async () => {
-    const result = await imageClassifier({ id: "", photos: [] } as any, mockContext);
+    const result = await imageClassifier({ id: "", photos: [] } as NewPhotosMessage, mockContext);
     expect(result).toBeUndefined();
     expect(mockContext.error).toHaveBeenCalled();
   });
