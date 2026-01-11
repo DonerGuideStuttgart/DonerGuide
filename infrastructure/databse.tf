@@ -34,28 +34,11 @@ resource "azurerm_cosmosdb_sql_container" "places_container" {
   partition_key_version = "2"
 }
 
-/*
-[
-    {
-        "SecretUri": "google-places-api-key",
-        "used-quota": 0,
-        "quota": 1000,
-        "quota-restart-date": "2024-07-01T00:00:00Z"
-    },
-    {
-        "SecretUri": "azure-vision-api-key",
-        "used-quota": 0,
-        "quota": 400,
-        "quota-restart-date": "2024-07-01T00:00:00Z"
-    }
-]
-*/
-
-resource "azurerm_cosmosdb_sql_container" "api_keys_container" {
-  name                  = "api-keys"
+resource "azurerm_cosmosdb_sql_container" "places_playground_container" {
+  name                  = "places-playground"
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.cosmosdb_account.name
   database_name         = azurerm_cosmosdb_sql_database.database.name
-  partition_key_paths   = ["/SecretUri"]
+  partition_key_paths   = ["/id"]
   partition_key_version = "2"
 }

@@ -8,7 +8,7 @@
  * @param {string} photoId
  * @param {object} analysisResult { category, confidence, mimeType }
  */
-export function patchPhoto(storeId, photoId, analysisResult) {
+function patchPhoto(storeId, photoId, analysisResult) {
   // eslint-disable-next-line no-undef
   var collection = getContext().getCollection();
   // eslint-disable-next-line no-undef
