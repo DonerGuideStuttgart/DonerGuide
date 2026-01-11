@@ -217,12 +217,10 @@ async function patchPhotoClientSide(
     place.lastUpdated = new Date().toISOString();
 
     try {
-      await container
-        .item(storeId, storeId)
-        .replace(place, { accessCondition: { type: "IfMatch", condition: etag as string } });
+      await container.item(storeId, storeId).replace(place, { accessCondition: { type: "IfMatch", condition: etag } });
       return pendingCount === 0;
-    } catch (error: any) {
-      if (error.code === 412) {
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "code" in error && (error as { code: number }).code === 412) {
         attempts++;
         continue;
       }
@@ -230,5 +228,7 @@ async function patchPhotoClientSide(
     }
   }
 
-  throw new Error(`Failed to update photo ${photoId} in store ${storeId} after ${maxAttempts} attempts due to conflict.`);
+  throw new Error(
+    `Failed to update photo ${photoId} in store ${storeId} after ${maxAttempts.toString()} attempts due to conflict.`
+  );
 }

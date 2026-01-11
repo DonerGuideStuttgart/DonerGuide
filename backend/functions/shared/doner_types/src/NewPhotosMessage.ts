@@ -7,4 +7,3 @@ export interface NewPhotosMessage {
   id: string;
   photos: Photo[];
 }
-

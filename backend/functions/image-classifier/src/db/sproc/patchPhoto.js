@@ -8,6 +8,7 @@
  * @param {string} photoId
  * @param {object} analysisResult { category, confidence, mimeType }
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function patchPhoto(storeId, photoId, analysisResult) {
   // eslint-disable-next-line no-undef
   var collection = getContext().getCollection();
@@ -26,7 +27,8 @@ function patchPhoto(storeId, photoId, analysisResult) {
 
     var place = docs[0];
     var photos = place.photos || [];
-    // 2. Find and Update Photo
+    // 2. Find and Update Photo (using traditional loop for splice-safety if needed, but linter wants for-of)
+    // Actually, linter wants for-of. Since we break after splice, it's safe.
     for (var i = 0; i < photos.length; i++) {
       if (photos[i].id === photoId) {
         if (analysisResult.category === "discard") {
@@ -42,8 +44,8 @@ function patchPhoto(storeId, photoId, analysisResult) {
 
     // 3. Check completeness (are there any 'uncategorized' photos left?)
     var pendingCount = 0;
-    for (var j = 0; j < photos.length; j++) {
-      if (photos[j].category === "uncategorized") {
+    for (const photo of photos) {
+      if (photo.category === "uncategorized") {
         pendingCount++;
       }
     }
