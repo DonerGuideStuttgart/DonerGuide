@@ -4,11 +4,12 @@ services:
     image: node:22
     container_name: "place-search"
     working_dir: /app/place-search
-    user: "1000:1000"
     volumes:
       - ./functions:/app
       - node_modules_place-search:/app/place-search/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
+      - node_dist_place-search:/app/place-search/dist
+      - node_dist_shared:/app/shared/doner_types/dist
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
@@ -27,11 +28,12 @@ services:
     image: node:22
     container_name: "image-classifier"
     working_dir: /app/image-classifier
-    user: "1000:1000"
     volumes:
       - ./functions:/app
       - node_modules_image-classifier:/app/image-classifier/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
+      - node_dist_image-classifier:/app/image-classifier/dist
+      - node_dist_shared:/app/shared/doner_types/dist
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
@@ -50,11 +52,12 @@ services:
     image: node:22
     container_name: "llm-analyzer"
     working_dir: /app/llm-analyzer
-    user: "1000:1000"
     volumes:
       - ./functions:/app
       - node_modules_llm-analyzer:/app/llm-analyzer/node_modules
       - node_modules_shared:/app/shared/doner_types/node_modules
+      - node_dist_llm-analyzer:/app/llm-analyzer/dist
+      - node_dist_shared:/app/shared/doner_types/dist
     command: >-
       sh -c "npm install --prefix ../shared/doner_types &&
       npm run build --prefix ../shared/doner_types &&
@@ -74,11 +77,11 @@ services:
     image: node:22
     container_name: "places-reader"
     working_dir: /app
-    user: "1000:1000"
     restart: always
     volumes:
       - ./helper/service-bus-reader:/app
       - node_modules_service-bus-reader:/app/node_modules
+      - node_dist_service-bus-reader:/app/node_modules
     command: sh -c "npm install && npm start"
     depends_on:
       - servicebus-emulator
@@ -91,11 +94,11 @@ services:
     image: node:22
     container_name: "image-classifier-reader"
     working_dir: /app
-    user: "1000:1000"
     restart: always
     volumes:
       - ./helper/service-bus-reader:/app
       - node_modules_service-bus-reader:/app/node_modules
+      - node_dist_service-bus-reader:/app/node_modules
     command: sh -c "npm install && npm start"
     depends_on:
       - servicebus-emulator
@@ -162,3 +165,8 @@ volumes:
   node_modules_llm-analyzer:
   node_modules_service-bus-reader:
   node_modules_shared:
+  node_dist_place-search:
+  node_dist_image-classifier:
+  node_dist_llm-analyzer:
+  node_dist_service-bus-reader:
+  node_dist_shared:

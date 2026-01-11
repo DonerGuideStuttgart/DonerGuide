@@ -13,6 +13,7 @@
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.9.0",
     "@azure/functions": "^4.0.0",
     "doner_types": "file:../shared/doner_types"
   },
