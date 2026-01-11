@@ -2,7 +2,7 @@ import { Container, CosmosClient } from "@azure/cosmos";
 import * as fs from "fs";
 import * as path from "path";
 import { app, InvocationContext, output } from "@azure/functions";
-import type { PhotoClassificationMessage, Photo, Place } from "doner_types";
+import type { PhotoClassificationMessage, Place } from "doner_types";
 import { BlobService } from "../services/BlobService";
 import { VisionService } from "../services/VisionService";
 
@@ -37,8 +37,9 @@ async function ensureStoredProcedure(container: Container) {
   try {
     const { resource: sp } = await container.scripts.storedProcedure(spId).read();
     if (sp) return;
-  } catch (error: any) {
-    if (error.code !== 404) throw error;
+  } catch (error: unknown) {
+    const errorWithCode = error as { code?: number };
+    if (errorWithCode.code !== 404) throw error;
   }
 
   // Load SP content from file
@@ -127,7 +128,7 @@ export async function imageClassifier(
     const { contentType, buffer } = await bs.downloadAndUploadImage(url, photoId);
     const analysis = await vs.analyzeImage(buffer);
 
-    let finalCategory = analysis.category;
+    const finalCategory = analysis.category;
     if (finalCategory === "discard") {
       context.log(`Photo ${photoId} discarded by vision analysis.`);
       await bs.deleteImage(photoId);

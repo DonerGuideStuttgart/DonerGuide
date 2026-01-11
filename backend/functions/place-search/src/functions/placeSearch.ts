@@ -117,7 +117,6 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
     let newPlacesCount = 0;
     let updatedPlacesCount = 0;
-    let newPhotosToClassifyCount = 0;
     const photoMessages: PhotoClassificationMessage[] = [];
 
     for (const googlePlace of googlePlaces) {
@@ -138,7 +137,6 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
               photoId: photo.id,
               url: photo.url,
             });
-            newPhotosToClassifyCount++;
           }
         }
       } catch (error: unknown) {
@@ -202,8 +200,9 @@ async function createOrUpdateItem(
       try {
         await container.items.create(itemBody);
         return { created: true, updated: false, newPhotos: itemBody.photos };
-      } catch (e: any) {
-        if (e.code === 409) {
+      } catch (e: unknown) {
+        const errorWithCode = e as { code?: number };
+        if (errorWithCode.code === 409) {
           // Conflict: someone just created it
           attempts++;
           continue;
@@ -249,8 +248,9 @@ async function createOrUpdateItem(
         .item(itemBody.id, itemBody.id)
         .replace(updatedItem, { accessCondition: { type: "IfMatch", condition: etag } });
       return { created: false, updated: true, newPhotos };
-    } catch (e: any) {
-      if (e.code === 412) {
+    } catch (e: unknown) {
+      const errorWithCode = e as { code?: number };
+      if (errorWithCode.code === 412) {
         // Precondition Failed: Document modified since last read
         attempts++;
         continue;
@@ -259,5 +259,7 @@ async function createOrUpdateItem(
     }
   }
 
-  throw new Error(`Failed to update item ${itemBody.id} after ${maxAttempts} attempts due to concurrency conflicts.`);
+  throw new Error(
+    `Failed to update item ${itemBody.id} after ${String(maxAttempts)} attempts due to concurrency conflicts.`
+  );
 }
