@@ -102,13 +102,16 @@ export async function imageClassifier(
 
     // Ensure services are initialized
     const { client: cosmosClient, blobService: bs, visionService: vs } = initializeServices();
+    const useSproc = process.env.IMAGE_CLASSIFIER_USE_SPROC !== "false";
 
     // Initialize database connection
     const database = cosmosClient.database(COSMOSDB_DATABASE_NAME);
     const container = database.container(COSMOSDB_CONTAINER_NAME);
 
-    // Ensure SP exists
-    await ensureStoredProcedure(container);
+    // Ensure SP exists (only if not using workaround)
+    if (useSproc) {
+      await ensureStoredProcedure(container);
+    }
 
     // 1. Idempotency Check: Read the Place to see if it's already classified
     const { resource: place } = await container.item(storeId, storeId).read<Place>();
@@ -136,21 +139,33 @@ export async function imageClassifier(
 
     context.log(`Photo ${photoId} classified as ${finalCategory} (${String(analysis.confidence)})`);
 
-    // 3. Atomic Update via Stored Procedure
-    const spResult = await container.scripts.storedProcedure("patchPhoto").execute(storeId, [
-      storeId,
-      photoId,
-      {
+    // 3. Atomic Update (Stored Procedure vs Client-Side Fallback)
+    let isComplete = false;
+
+    if (useSproc) {
+      context.log("Using Stored Procedure for atomic update...");
+      const spResult = await container.scripts.storedProcedure("patchPhoto").execute(storeId, [
+        storeId,
+        photoId,
+        {
+          category: finalCategory,
+          confidence: analysis.confidence,
+          mimeType: contentType,
+        },
+      ]);
+      const resultBody = spResult.resource as { storeId: string; isComplete: boolean };
+      isComplete = resultBody.isComplete;
+    } else {
+      context.log("Using Client-Side Fallback (OCC) for update...");
+      isComplete = await patchPhotoClientSide(container, storeId, photoId, {
         category: finalCategory,
         confidence: analysis.confidence,
         mimeType: contentType,
-      },
-    ]);
-
-    const resultBody = spResult.resource as { storeId: string; isComplete: boolean };
+      });
+    }
 
     // 4. Trigger next step if all photos are done
-    if (resultBody.isComplete) {
+    if (isComplete) {
       context.log(`All photos for store ${storeId} are processed. Triggering downstream.`);
       const duration = Date.now() - startTime;
       context.log(`Finished processing store ${storeId} in ${String(duration)}ms`);
@@ -165,4 +180,55 @@ export async function imageClassifier(
     context.error(`Error in imageClassifier for store ${storeId} after ${String(duration)}ms:`, error);
     throw error;
   }
+}
+
+/**
+ * Client-side fallback for updating a photo and checking completeness using OCC.
+ * Used when Stored Procedures are not supported (e.g., local emulator).
+ */
+async function patchPhotoClientSide(
+  container: Container,
+  storeId: string,
+  photoId: string,
+  analysisResult: { category: "food" | "place" | "discard"; confidence: number; mimeType: string }
+): Promise<boolean> {
+  const maxAttempts = 5;
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    const { resource: place, etag } = await container.item(storeId, storeId).read<Place>();
+    if (!place) throw new Error(`Place ${storeId} not found during update`);
+
+    // Update or remove photo
+    const photoIndex = place.photos.findIndex((p) => p.id === photoId);
+    if (photoIndex !== -1) {
+      if (analysisResult.category === "discard") {
+        place.photos.splice(photoIndex, 1);
+      } else {
+        const photo = place.photos[photoIndex];
+        photo.category = analysisResult.category as "food" | "place" | "uncategorized";
+        photo.confidence = analysisResult.confidence;
+        photo.mimeType = analysisResult.mimeType;
+      }
+    }
+
+    // Check completeness
+    const pendingCount = place.photos.filter((p) => p.category === "uncategorized").length;
+    place.lastUpdated = new Date().toISOString();
+
+    try {
+      await container
+        .item(storeId, storeId)
+        .replace(place, { accessCondition: { type: "IfMatch", condition: etag as string } });
+      return pendingCount === 0;
+    } catch (error: any) {
+      if (error.code === 412) {
+        attempts++;
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new Error(`Failed to update photo ${photoId} in store ${storeId} after ${maxAttempts} attempts due to conflict.`);
 }

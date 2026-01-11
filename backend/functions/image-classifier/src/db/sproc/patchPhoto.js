@@ -27,19 +27,23 @@ function patchPhoto(storeId, photoId, analysisResult) {
     var place = docs[0];
     var photos = place.photos || [];
     // 2. Find and Update Photo
-    for (const photo of photos) {
-      if (photo.id === photoId) {
-        photo.category = analysisResult.category;
-        photo.confidence = analysisResult.confidence;
-        photo.mimeType = analysisResult.mimeType;
+    for (var i = 0; i < photos.length; i++) {
+      if (photos[i].id === photoId) {
+        if (analysisResult.category === "discard") {
+          photos.splice(i, 1);
+        } else {
+          photos[i].category = analysisResult.category;
+          photos[i].confidence = analysisResult.confidence;
+          photos[i].mimeType = analysisResult.mimeType;
+        }
         break;
       }
     }
 
     // 3. Check completeness (are there any 'uncategorized' photos left?)
     var pendingCount = 0;
-    for (const photo of photos) {
-      if (photo.category === "uncategorized") {
+    for (var j = 0; j < photos.length; j++) {
+      if (photos[j].category === "uncategorized") {
         pendingCount++;
       }
     }
