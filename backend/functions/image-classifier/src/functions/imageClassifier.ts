@@ -1,6 +1,8 @@
-import { CosmosClient } from "@azure/cosmos";
+import { Container, CosmosClient } from "@azure/cosmos";
+import * as fs from "fs";
+import * as path from "path";
 import { app, InvocationContext, output } from "@azure/functions";
-import type { NewPhotosMessage, Photo, Place } from "doner_types";
+import type { PhotoClassificationMessage, Photo, Place } from "doner_types";
 import { BlobService } from "../services/BlobService";
 import { VisionService } from "../services/VisionService";
 
@@ -25,6 +27,28 @@ function initializeServices() {
   blobService ??= new BlobService();
   visionService ??= new VisionService();
   return { client, blobService, visionService };
+}
+
+/**
+ * Ensures that the required stored procedure 'patchPhoto' is registered in CosmosDB.
+ */
+async function ensureStoredProcedure(container: Container) {
+  const spId = "patchPhoto";
+  try {
+    const { resource: sp } = await container.scripts.storedProcedure(spId).read();
+    if (sp) return;
+  } catch (error: any) {
+    if (error.code !== 404) throw error;
+  }
+
+  // Load SP content from file
+  const spPath = path.join(__dirname, "..", "db", "sproc", "patchPhoto.js");
+  const spContent = fs.readFileSync(spPath, "utf8");
+
+  await container.scripts.storedProcedures.create({
+    id: spId,
+    body: spContent,
+  });
 }
 
 /**
@@ -55,13 +79,13 @@ app.serviceBusQueue("imageClassifier", {
  * @returns Object with storeId if successful, undefined if failed
  */
 export async function imageClassifier(
-  message: NewPhotosMessage,
+  message: PhotoClassificationMessage,
   context: InvocationContext
 ): Promise<{ storeId: string } | undefined> {
-  const storeId = message.id;
+  const { storeId, photoId, url } = message;
   const startTime = Date.now();
 
-  context.log(`Image Classifier: Processing ${String(message.photos.length)} photos for store ${storeId}`);
+  context.log(`Image Classifier: Processing photo ${photoId} for store ${storeId}`);
 
   try {
     // Validate input
@@ -70,8 +94,8 @@ export async function imageClassifier(
       return undefined;
     }
 
-    if (!Array.isArray(message.photos) || message.photos.length === 0) {
-      context.warn("No photos in message, skipping");
+    if (!photoId || !url) {
+      context.error("Invalid photoId or url in message");
       return undefined;
     }
 
@@ -82,114 +106,59 @@ export async function imageClassifier(
     const database = cosmosClient.database(COSMOSDB_DATABASE_NAME);
     const container = database.container(COSMOSDB_CONTAINER_NAME);
 
-    // Fetch the current place document
-    const { resource: place } = await container.item(storeId, storeId).read<Place>();
+    // Ensure SP exists
+    await ensureStoredProcedure(container);
 
+    // 1. Idempotency Check: Read the Place to see if it's already classified
+    const { resource: place } = await container.item(storeId, storeId).read<Place>();
     if (!place) {
-      context.error(`Place ${storeId} not found in database.`);
+      context.error(`Place ${storeId} not found`);
       return undefined;
     }
 
-    // Ensure blob container exists
+    const existingPhoto = place.photos.find((p) => p.id === photoId);
+    if (existingPhoto && existingPhoto.category !== "uncategorized") {
+      context.log(`Photo ${photoId} already classified as ${existingPhoto.category}. skipping.`);
+      return { storeId };
+    }
+
+    // 2. Download and Analyze
     await bs.ensureContainerExists();
+    const { contentType, buffer } = await bs.downloadAndUploadImage(url, photoId);
+    const analysis = await vs.analyzeImage(buffer);
 
-    // Process photos in parallel
-    const photoResults = await Promise.allSettled(
-      message.photos.map(async (photoMsg) => {
-        if (!photoMsg.id || !photoMsg.url) {
-          throw new Error("Photo missing id or url");
-        }
-
-        context.log(`Processing photo ${photoMsg.id} from ${photoMsg.url}`);
-
-        // 1. Download from Google and Upload to Azure Blob Storage
-        const { contentType, buffer } = await bs.downloadAndUploadImage(photoMsg.url, photoMsg.id);
-
-        // 2. Vision Analysis
-        const analysis = await vs.analyzeImage(buffer);
-
-        if (analysis.category === "discard") {
-          context.log(`Photo ${photoMsg.id} discarded by vision analysis (confidence: ${String(analysis.confidence)})`);
-          await bs.deleteImage(photoMsg.id);
-          return { id: photoMsg.id, status: "discarded" as const };
-        }
-
-        context.log(
-          `Photo ${photoMsg.id} classified as ${analysis.category} with confidence ${String(analysis.confidence)}`
-        );
-        return {
-          id: photoMsg.id,
-          status: "processed" as const,
-          photo: {
-            id: photoMsg.id,
-            url: photoMsg.url,
-            mimeType: contentType,
-            category: analysis.category,
-            confidence: analysis.confidence,
-          } as Photo,
-        };
-      })
-    );
-
-    // Collect results and merge into place document
-    const photoIdsToDiscard: string[] = [];
-    const updatedPhotosMap = new Map<string, Photo>();
-
-    for (const result of photoResults) {
-      if (result.status === "fulfilled") {
-        if (result.value.status === "discarded") {
-          photoIdsToDiscard.push(result.value.id);
-        } else {
-          updatedPhotosMap.set(result.value.photo.id, result.value.photo);
-        }
-      } else {
-        context.error(`Failed to process a photo:`, result.reason);
-        // Note: we don't have the photoId easily if it failed before validation,
-        // but individual catch within map could handle that if needed.
-        // For now, we continue with what succeeded.
-      }
+    let finalCategory = analysis.category;
+    if (finalCategory === "discard") {
+      context.log(`Photo ${photoId} discarded by vision analysis.`);
+      await bs.deleteImage(photoId);
     }
 
-    // Deep Merge Logic:
-    // 1. Remove photos that were discarded in this run
-    // 2. Update existing photos or add new ones from this run
-    // 3. Keep other photos as they were (uncategorized or previously categorized)
+    context.log(`Photo ${photoId} classified as ${finalCategory} (${String(analysis.confidence)})`);
 
-    let photosChanged = false;
+    // 3. Atomic Update via Stored Procedure
+    const spResult = await container.scripts.storedProcedure("patchPhoto").execute(storeId, [
+      storeId,
+      photoId,
+      {
+        category: finalCategory,
+        confidence: analysis.confidence,
+        mimeType: contentType,
+      },
+    ]);
 
-    // Filter out discarded photos
-    const originalCount = place.photos.length;
-    place.photos = place.photos.filter((p) => !photoIdsToDiscard.includes(p.id));
-    if (place.photos.length !== originalCount) photosChanged = true;
+    const resultBody = spResult.resource as { storeId: string; isComplete: boolean };
 
-    // Update or add processed photos
-    for (const [id, updatedPhoto] of updatedPhotosMap) {
-      const existingIndex = place.photos.findIndex((p) => p.id === id);
-      if (existingIndex !== -1) {
-        // Deep merge: only update specific fields if needed,
-        // but here we trust the classification result
-        place.photos[existingIndex] = updatedPhoto;
-        photosChanged = true;
-      } else {
-        place.photos.push(updatedPhoto);
-        photosChanged = true;
-      }
-    }
-
-    // Save back to CosmosDB if changes occurred
-    if (photosChanged) {
-      await container.item(storeId, storeId).replace(place);
-      context.log(
-        `Successfully updated ${storeId} with ${String(updatedPhotosMap.size)} processed and ${String(photoIdsToDiscard.length)} discarded images.`
-      );
-    } else {
-      context.log(`No changes needed for ${storeId}.`);
+    // 4. Trigger next step if all photos are done
+    if (resultBody.isComplete) {
+      context.log(`All photos for store ${storeId} are processed. Triggering downstream.`);
+      const duration = Date.now() - startTime;
+      context.log(`Finished processing store ${storeId} in ${String(duration)}ms`);
+      return { storeId };
     }
 
     const duration = Date.now() - startTime;
     context.log(`Finished processing store ${storeId} in ${String(duration)}ms`);
-
-    return { storeId };
+    return undefined; // Do not trigger output queue yet
   } catch (error) {
     const duration = Date.now() - startTime;
     context.error(`Error in imageClassifier for store ${storeId} after ${String(duration)}ms:`, error);

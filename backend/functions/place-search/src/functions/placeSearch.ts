@@ -5,7 +5,7 @@
 
 import { Container, CosmosClient, PartitionKeyKind, SpatialType } from "@azure/cosmos";
 import { app, InvocationContext, output, Timer } from "@azure/functions";
-import type { Place } from "doner_types";
+import type { Photo, PhotoClassificationMessage, Place } from "doner_types";
 import { GridService } from "../services/grid.service";
 import { GoogleMapsService } from "../services/google-maps.service";
 
@@ -117,7 +117,8 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
     let newPlacesCount = 0;
     let updatedPlacesCount = 0;
-    const messages: { id: string; photos: unknown[] }[] = [];
+    let newPhotosToClassifyCount = 0;
+    const photoMessages: PhotoClassificationMessage[] = [];
 
     for (const googlePlace of googlePlaces) {
       try {
@@ -125,16 +126,20 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
           continue;
         }
         const place = googleMapsService.mapGooglePlaceToPlace(googlePlace as Record<string, unknown>);
-        const { created, updated } = await createOrUpdateItem(placesContainer, place);
+        const { created, updated, newPhotos } = await createOrUpdateItem(placesContainer, place);
 
         if (created || updated) {
           if (created) newPlacesCount++;
           if (updated) updatedPlacesCount++;
 
-          messages.push({
-            id: place.id,
-            photos: place.photos,
-          });
+          for (const photo of newPhotos) {
+            photoMessages.push({
+              storeId: place.id,
+              photoId: photo.id,
+              url: photo.url,
+            });
+            newPhotosToClassifyCount++;
+          }
         }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -170,9 +175,9 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
       await gridCellsContainer.items.upsert(cell);
     }
 
-    if (messages.length > 0) {
-      context.extraOutputs.set(serviceBusOutput, messages);
-      context.log(`Sent ${String(messages.length)} places to Service Bus for photo processing.`);
+    if (photoMessages.length > 0) {
+      context.extraOutputs.set(serviceBusOutput, photoMessages);
+      context.log(`Sent ${String(photoMessages.length)} photos to Service Bus for classification.`);
     }
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -185,45 +190,74 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 async function createOrUpdateItem(
   container: Container,
   itemBody: Place
-): Promise<{ created: boolean; updated: boolean }> {
-  const { resource: existingItem } = await container.item(itemBody.id, itemBody.id).read<Place>();
+): Promise<{ created: boolean; updated: boolean; newPhotos: Photo[] }> {
+  let attempts = 0;
+  const maxAttempts = 3;
 
-  if (!existingItem) {
-    itemBody.lastUpdated = new Date().toISOString();
-    await container.items.create(itemBody);
-    return { created: true, updated: false };
+  while (attempts < maxAttempts) {
+    const { resource: existingItem, etag } = await container.item(itemBody.id, itemBody.id).read<Place>();
+
+    if (!existingItem) {
+      itemBody.lastUpdated = new Date().toISOString();
+      try {
+        await container.items.create(itemBody);
+        return { created: true, updated: false, newPhotos: itemBody.photos };
+      } catch (e: any) {
+        if (e.code === 409) {
+          // Conflict: someone just created it
+          attempts++;
+          continue;
+        }
+        throw e;
+      }
+    }
+
+    // Identify new photos (those that don't exist in the DB yet)
+    const existingPhotoIds = new Set(existingItem.photos.map((p) => p.id));
+    const newPhotos = itemBody.photos.filter((p) => !existingPhotoIds.has(p.id));
+
+    // Merge photos with deduplication, preserving existing classifications and adding ONLY the new ones
+    const mergedPhotos = [...existingItem.photos, ...newPhotos];
+
+    // Check if anything meaningful changed
+    const hasNewPhotos = newPhotos.length > 0;
+
+    const hasDataChanges =
+      existingItem.name !== itemBody.name ||
+      existingItem.internationalPhoneNumber !== itemBody.internationalPhoneNumber ||
+      JSON.stringify(existingItem.address) !== JSON.stringify(itemBody.address) ||
+      JSON.stringify(existingItem.openingHours) !== JSON.stringify(itemBody.openingHours) ||
+      existingItem.takeout !== itemBody.takeout ||
+      existingItem.delivery !== itemBody.delivery ||
+      existingItem.dineIn !== itemBody.dineIn ||
+      existingItem.servesVegetarianFood !== itemBody.servesVegetarianFood ||
+      JSON.stringify(existingItem.paymentMethods) !== JSON.stringify(itemBody.paymentMethods);
+
+    if (!hasNewPhotos && !hasDataChanges) {
+      return { created: false, updated: false, newPhotos: [] };
+    }
+
+    const updatedItem: Place = {
+      ...itemBody,
+      ai_analysis: existingItem.ai_analysis, // Preserve AI analysis
+      photos: mergedPhotos,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    try {
+      await container
+        .item(itemBody.id, itemBody.id)
+        .replace(updatedItem, { accessCondition: { type: "IfMatch", condition: etag } });
+      return { created: false, updated: true, newPhotos };
+    } catch (e: any) {
+      if (e.code === 412) {
+        // Precondition Failed: Document modified since last read
+        attempts++;
+        continue;
+      }
+      throw e;
+    }
   }
 
-  // Merge photos with deduplication, preserving existing classifications
-  const mergedPhotos = [...existingItem.photos, ...itemBody.photos].filter(
-    (photo, index, self) => index === self.findIndex((p) => p.id === photo.id)
-  );
-
-  // Check if anything meaningful changed
-  const hasNewPhotos = mergedPhotos.length > existingItem.photos.length;
-
-  const hasDataChanges =
-    existingItem.name !== itemBody.name ||
-    existingItem.internationalPhoneNumber !== itemBody.internationalPhoneNumber ||
-    JSON.stringify(existingItem.address) !== JSON.stringify(itemBody.address) ||
-    JSON.stringify(existingItem.openingHours) !== JSON.stringify(itemBody.openingHours) ||
-    existingItem.takeout !== itemBody.takeout ||
-    existingItem.delivery !== itemBody.delivery ||
-    existingItem.dineIn !== itemBody.dineIn ||
-    existingItem.servesVegetarianFood !== itemBody.servesVegetarianFood ||
-    JSON.stringify(existingItem.paymentMethods) !== JSON.stringify(itemBody.paymentMethods);
-
-  if (!hasNewPhotos && !hasDataChanges) {
-    return { created: false, updated: false };
-  }
-
-  const updatedItem: Place = {
-    ...itemBody,
-    ai_analysis: existingItem.ai_analysis, // Preserve AI analysis
-    photos: mergedPhotos,
-    lastUpdated: new Date().toISOString(),
-  };
-
-  await container.items.upsert(updatedItem);
-  return { created: false, updated: true };
+  throw new Error(`Failed to update item ${itemBody.id} after ${maxAttempts} attempts due to concurrency conflicts.`);
 }
