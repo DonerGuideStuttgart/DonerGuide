@@ -5,4 +5,9 @@
     "rootDir": "."
   },
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/__tests__/**"]
+    "types": ["node"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "lib": ["ES2020"]
+  }
 }
