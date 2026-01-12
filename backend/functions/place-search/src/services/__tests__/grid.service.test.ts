@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GridService } from "./grid.service";
 import { Container } from "@azure/cosmos";
+import type { GridCell } from "../types/grid";
 
 describe("GridService", () => {
   let mockContainer: jest.Mocked<Container>;
@@ -85,7 +87,7 @@ describe("GridService", () => {
           minLat: 48.0,
           minLon: 9.0,
           maxLat: 48.2, // Lat diff 0.2
-          maxLon: 9.1,  // Lon diff 0.1
+          maxLon: 9.1, // Lon diff 0.1
         },
         geometry: { type: "Polygon", coordinates: [] },
         resultsCount: 60,
@@ -98,30 +100,31 @@ describe("GridService", () => {
     });
 
     it("should split along latitude if it's the longer side", async () => {
-      await gridService.splitCell(mockCell);
+      await gridService.splitCell(mockCell as GridCell);
 
       expect(mockContainer.items.create).toHaveBeenCalledTimes(2);
-      expect(mockContainer.items.upsert).toHaveBeenCalledWith(expect.objectContaining({
-        id: "parent-id",
-        status: "SPLIT"
-      }));
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "parent-id",
+          status: "SPLIT",
+        })
+      );
 
       const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
       const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
 
       expect(child1.level).toBe(1);
       expect(child2.level).toBe(1);
-      
+
       // midLat = 48.1
       expect(child1.boundaryBox.maxLat).toBe(48.1);
       expect(child2.boundaryBox.minLat).toBe(48.1);
     });
-
     it("should split along longitude if it's the longer side", async () => {
       mockCell.boundaryBox.maxLat = 48.1; // Lat diff 0.1
-      mockCell.boundaryBox.maxLon = 9.3;  // Lon diff 0.3
+      mockCell.boundaryBox.maxLon = 9.3; // Lon diff 0.3
 
-      await gridService.splitCell(mockCell);
+      await gridService.splitCell(mockCell as GridCell);
 
       const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
       const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
@@ -134,13 +137,15 @@ describe("GridService", () => {
     it("should mark as COMPLETED if MAX_LEVEL is reached", async () => {
       mockCell.level = 10;
 
-      await gridService.splitCell(mockCell);
+      await gridService.splitCell(mockCell as GridCell);
 
       expect(mockContainer.items.create).not.toHaveBeenCalled();
-      expect(mockContainer.items.upsert).toHaveBeenCalledWith(expect.objectContaining({
-        id: "parent-id",
-        status: "COMPLETED"
-      }));
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "parent-id",
+          status: "COMPLETED",
+        })
+      );
     });
   });
 });

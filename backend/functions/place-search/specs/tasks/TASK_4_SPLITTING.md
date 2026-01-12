@@ -1,9 +1,11 @@
 # Task 4: Binary Splitting Logic
 
 ## Ziel
+
 Implementierung des "Divide"-Teils des Algorithmus.
 
 ## Details
+
 - [ ] Implementiere `splitCell(cell: GridCell)`:
   - Überprüfe `cell.level < 10`.
   - Falls ja:

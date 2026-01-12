@@ -1,4 +1,7 @@
 export interface Photo {
   id: string;
-  photoUrl: string;
+  url: string;
+  mimeType: string;
+  category: "food" | "place" | "uncategorized";
+  confidence: number;
 }

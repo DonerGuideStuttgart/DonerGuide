@@ -15,5 +15,9 @@
   "devDependencies": {
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@azure/openai": "^2.0.0",
+    "openai": "^6.16.0"
   }
 }

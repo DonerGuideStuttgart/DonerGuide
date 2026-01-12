@@ -59,7 +59,8 @@ describe("GoogleMapsService", () => {
 
     it("should fetch up to 3 pages in searchAllPages", async () => {
       // Mock global fetch
-      const mockFetch = jest.fn()
+      const mockFetch = jest
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ places: [{ id: "p1" }], nextPageToken: "token2" }),
@@ -115,7 +116,7 @@ describe("GoogleMapsService", () => {
         dineIn: true,
         servesVegetarianFood: true,
         photos: [
-          { 
+          {
             name: "places/ch_123/photos/p1",
           },
           { name: "places/ch_123/photos/p2" },
@@ -133,8 +134,8 @@ describe("GoogleMapsService", () => {
       expect(place.openingHours.Mo).toEqual([630, 1320]);
       expect(place.paymentMethods).toContain(PaymentMethods.CREDIT_CARD);
       expect(place.paymentMethods).toContain(PaymentMethods.NFC);
-      expect(place.photos.uncategorized).toHaveLength(2);
-      expect(place.photos.uncategorized?.[0].id).toBe("places/ch_123/photos/p1");
+      expect(place.photos).toHaveLength(2);
+      expect(place.photos[0].id).toBe("places/ch_123/photos/p1");
       expect(place.takeout).toBe(true);
       expect(place.delivery).toBe(false);
     });

@@ -18,6 +18,9 @@
         "mode": "exponential",
         "delay": "00:00:02.00",
         "maxRetries": 4
+      },
+      "messageHandlerOptions": {
+        "maxConcurrentCalls": 5
       }
     }
   }

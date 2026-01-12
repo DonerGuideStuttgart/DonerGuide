@@ -1,9 +1,11 @@
 # Task 7: Place Sync & Service Bus
 
 ## Ziel
+
 Datenpersistenz und Triggerung der KI-Pipeline.
 
 ## Details
+
 - [ ] Implementiere die "Deep Merge" Logik für `Places`:
   - Neue Google Daten überschreiben alte Stammdaten.
   - `ai_analysis` Feld muss erhalten bleiben.
