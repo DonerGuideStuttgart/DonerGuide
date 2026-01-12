@@ -45,4 +45,4 @@ export const userPrompt = `Analysiere alle Bilder sorgfältig und erstelle eine 
                   "score_verhaeltnis": 0,
                   "score_gesamt": 0
                 }
-                `
+                `;
