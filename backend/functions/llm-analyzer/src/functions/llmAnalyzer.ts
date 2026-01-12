@@ -1,7 +1,7 @@
 import { CosmosClient, Item } from "@azure/cosmos";
 import { app, InvocationContext } from "@azure/functions";
-import { Place } from "doner_types"
-import { AzureOpenAI, OpenAI } from "openai";
+import { Place } from "doner_types";
+import { AzureOpenAI } from "openai";
 import { analyzeImage } from "../helper/analyzeImage";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { getImages } from "../helper/getImages";
@@ -28,7 +28,8 @@ const aiClient = new AzureOpenAI({
   deployment: FOUNDRY_DEPLOYMENT_NAME,
 });
 
-const containerClient: ContainerClient = BlobServiceClient.fromConnectionString(STORAGE_CONNECTION_STRING).getContainerClient(STORAGE_CONTAINER_NAME);
+const containerClient: ContainerClient =
+  BlobServiceClient.fromConnectionString(STORAGE_CONNECTION_STRING).getContainerClient(STORAGE_CONTAINER_NAME);
 
 app.serviceBusQueue("llmAnalyzer", {
   connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING",
@@ -36,10 +37,7 @@ app.serviceBusQueue("llmAnalyzer", {
   handler: llmAnalyzer,
 });
 
-
-
-
-export async function llmAnalyzer(storeId: any, context: InvocationContext): Promise<void> {
+export async function llmAnalyzer(storeId: { storeId: string }, context: InvocationContext): Promise<void> {
   context.log("LLM Analyzer function ran at", new Date().toISOString());
 
   const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
@@ -53,9 +51,6 @@ export async function llmAnalyzer(storeId: any, context: InvocationContext): Pro
   const item: Item = container.item(storeId.storeId, storeId.storeId);
 
   context.log("Store ID found:", storeId);
-
-
-
 
   const { resource } = await item.read<Place>();
   const images = await getImages(context, containerClient, resource as Place);
