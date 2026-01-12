@@ -66,6 +66,8 @@ services:
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
+    ports:
+      - 7073:7073
     env_file:
       - ./functions/llm-analyzer/.env
 

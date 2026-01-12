@@ -3,15 +3,16 @@ import axios from "axios";
 
 export class BlobService {
   private containerClient: ContainerClient;
-  private containerName = "photos";
 
   constructor() {
     const connectionString = process.env.IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING;
     if (connectionString === undefined || connectionString === "") {
       throw new Error("IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING is not defined");
     }
+    const containerName = process.env.IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME ?? "photos";
+    
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-    this.containerClient = blobServiceClient.getContainerClient(this.containerName);
+    this.containerClient = blobServiceClient.getContainerClient(containerName);
   }
 
   /**

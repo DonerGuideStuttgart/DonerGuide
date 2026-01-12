@@ -7,15 +7,18 @@
     "build": "tsc",
     "watch": "tsc -w",
     "clean": "rimraf dist",
-    "start": "func start",
+    "start": "func start --port 7073",
     "dev": "concurrently --raw 'npm run watch' 'npm run start'",
-    "test": "echo \"No tests yet...\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
     "@azure/cosmos": "^4.9.0",
     "@azure/functions": "^4.0.0",
     "@azure/openai": "^2.0.0",
+    "@azure/storage-blob": "^12.29.1",
     "doner_types": "file:../shared/doner_types",
     "openai": "^6.16.0"
   },
