@@ -31,7 +31,7 @@ interface FoundryResponse {
   }[];
 }
 
-app.serviceBusQueue("imageClassifier", {
+app.serviceBusQueue("llmAnalyzer", {
   connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING",
   queueName: QUEUE_NAME_INPUT,
   handler: llmAnalyzer,
@@ -49,6 +49,8 @@ export async function llmAnalyzer(storeId: string, context: InvocationContext): 
   ).container;
 
   const item: Item = container.item(storeId, storeId);
+
+  context.log("Store ID found:", storeId);
 
   const { resource } = await item.read<StoreData>();
   const imageUrl = resource?.image_URL;

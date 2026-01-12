@@ -15,7 +15,9 @@
   "dependencies": {
     "@azure/cosmos": "^4.9.0",
     "@azure/functions": "^4.0.0",
-    "doner_types": "file:../shared/doner_types"
+    "@azure/openai": "^2.0.0",
+    "doner_types": "file:../shared/doner_types",
+    "openai": "^6.16.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
