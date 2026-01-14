@@ -20,10 +20,12 @@
 		"@heroui/react": "^2.8.6",
 		"@heroui/slider": "^2.4.24",
 		"@heroui/theme": "^2.4.25",
+		"mapbox-gl": "^3.18.0",
 		"next": "^16.0.7",
 		"nuqs": "^2.8.6",
 		"react": "^19.2.3",
-		"react-dom": "^19.2.3"
+		"react-dom": "^19.2.3",
+		"react-map-gl": "^8.1.0"
 	},
 	"devDependencies": {
 		"@svgr/webpack": "^8.1.0",
