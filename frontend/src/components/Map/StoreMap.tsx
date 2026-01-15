@@ -2,7 +2,6 @@
 import { StoreBase } from '@/types/store'
 import { useRef, useState } from 'react'
 import Map, { MapRef, Marker } from 'react-map-gl/mapbox'
-import 'mapbox-gl/dist/mapbox-gl.css'
 import { StoreMarkerPopup } from './StoreMarkerPopup'
 
 interface StoreMapProps {
