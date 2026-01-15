@@ -23,9 +23,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
 	if (!MAPBOX_TOKEN) {
 		return (
 			<div className="w-full h-full flex items-center justify-center bg-base-200 rounded-xl border border-primary">
-				<p className="text-neutral">
-					Mapbox Token fehlt. Bitte NEXT_PUBLIC_MAPBOX_TOKEN setzen.
-				</p>
+				<p className="text-neutral">Map kann nicht geladen werden.</p>
 			</div>
 		)
 	}
