@@ -8,7 +8,7 @@ import { routes } from '@/helpers/routes'
 import { DISTRICT_LABELS } from '@/types/records'
 import { StoreBase } from '@/types/store'
 import { useRouter } from 'next/navigation'
-import { Popup } from 'react-map-gl'
+import { Popup } from 'react-map-gl/mapbox'
 
 interface StoreMarkerPopupProps {
 	store: StoreBase
@@ -34,7 +34,7 @@ export function StoreMarkerPopup({ store, onClose }: StoreMarkerPopupProps) {
 			className="store-popup"
 		>
 			<div
-				className="bg-base-100 rounded-lg shadow-lg cursor-pointer hover:bg-base-200 transition-colors"
+				className=" rounded-lg shadow-lg cursor-pointer hover:bg-base-200 transition-colors"
 				onClick={handleClick}
 				role="button"
 				tabIndex={0}
@@ -44,7 +44,7 @@ export function StoreMarkerPopup({ store, onClose }: StoreMarkerPopupProps) {
 					}
 				}}
 			>
-				<div className="p-3 space-y-2 min-w-[240px] max-w-[280px]">
+				<div className="p-3 space-y-2 min-w-60 max-w-80">
 					{/* Header with name and score */}
 					<div className="flex items-center gap-2">
 						<h3 className="text-base font-bold flex-1 truncate">
@@ -55,6 +55,7 @@ export function StoreMarkerPopup({ store, onClose }: StoreMarkerPopupProps) {
 							icon={<Aistars className="size-3 fill-secondary" />}
 							className="badge-secondary badge-sm"
 						/>
+						<div className="pl-4"></div>
 					</div>
 
 					{/* Opening hours and price */}

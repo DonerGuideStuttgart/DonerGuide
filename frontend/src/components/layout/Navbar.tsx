@@ -14,7 +14,7 @@ export default function Navbar() {
 		<nav className="navbar bg-base-300 py-5 mb-4">
 			<div className="container navbar-start">
 				{/* Mobile Dropdown */}
-				<div className="lg:hidden dropdown mr-auto">
+				<div className="lg:hidden dropdown mr-4!">
 					<div tabIndex={0} role="button" className="flex cursor-pointer">
 						<Menu className="size-5" />
 					</div>

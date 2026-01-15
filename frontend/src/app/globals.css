@@ -103,21 +103,13 @@
 }
 
 /* Popup customization */
-.mapboxgl-popup-content {
-	@apply p-0 rounded-lg shadow-lg border border-primary;
-	background: transparent;
-}
-
 .mapboxgl-popup-close-button {
 	@apply text-primary hover:text-secondary;
 	@apply text-xl font-bold;
-	padding: 4px 8px;
+	padding: 8px 10px;
 }
 
-.mapboxgl-popup-close-button:hover {
-	@apply bg-base-200;
-}
-
-.mapboxgl-popup-tip {
-	@apply border-primary;
+.mapboxgl-popup-content {
+	@apply p-0 rounded-2xl;
+	padding: 0 !important;
 }
