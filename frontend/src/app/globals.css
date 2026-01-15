@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
 @plugin "daisyui" {
 	themes: bumblebee;
 }
@@ -63,4 +65,51 @@
 
 [data-slot='value'] {
 	@apply text-sm text-base-content/70;
+}
+
+/* Mapbox GL Custom Styles */
+/* Override default Mapbox controls with DaisyUI theme colors */
+.mapboxgl-ctrl-group {
+	@apply bg-base-100 border-primary shadow-md rounded-lg;
+}
+
+.mapboxgl-ctrl-group > button {
+	@apply bg-base-100 border-primary;
+	@apply hover:bg-base-200;
+	@apply transition-colors;
+}
+
+.mapboxgl-ctrl-group > button:hover {
+	@apply bg-base-200;
+}
+
+.mapboxgl-ctrl-group > button + button {
+	@apply border-t border-primary;
+}
+
+/* Zoom controls */
+.mapboxgl-ctrl-zoom-in,
+.mapboxgl-ctrl-zoom-out {
+	@apply text-primary;
+}
+
+/* Attribution */
+.mapboxgl-ctrl-attrib {
+	@apply bg-base-100/90 text-neutral text-xs;
+}
+
+.mapboxgl-ctrl-attrib a {
+	@apply text-primary hover:text-secondary;
+}
+
+/* Popup customization */
+.mapboxgl-popup-close-button {
+	@apply text-primary hover:text-secondary;
+	@apply text-xl font-bold;
+	padding: 8px 10px;
+}
+
+.mapboxgl-popup-content {
+	@apply p-0 rounded-2xl;
+	padding: 0 !important;
 }
