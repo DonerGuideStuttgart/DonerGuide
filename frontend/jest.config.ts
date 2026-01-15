@@ -8,6 +8,8 @@ const config = {
 	moduleNameMapper: {
 		'^@/(.*)$': '<rootDir>/src/$1',
 		'\\.svg$': '<rootDir>/__mocks__/svg.tsx',
+		'mapbox-gl/dist/mapbox-gl.css': '<rootDir>/__mocks__/css.js',
+		'^react-map-gl$': '<rootDir>/__mocks__/react-map-gl.tsx',
 	},
 	transformIgnorePatterns: ['node_modules/(?!(nuqs)/)'],
 }
