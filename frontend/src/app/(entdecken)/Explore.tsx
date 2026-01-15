@@ -1,9 +1,11 @@
 'use client'
 import Filter from '@/assets/icons/filter.svg'
+import ClientOnly from '@/components/ClientOnly'
 import DonerCard, { DonerCardSkeleton } from '@/components/DonerCard'
 import Drawer from '@/components/Drawer'
 import FilterChips from '@/components/FilterChips'
 import FilterPanel from '@/components/FilterPanel'
+import StoreMap from '@/components/Map/StoreMap'
 import Sort from '@/components/Sort'
 import { useState } from 'react'
 import { INITIAL_LIMIT, LOAD_MORE_COUNT } from './searchParams'
@@ -11,6 +13,7 @@ import { useExplore } from './useExplore'
 
 export default function Explore() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
 
 	const {
 		stores,
@@ -35,10 +38,44 @@ export default function Explore() {
 				<h1 className="text-2xl font-bold">{title}</h1>
 			</header>
 
-			{/* Sort */}
-			<section className="flex justify-end mb-2 lg:mb-4">
-				<Sort />
+			{/* View Mode Toggle Mobile */}
+			<section className="lg:hidden flex gap-2 mb-3">
+				<button
+					onClick={() => setViewMode('list')}
+					className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+						viewMode === 'list'
+							? 'bg-primary text-white shadow-[0_3px_0px_#000000]'
+							: 'bg-base-200 text-neutral'
+					}`}
+				>
+					Liste
+				</button>
+				<button
+					onClick={() => setViewMode('map')}
+					className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+						viewMode === 'map'
+							? 'bg-primary text-white shadow-[0_3px_0px_#000000]'
+							: 'bg-base-200 text-neutral'
+					}`}
+				>
+					Karte
+				</button>
 			</section>
+			{/* View Mode Toggle Mobile End */}
+
+			{/* Filter Mobile Button and Chips */}
+			<div className="lg:hidden flex items-center flex-wrap gap-2 mb-3">
+				<button
+					onClick={() => setIsDrawerOpen(true)}
+					className="flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4"
+					aria-label="Open filters"
+				>
+					<Filter className="size-5 fill-base-300" />
+				</button>
+
+				<FilterChips />
+			</div>
+			{/* Filter Mobile Button and Chips End */}
 
 			<section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 				{/* Filter Desktop */}
@@ -55,20 +92,39 @@ export default function Explore() {
 				</section>
 				{/* Filter Desktop End */}
 
-				<section className="lg:col-span-3">
-					<div className="flex items-center flex-wrap gap-2 mb-3">
-						{/* Filter Mobile Button */}
-						<button
-							onClick={() => setIsDrawerOpen(true)}
-							className="lg:hidden flex items-center cursor-pointer bg-primary text-white rounded-full shadow-[0_3px_0px_#000000] active:shadow-none active:translate-y-0.5 py-2 px-4 lg:mb-3"
-							aria-label="Open filters"
+				{/* Mobile Map View */}
+				{viewMode === 'map' && (
+					<section className="lg:hidden col-span-1 mb-4">
+						<ClientOnly
+							fallback={
+								<div className="h-[400px] bg-base-200 rounded-xl animate-pulse" />
+							}
 						>
-							<Filter className="size-5 fill-base-300" />
-						</button>
-						{/* Filter Mobile Button End */}
+							<StoreMap stores={stores} />
+						</ClientOnly>
+					</section>
+				)}
+				{/* Mobile Map View End */}
 
-						<FilterChips />
+				<section
+					className={`lg:col-span-3 space-y-4 ${viewMode === 'map' ? 'hidden lg:block' : ''}`}
+				>
+					{/* Map Section - Desktop Only */}
+					<div className="hidden lg:block mt-6">
+						<ClientOnly
+							fallback={
+								<div className="h-[400px] bg-base-200 rounded-xl animate-pulse" />
+							}
+						>
+							<StoreMap stores={stores} />
+						</ClientOnly>
 					</div>
+					{/* Map Section End */}
+
+					{/* Sort */}
+					<section className="flex justify-end mb-2 lg:mb-4">
+						<Sort />
+					</section>
 
 					{/* Error Handling */}
 					{error && (

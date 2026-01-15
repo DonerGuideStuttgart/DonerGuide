@@ -1,7 +1,7 @@
 'use client'
 import { StoreBase } from '@/types/store'
 import { useRef, useState } from 'react'
-import Map, { MapRef, Marker } from 'react-map-gl'
+import Map, { MapRef, Marker } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { StoreMarkerPopup } from './StoreMarkerPopup'
 
@@ -32,7 +32,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
 	}
 
 	return (
-		<div className="w-full h-[400px] lg:h-[600px] rounded-xl overflow-hidden border border-primary relative">
+		<div className="w-full h-[400px] lg:h-[600px] rounded-md overflow-hidden border border-primary relative">
 			<Map
 				ref={mapRef}
 				mapboxAccessToken={MAPBOX_TOKEN}
@@ -60,7 +60,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
 							<svg
 								width="32"
 								height="40"
-								viewBox="0 0 32 40"
+								viewBox="-2 -2 36 44"
 								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
 							>

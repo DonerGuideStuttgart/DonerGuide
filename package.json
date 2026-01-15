@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@azure/cosmos": "^4.9.0",
-    "@azure/functions": "^4.10.0"
+    "@azure/functions": "^4.10.0",
+    "mapbox-gl": "^3.18.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.3"
