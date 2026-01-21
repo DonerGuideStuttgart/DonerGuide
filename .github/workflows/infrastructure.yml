@@ -44,3 +44,4 @@ jobs:
 
   redeploy-functions:
     uses: ./.github/workflows/backend.yml
+    secrets: inherit
