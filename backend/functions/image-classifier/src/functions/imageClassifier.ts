@@ -13,16 +13,25 @@ let client: CosmosClient | undefined;
 let blobService: BlobService | undefined;
 let visionService: VisionService | undefined;
 
+import { DefaultAzureCredential } from "@azure/identity";
+
 /**
  * Lazy initialization of services to avoid top-level side effects and enable easier testing.
  */
 function initializeServices() {
   if (!client) {
-    const connectionString = process.env.IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING ?? "";
-    if (!connectionString) {
-      throw new Error("IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING is required");
+    const endpoint = process.env.IMAGE_CLASSIFIER_COSMOSDB_ENDPOINT ?? "";
+    const key = process.env.IMAGE_CLASSIFIER_COSMOSDB_KEY;
+
+    if (!endpoint) {
+      throw new Error("IMAGE_CLASSIFIER_COSMOSDB_ENDPOINT is required");
     }
-    client = new CosmosClient(connectionString);
+
+    if (key) {
+      client = new CosmosClient({ endpoint, key });
+    } else {
+      client = new CosmosClient({ endpoint, aadCredentials: new DefaultAzureCredential() });
+    }
   }
   blobService ??= new BlobService();
   visionService ??= new VisionService();

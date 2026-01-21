@@ -9,9 +9,18 @@ import type { Photo, PhotoClassificationMessage, Place } from "doner_types";
 import { GridService } from "../services/grid.service";
 import { GoogleMapsService } from "../services/google-maps.service";
 
-const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.PLACE_SEARCH_COSMOSDB_CONNECTION_STRING ?? "";
+import { DefaultAzureCredential } from "@azure/identity";
+
+const COSMOSDB_ENDPOINT = process.env.PLACE_SEARCH_COSMOSDB_ENDPOINT ?? "";
+const COSMOSDB_KEY = process.env.PLACE_SEARCH_COSMOSDB_KEY;
 const COSMOSDB_DATABASE_NAME = process.env.PLACE_SEARCH_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
-const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
+
+let client: CosmosClient;
+if (COSMOSDB_KEY) {
+  client = new CosmosClient({ endpoint: COSMOSDB_ENDPOINT, key: COSMOSDB_KEY });
+} else {
+  client = new CosmosClient({ endpoint: COSMOSDB_ENDPOINT, aadCredentials: new DefaultAzureCredential() });
+}
 
 const serviceBusOutput = output.serviceBusQueue({
   queueName: "places",

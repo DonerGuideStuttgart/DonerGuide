@@ -5,21 +5,31 @@ import { AzureOpenAI } from "openai";
 import { analyzeImage } from "../helper/analyzeImage";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { getImages } from "../helper/getImages";
+import { DefaultAzureCredential } from "@azure/identity";
+import { StorageSharedKeyCredential } from "@azure/storage-blob";
 
 const QUEUE_NAME_INPUT = process.env.LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT ?? "classified-images";
 
-const COSMOSDB_DATABASE_CONNECTION_STRING = process.env.LLM_ANALYZER_COSMOSDB_CONNECTION_STRING ?? "";
+const COSMOSDB_ENDPOINT = process.env.LLM_ANALYZER_COSMOSDB_ENDPOINT ?? "";
+const COSMOSDB_KEY = process.env.LLM_ANALYZER_COSMOSDB_KEY;
 const COSMOSDB_DATABASE_NAME = process.env.LLM_ANALYZER_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
 const COSMOSDB_CONTAINER_NAME = process.env.LLM_ANALYZER_COSMOSDB_CONTAINER_NAME ?? "Places";
 
-const STORAGE_CONNECTION_STRING = process.env.LLM_ANALYZER_STORAGE_CONNECTION_STRING ?? "";
+const STORAGE_ENDPOINT = process.env.LLM_ANALYZER_STORAGE_ENDPOINT ?? "";
+const STORAGE_ACCOUNT_NAME = process.env.LLM_ANALYZER_STORAGE_ACCOUNT_NAME;
+const STORAGE_KEY = process.env.LLM_ANALYZER_STORAGE_KEY;
 const STORAGE_CONTAINER_NAME = process.env.LLM_ANALYZER_STORAGE_CONTAINER_NAME ?? "photos";
 
 const FOUNDRY_ENDPOINT = process.env.FOUNDRY_ENDPOINT ?? "";
 const FOUNDRY_API_KEY = process.env.FOUNDRY_API_KEY ?? "";
 const FOUNDRY_DEPLOYMENT_NAME = process.env.FOUNDRY_DEPLOYMENT_NAME ?? "gpt-5-mini";
 
-const client = new CosmosClient(COSMOSDB_DATABASE_CONNECTION_STRING);
+let client: CosmosClient;
+if (COSMOSDB_KEY) {
+  client = new CosmosClient({ endpoint: COSMOSDB_ENDPOINT, key: COSMOSDB_KEY });
+} else {
+  client = new CosmosClient({ endpoint: COSMOSDB_ENDPOINT, aadCredentials: new DefaultAzureCredential() });
+}
 
 const aiClient = new AzureOpenAI({
   endpoint: FOUNDRY_ENDPOINT,
@@ -28,8 +38,23 @@ const aiClient = new AzureOpenAI({
   deployment: FOUNDRY_DEPLOYMENT_NAME,
 });
 
-const containerClient: ContainerClient =
-  BlobServiceClient.fromConnectionString(STORAGE_CONNECTION_STRING).getContainerClient(STORAGE_CONTAINER_NAME);
+let containerClient: ContainerClient;
+
+if (STORAGE_ENDPOINT) {
+  let blobServiceClient: BlobServiceClient;
+  if (STORAGE_ACCOUNT_NAME && STORAGE_KEY) {
+    const credential = new StorageSharedKeyCredential(STORAGE_ACCOUNT_NAME, STORAGE_KEY);
+    blobServiceClient = new BlobServiceClient(STORAGE_ENDPOINT, credential);
+  } else {
+    blobServiceClient = new BlobServiceClient(STORAGE_ENDPOINT, new DefaultAzureCredential());
+  }
+  containerClient = blobServiceClient.getContainerClient(STORAGE_CONTAINER_NAME);
+} else {
+  // Fallback (or throw error)
+  const STORAGE_CONNECTION_STRING = process.env.LLM_ANALYZER_STORAGE_CONNECTION_STRING ?? "";
+  containerClient =
+    BlobServiceClient.fromConnectionString(STORAGE_CONNECTION_STRING).getContainerClient(STORAGE_CONTAINER_NAME);
+}
 
 app.serviceBusQueue("llmAnalyzer", {
   connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING",

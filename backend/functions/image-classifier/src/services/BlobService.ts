@@ -1,17 +1,36 @@
-import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
+import { DefaultAzureCredential } from "@azure/identity";
 import axios from "axios";
 
 export class BlobService {
   private containerClient: ContainerClient;
 
   constructor() {
-    const connectionString = process.env.IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING;
-    if (connectionString === undefined || connectionString === "") {
-      throw new Error("IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING is not defined");
-    }
+    const endpoint = process.env.IMAGE_CLASSIFIER_STORAGE_ENDPOINT;
+    const accountName = process.env.IMAGE_CLASSIFIER_STORAGE_ACCOUNT_NAME;
+    const accountKey = process.env.IMAGE_CLASSIFIER_STORAGE_KEY;
     const containerName = process.env.IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME ?? "photos";
-    
-    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+
+    if (!endpoint) {
+      // Fallback for legacy connection string if needed, or just throw
+      const connectionString = process.env.IMAGE_CLASSIFIER_STORAGE_CONNECTION_STRING;
+      if (connectionString) {
+        this.containerClient =
+          BlobServiceClient.fromConnectionString(connectionString).getContainerClient(containerName);
+        return;
+      }
+      throw new Error("IMAGE_CLASSIFIER_STORAGE_ENDPOINT is not defined");
+    }
+
+    let blobServiceClient: BlobServiceClient;
+
+    if (accountName && accountKey) {
+      const credential = new StorageSharedKeyCredential(accountName, accountKey);
+      blobServiceClient = new BlobServiceClient(endpoint, credential);
+    } else {
+      blobServiceClient = new BlobServiceClient(endpoint, new DefaultAzureCredential());
+    }
+
     this.containerClient = blobServiceClient.getContainerClient(containerName);
   }
 

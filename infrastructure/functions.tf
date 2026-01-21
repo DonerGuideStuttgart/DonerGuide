@@ -86,3 +86,51 @@ resource "azurerm_role_assignment" "function_app_role_assignment_llm_analyzer" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
 }
+
+
+# --- Service Bus Role Assignments ---
+
+resource "azurerm_role_assignment" "place_search_sb_role" {
+  scope                = azurerm_servicebus_namespace.sb_namespace.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_linux_function_app.place-search-function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "image_classifier_sb_role" {
+  scope                = azurerm_servicebus_namespace.sb_namespace.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "llm_analyzer_sb_role" {
+  scope                = azurerm_servicebus_namespace.sb_namespace.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
+}
+
+
+# --- Cosmos DB Role Assignments ---
+
+resource "azurerm_cosmosdb_sql_role_assignment" "place_search_cosmos_role" {
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_function_app.place-search-function.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.cosmosdb_account.id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "image_classifier_cosmos_role" {
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.cosmosdb_account.id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "llm_analyzer_cosmos_role" {
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.cosmosdb_account.id
+}
