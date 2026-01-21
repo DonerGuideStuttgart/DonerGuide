@@ -8,10 +8,12 @@ resource "azurerm_service_plan" "service_plan" {
 
 
 resource "azurerm_linux_function_app" "place-search-function" {
-  name                = "${var.prefix}-place-search-func"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
+  name                                     = "${var.prefix}-place-search-func"
+  location                                 = azurerm_resource_group.rg.location
+  resource_group_name                      = azurerm_resource_group.rg.name
+  service_plan_id                          = azurerm_service_plan.service_plan.id
+  ftp_publish_basic_authentication_enabled = false
+  public_network_access_enabled            = false
 
   site_config {
     application_stack {
@@ -35,10 +37,12 @@ resource "azurerm_role_assignment" "function_app_role_assignment" {
 
 
 resource "azurerm_linux_function_app" "image-classifier-function" {
-  name                = "${var.prefix}-image-classifier-func"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
+  name                                     = "${var.prefix}-image-classifier-func"
+  location                                 = azurerm_resource_group.rg.location
+  resource_group_name                      = azurerm_resource_group.rg.name
+  service_plan_id                          = azurerm_service_plan.service_plan.id
+  ftp_publish_basic_authentication_enabled = false
+  public_network_access_enabled            = false
 
   site_config {
     application_stack {
@@ -62,10 +66,12 @@ resource "azurerm_role_assignment" "function_app_role_assignment_image_classifie
 }
 
 resource "azurerm_linux_function_app" "llm-analyzer-function" {
-  name                = "${var.prefix}-llm-analyzer-func"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
+  name                                     = "${var.prefix}-llm-analyzer-func"
+  location                                 = azurerm_resource_group.rg.location
+  resource_group_name                      = azurerm_resource_group.rg.name
+  service_plan_id                          = azurerm_service_plan.service_plan.id
+  ftp_publish_basic_authentication_enabled = false
+  public_network_access_enabled            = false
 
   site_config {
     application_stack {
