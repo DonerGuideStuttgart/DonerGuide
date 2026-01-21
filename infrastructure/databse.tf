@@ -47,9 +47,5 @@ resource "azurerm_cosmosdb_sql_container" "grid_cells_container" {
     included_path {
       path = "/*"
     }
-    spatial_index {
-      path  = "/geometry/*"
-      types = ["Polygon"]
-    }
   }
 }

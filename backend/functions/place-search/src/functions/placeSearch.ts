@@ -64,16 +64,6 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
               path: "/*",
             },
           ],
-          spatialIndexes: [
-            {
-              path: "/geometry/*",
-              types: ["Polygon"] as SpatialType[],
-            } as {
-              path: string;
-              types: SpatialType[];
-              boundingBox: { xmin: number; ymin: number; xmax: number; ymax: number };
-            },
-          ],
         },
       })
     ).container;
