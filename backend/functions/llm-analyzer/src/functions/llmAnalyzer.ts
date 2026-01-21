@@ -64,7 +64,7 @@ if (STORAGE_ENDPOINT) {
 }
 
 app.serviceBusQueue("llmAnalyzer", {
-  connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING",
+  connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_INPUT",
   queueName: QUEUE_NAME_INPUT,
   handler: llmAnalyzer,
 });
