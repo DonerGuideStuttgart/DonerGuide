@@ -19,6 +19,7 @@ resource "azurerm_linux_function_app" "place-search-function" {
     application_stack {
       node_version = "22"
     }
+    application_insights_connection_string = azurerm_application_insights.application_insights_place_search.connection_string
   }
 
   storage_uses_managed_identity = true
@@ -70,6 +71,7 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
     application_stack {
       node_version = "22"
     }
+    application_insights_connection_string = azurerm_application_insights.application_insights_image_classifier.connection_string
   }
 
   storage_uses_managed_identity = true
@@ -119,6 +121,7 @@ resource "azurerm_linux_function_app" "llm-analyzer-function" {
     application_stack {
       node_version = "22"
     }
+    application_insights_connection_string = azurerm_application_insights.application_insights_llm_analyzer.connection_string
   }
 
   storage_uses_managed_identity = true
