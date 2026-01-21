@@ -1,17 +1,19 @@
 resource "azurerm_cognitive_account" "vision_free" {
-  name                = "${var.prefix}-vision-free"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  kind                = "ComputerVision"
-  sku_name            = "F0"
+  name                  = "${var.prefix}-vision-free"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "ComputerVision"
+  sku_name              = "F0"
+  custom_subdomain_name = "${var.prefix}-vision-free"
 }
 
 resource "azurerm_cognitive_account" "vision_paid" {
-  name                = "${var.prefix}-vision-paid"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  kind                = "ComputerVision"
-  sku_name            = "S1"
+  name                  = "${var.prefix}-vision-paid"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "ComputerVision"
+  sku_name              = "S1"
+  custom_subdomain_name = "${var.prefix}-vision-paid"
 }
 
 resource "azurerm_cognitive_account" "account_llm" {
