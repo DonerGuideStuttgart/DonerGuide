@@ -1,6 +1,4 @@
 import { Container, CosmosClient } from "@azure/cosmos";
-import * as fs from "fs";
-import * as path from "path";
 import { app, InvocationContext, output } from "@azure/functions";
 import type { PhotoClassificationMessage, Place } from "doner_types";
 import { BlobService } from "../services/BlobService";
@@ -38,28 +36,6 @@ function initializeServices() {
   return { client, blobService, visionService };
 }
 
-/**
- * Ensures that the required stored procedure 'patchPhoto' is registered in CosmosDB.
- */
-async function ensureStoredProcedure(container: Container) {
-  const spId = "patchPhoto";
-  try {
-    const { resource: sp } = await container.scripts.storedProcedure(spId).read();
-    if (sp) return;
-  } catch (error: unknown) {
-    const errorWithCode = error as { code?: number };
-    if (errorWithCode.code !== 404) throw error;
-  }
-
-  // Load SP content from file
-  const spPath = path.join(__dirname, "..", "db", "sproc", "patchPhoto.js");
-  const spContent = fs.readFileSync(spPath, "utf8");
-
-  await container.scripts.storedProcedures.create({
-    id: spId,
-    body: spContent,
-  });
-}
 
 /**
  * Resets the services (used for testing).
@@ -118,9 +94,6 @@ export async function imageClassifier(
     const container = database.container(COSMOSDB_CONTAINER_NAME);
 
     // Ensure SP exists (only if not using workaround)
-    if (useSproc) {
-      await ensureStoredProcedure(container);
-    }
 
     // 1. Idempotency Check: Read the Place to see if it's already classified
     const { resource: place } = await container.item(storeId, storeId).read<Place>();
