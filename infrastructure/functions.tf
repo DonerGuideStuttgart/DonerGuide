@@ -85,12 +85,12 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
     "IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME"                                      = azurerm_cosmosdb_sql_container.places_container.name
     "IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_INPUT"                                  = azurerm_servicebus_queue.sb_queue_places.name
     "IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_INPUT__fullyQualifiedNamespace"  = azurerm_servicebus_namespace.sb_namespace.name
-    "IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT"                                 = "classified-images"
+    "IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT"                                 = azurerm_servicebus_queue.sb_queue_images.name
     "IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_OUTPUT__fullyQualifiedNamespace" = azurerm_servicebus_namespace.sb_namespace.name
     "IMAGE_CLASSIFIER_STORAGE_ENDPOINT"                                             = azurerm_storage_account.storage_account_functions.primary_blob_endpoint
     "IMAGE_CLASSIFIER_STORAGE_ACCOUNT_NAME"                                         = azurerm_storage_account.storage_account_functions.name
-    "IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME"                                       = "photos"
-    "IMAGE_CLASSIFIER_VISION_ENDPOINT"                                              = azurerm_cognitive_account.vision_free.endpoint
+    "IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME"                                       = azurerm_storage_container.sc_classified_images.name
+    "IMAGE_CLASSIFIER_VISION_ENDPOINT"                                              = azurerm_cognitive_account.vision_paid.endpoint
   }
 }
 
@@ -102,7 +102,7 @@ resource "azurerm_role_assignment" "function_app_role_assignment_image_classifie
 }
 
 resource "azurerm_role_assignment" "image_classifier_vision_role" {
-  scope                = azurerm_cognitive_account.vision_free.id
+  scope                = azurerm_cognitive_account.vision_paid.id
   role_definition_name = "Cognitive Services User"
   principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
 }
