@@ -36,7 +36,7 @@ resource "azurerm_linux_function_app" "place-search-function" {
     "PLACE_SEARCH_STUTTGART_MIN_LON"                                     = "9.038"
     "PLACE_SEARCH_STUTTGART_MAX_LAT"                                     = "48.866"
     "PLACE_SEARCH_STUTTGART_MAX_LON"                                     = "9.315"
-    "GOOGLE_PLACES_API_KEY"                                              = "@Microsoft.KeyVault(SecretUri=" + azurerm_key_vault.kv.vault_uri + "/secrets/google-maps-places-api-key)"
+    "GOOGLE_PLACES_API_KEY"                                              = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.kv.vault_uri}/secrets/google-maps-places-api-key)"
     "PLACE_SEARCH_COSMOSDB_ENDPOINT"                                     = azurerm_cosmosdb_account.cosmosdb_account.endpoint
     "PLACE_SEARCH_COSMOSDB_DATABASE_NAME"                                = azurerm_cosmosdb_sql_database.database.name
     "PLACE_SEARCH_COSMOSDB_CONTAINER_NAME"                               = azurerm_cosmosdb_sql_container.places_container.name
