@@ -10,7 +10,7 @@ resource "azurerm_application_insights" "application_insights_place_search" {
   name                = "${var.prefix}-application-insights-place-search"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "node.js"
+  application_type    = "Node.JS"
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
 
@@ -18,7 +18,7 @@ resource "azurerm_application_insights" "application_insights_image_classifier" 
   name                = "${var.prefix}-application-insights-image-classifier"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "node.js"
+  application_type    = "Node.JS"
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
 
@@ -26,6 +26,6 @@ resource "azurerm_application_insights" "application_insights_llm_analyzer" {
   name                = "${var.prefix}-application-insights-llm-analyzer"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "node.js"
+  application_type    = "Node.JS"
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
