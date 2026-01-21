@@ -16,13 +16,25 @@ export interface VisionServiceConfig {
 
 const DEFAULT_CONFIDENCE_THRESHOLD = 0.6;
 
+// Define the expected shape of the API response
+interface ImageAnalysisResult {
+  tagsResult?: {
+    values: { name: string; confidence: number }[];
+  };
+  objectsResult?: {
+    values: { name: string; confidence: number }[];
+  };
+}
+
 export class VisionService {
+  // ... existing properties ...
   private client: ImageAnalysisClient | undefined;
   private isMockMode: boolean;
   private confidenceThreshold: number;
   private endpoint: string;
 
   constructor(config?: Partial<VisionServiceConfig>) {
+    // ... (unchanged constructor)
     this.endpoint = config?.endpoint ?? process.env.IMAGE_CLASSIFIER_VISION_ENDPOINT ?? "";
     const key = config?.key ?? process.env.IMAGE_CLASSIFIER_VISION_KEY;
     this.isMockMode = config?.enableMockMode ?? (this.endpoint === "" && !key);
@@ -42,9 +54,6 @@ export class VisionService {
         this.endpoint = `https://${this.endpoint}`;
       }
 
-      // Remove any path like /vision/v3.2/analyze if present, as the SDK handles it (SDK expects base endpoint)
-      // Actually SDK documentation usually says endpoint like "https://<resource>.cognitiveservices.azure.com/"
-      // I will strip the path if it looks like a legacy path
       const url = new URL(this.endpoint);
       this.endpoint = `${url.protocol}//${url.host}`;
 
@@ -60,7 +69,7 @@ export class VisionService {
    * Validates that the buffer contains valid image data
    */
   private validateImageBuffer(buffer: Buffer): void {
-    if (!buffer || buffer.length === 0) {
+    if (buffer.length === 0) {
       throw new Error("Image buffer is empty or undefined");
     }
     if (buffer.length < 100) {
@@ -94,7 +103,8 @@ export class VisionService {
         throw new Error(response.body.error.message);
       }
 
-      return this.mapResponseToResult(response.body);
+      // Cast the body to our expected type since the SDK might return unknown/any
+      return this.mapResponseToResult(response.body as ImageAnalysisResult);
     } catch (error: unknown) {
       const errorMessage = `Vision analysis failed: ${error instanceof Error ? error.message : String(error)}`;
       console.error("VisionService:", errorMessage);
@@ -102,15 +112,15 @@ export class VisionService {
     }
   }
 
-  private mapResponseToResult(result: any): VisionAnalysisResult {
+  private mapResponseToResult(result: ImageAnalysisResult): VisionAnalysisResult {
     // Check Tags
-    const tags = result.tagsResult?.values || [];
+    const tags = result.tagsResult?.values ?? [];
 
     // Check Objects if tags are ambiguous
     // const objects = result.objectsResult?.values || [];
 
     // Sort tags by confidence
-    tags.sort((a: any, b: any) => b.confidence - a.confidence);
+    tags.sort((a, b) => b.confidence - a.confidence);
 
     for (const tag of tags) {
       if (tag.confidence < this.confidenceThreshold) continue;

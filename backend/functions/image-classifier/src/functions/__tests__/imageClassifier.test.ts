@@ -157,7 +157,7 @@ describe("imageClassifier Handler", () => {
   });
 
   it("should return undefined if input is invalid", async () => {
-    const result = await imageClassifier({} as any, mockContext);
+    const result = await imageClassifier({} as unknown as PhotoClassificationMessage, mockContext);
     expect(result).toBeUndefined();
     expect(mockContext.error).toHaveBeenCalled();
   });
