@@ -35,6 +35,12 @@ resource "azurerm_role_assignment" "function_app_role_assignment" {
   principal_id         = azurerm_linux_function_app.place-search-function.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "function_app_role_assignment_key_vault" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_function_app.place-search-function.identity[0].principal_id
+}
+
 
 resource "azurerm_linux_function_app" "image-classifier-function" {
   name                                     = "${var.prefix}-image-classifier-func"
