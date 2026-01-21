@@ -17,11 +17,12 @@ resource "azurerm_cognitive_account" "vision_paid" {
 }
 
 resource "azurerm_cognitive_account" "account_llm" {
-  name                = "${var.prefix}-llm-account"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  kind                = "AIServices"
-  sku_name            = "S0"
+  name                  = "${var.prefix}-llm-account"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "AIServices"
+  sku_name              = "S0"
+  custom_subdomain_name = "${var.prefix}-llm-account"
 }
 
 resource "azurerm_cognitive_deployment" "deployment_llm" {
