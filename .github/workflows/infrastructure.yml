@@ -41,3 +41,6 @@ jobs:
         working-directory: infrastructure
         id: apply
         run: terraform apply -auto-approve -input=false tfplan
+
+  redeploy-functions:
+    uses: ./.github/workflows/backend.yml

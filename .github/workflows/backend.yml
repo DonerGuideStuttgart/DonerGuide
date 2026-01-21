@@ -8,6 +8,7 @@ on:
       - "backend/**"
       - ".github/workflows/backend.yml"
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build-and-deploy:
