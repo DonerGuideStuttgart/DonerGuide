@@ -13,13 +13,17 @@ resource "azurerm_linux_function_app" "place-search-function" {
   resource_group_name                      = azurerm_resource_group.rg.name
   service_plan_id                          = azurerm_service_plan.service_plan.id
   ftp_publish_basic_authentication_enabled = false
-  public_network_access_enabled            = false
+  public_network_access_enabled            = true
 
   site_config {
     application_stack {
       node_version = "22"
     }
     application_insights_connection_string = azurerm_application_insights.application_insights_place_search.connection_string
+
+    cors {
+      allowed_origins = ["https://portal.azure.com"]
+    }
   }
 
   storage_uses_managed_identity = true
@@ -72,6 +76,10 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
       node_version = "22"
     }
     application_insights_connection_string = azurerm_application_insights.application_insights_image_classifier.connection_string
+
+    cors {
+      allowed_origins = ["https://portal.azure.com"]
+    }
   }
 
   storage_uses_managed_identity = true
@@ -122,6 +130,10 @@ resource "azurerm_linux_function_app" "llm-analyzer-function" {
       node_version = "22"
     }
     application_insights_connection_string = azurerm_application_insights.application_insights_llm_analyzer.connection_string
+
+    cors {
+      allowed_origins = ["https://portal.azure.com"]
+    }
   }
 
   storage_uses_managed_identity = true
