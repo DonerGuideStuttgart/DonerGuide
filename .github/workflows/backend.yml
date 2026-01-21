@@ -21,6 +21,32 @@ jobs:
     steps:
       - name: "Checkout GitHub Action"
         uses: actions/checkout@v3
+      - name: Login Azure CLI
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Export function app name
+        id: export-function-app-name
+        working-directory: infrastructure
+        run: |
+          terraform init
+          TOKEN=$(terraform output -raw static_web_app_api_token)
+          echo "::add-mask::$TOKEN"
+          echo "api_token=$TOKEN" >> $GITHUB_OUTPUT
+          if [[ ${{ matrix.function }} == "backend/functions/place-search" ]]; then
+            FUNCTION_APP_NAME=$(terraform output -raw function_app_name_place_search)
+            echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
+          elif [[ ${{ matrix.function }} == "backend/functions/image-classifier" ]]; then
+            FUNCTION_APP_NAME=$(terraform output -raw function_app_name_image_classifier)
+            echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
+          elif [[ ${{ matrix.function }} == "backend/functions/llm-analyzer" ]]; then
+            FUNCTION_APP_NAME=$(terraform output -raw function_app_name_llm_analyzer)
+            echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Node Environment
         uses: actions/setup-node@v3
         with:
@@ -30,13 +56,9 @@ jobs:
         run: |
           npm ci
           npm run build
-      - name: Login Azure CLI
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: "Run the Azure Functions action"
         uses: Azure/functions-action@v1
         id: deploy-to-function-app
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          app-name: ${{ steps.export-function-app-name.outputs.function_app_name }}
           package: ${{ matrix.function }}
