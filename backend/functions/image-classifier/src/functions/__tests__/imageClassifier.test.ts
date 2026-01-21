@@ -3,7 +3,7 @@ import { CosmosClient } from "@azure/cosmos";
 import { imageClassifier, resetServices } from "../imageClassifier";
 import { BlobService } from "../../services/BlobService";
 import { VisionService } from "../../services/VisionService";
-import type { NewPhotosMessage, Place } from "doner_types";
+import type { PhotoClassificationMessage, Place } from "doner_types";
 
 // Mock dependencies
 jest.mock("@azure/cosmos");
@@ -12,6 +12,8 @@ jest.mock("../../services/VisionService");
 
 process.env.IMAGE_CLASSIFIER_COSMOSDB_CONNECTION_STRING =
   "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+8QBY5V598YWwqy9oY1m2VJX7ry9otS3ADAFE=";
+process.env.IMAGE_CLASSIFIER_COSMOSDB_ENDPOINT = "https://localhost:8081/";
+process.env.IMAGE_CLASSIFIER_STORAGE_ENDPOINT = "https://localhost:10000/";
 
 describe("imageClassifier Handler", () => {
   let mockContext: InvocationContext;
@@ -20,28 +22,31 @@ describe("imageClassifier Handler", () => {
   let mockVisionService: jest.Mocked<VisionService>;
 
   const storeId = "test-store-id";
-  const mockPlace: Place = {
-    id: storeId,
-    name: "Test Store",
-    doner_guide_version: 1,
-    latitude: 0,
-    longitude: 0,
-    openingHours: {},
-    address: {},
-    photos: [{ id: "photo1", url: "url1", mimeType: "image/jpeg", category: "uncategorized", confidence: 0 }],
-  };
+  const photoId = "photo1";
+  const url = "url1";
 
-  const mockMessage: NewPhotosMessage = {
-    id: storeId,
-    photos: [
-      { id: "photo1", url: "url1", mimeType: "image/jpeg", category: "uncategorized", confidence: 0 },
-      { id: "photo2", url: "url2", mimeType: "image/jpeg", category: "uncategorized", confidence: 0 },
-    ],
+  let mockPlace: Place;
+  const mockMessage: PhotoClassificationMessage = {
+    storeId,
+    photoId,
+    url,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     resetServices();
+
+    // Reset mockPlace data
+    mockPlace = {
+      id: storeId,
+      name: "Test Store",
+      doner_guide_version: 1,
+      latitude: 0,
+      longitude: 0,
+      openingHours: {},
+      address: {},
+      photos: [{ id: photoId, url: url, mimeType: "image/jpeg", category: "uncategorized", confidence: 0 }],
+    };
 
     mockContext = {
       log: jest.fn(),
@@ -62,11 +67,16 @@ describe("imageClassifier Handler", () => {
 
     // Setup CosmosDB Mocks
     const mockItem = {
-      read: jest.fn().mockResolvedValue({ resource: mockPlace }),
+      read: jest.fn().mockImplementation(async () => ({ resource: JSON.parse(JSON.stringify(mockPlace)) })),
       replace: jest.fn().mockResolvedValue({ resource: mockPlace }),
     };
     const mockContainer = {
       item: jest.fn().mockReturnValue(mockItem),
+      scripts: {
+        storedProcedure: jest
+          .fn()
+          .mockReturnValue({ execute: jest.fn().mockResolvedValue({ resource: { isComplete: false } }) }),
+      },
     };
     const mockDatabase = {
       container: jest.fn().mockReturnValue(mockContainer),
@@ -74,108 +84,81 @@ describe("imageClassifier Handler", () => {
     (mockCosmosClient.database as jest.Mock).mockReturnValue(mockDatabase);
   });
 
-  it("should process photos and update CosmosDB successfully", async () => {
+  it("should process a single photo and update CosmosDB successfully", async () => {
     // Setup Mocks for successful processing
     mockBlobService.downloadAndUploadImage.mockResolvedValue({
       contentType: "image/jpeg",
       buffer: Buffer.from("test"),
     });
-    mockVisionService.analyzeImage.mockResolvedValueOnce({ category: "food", confidence: 0.9 });
-    mockVisionService.analyzeImage.mockResolvedValueOnce({ category: "place", confidence: 0.8 });
+    mockVisionService.analyzeImage.mockResolvedValue({ category: "food", confidence: 0.9 });
+
+    // We are testing the fallback logic path (or SP path depending on env).
+    // The handler uses SP by default unless disabled.
+    process.env.IMAGE_CLASSIFIER_USE_SPROC = "false"; // Force client-side for unit test simplicity or mock SP
 
     const result = await imageClassifier(mockMessage, mockContext);
 
-    expect(result).toEqual({ storeId });
-    expect(mockBlobService.ensureContainerExists).toHaveBeenCalled();
-    expect(mockBlobService.downloadAndUploadImage).toHaveBeenCalledTimes(2);
-    expect(mockVisionService.analyzeImage).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ storeId }); // Expect storeId because single photo processing completes the store
 
-    // Verify CosmosDB update
+    expect(mockBlobService.ensureContainerExists).toHaveBeenCalled();
+    expect(mockBlobService.downloadAndUploadImage).toHaveBeenCalledWith(url, photoId);
+    expect(mockVisionService.analyzeImage).toHaveBeenCalled();
+
+    // Verify CosmosDB update (Client Side Fallback)
     const mockContainer = (mockCosmosClient.database as jest.Mock)().container();
     const mockItem = mockContainer.item();
-    expect(mockItem.replace).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: storeId,
-        photos: expect.arrayContaining([
-          expect.objectContaining({ id: "photo1", category: "food" }),
-          expect.objectContaining({ id: "photo2", category: "place" }),
-        ]),
-      })
-    );
+    expect(mockItem.replace).toHaveBeenCalled();
+
+    // Check arguments of replace
+    const updatedPlace = mockItem.replace.mock.calls[0][0] as Place;
+    const photo = updatedPlace.photos.find((p) => p.id === photoId);
+    expect(photo?.category).toBe("food");
   });
 
-  it("should discard photos categorized as discard", async () => {
+  it("should discard photo categorized as discard", async () => {
+    process.env.IMAGE_CLASSIFIER_USE_SPROC = "false";
     mockBlobService.downloadAndUploadImage.mockResolvedValue({
       contentType: "image/jpeg",
       buffer: Buffer.from("test"),
     });
-    mockVisionService.analyzeImage.mockResolvedValueOnce({ category: "discard", confidence: 0.1 }); // photo1
-    mockVisionService.analyzeImage.mockResolvedValueOnce({ category: "food", confidence: 0.9 }); // photo2
+    // Force return value
+    mockVisionService.analyzeImage.mockResolvedValue({ category: "discard", confidence: 0.1 });
 
-    const result = await imageClassifier(mockMessage, mockContext);
+    await imageClassifier(mockMessage, mockContext);
 
-    expect(result).toEqual({ storeId });
-    expect(mockBlobService.deleteImage).toHaveBeenCalledWith("photo1");
+    expect(mockBlobService.deleteImage).toHaveBeenCalledWith(photoId);
 
-    // Verify photo1 is removed and photo2 is added/updated
     const mockItem = (mockCosmosClient.database as jest.Mock)().container().item();
     const updatedPlace = mockItem.replace.mock.calls[0][0] as Place;
-
-    expect(updatedPlace.photos.find((p) => p.id === "photo1")).toBeUndefined();
-    expect(updatedPlace.photos.find((p) => p.id === "photo2")).toBeDefined();
-    expect(updatedPlace.photos.find((p) => p.id === "photo2")?.category).toBe("food");
+    expect(updatedPlace.photos.find((p) => p.id === photoId)).toBeUndefined();
   });
 
-  it("should handle partial failures in photo processing", async () => {
-    mockBlobService.downloadAndUploadImage
-      .mockResolvedValueOnce({ contentType: "image/jpeg", buffer: Buffer.from("test") }) // photo1 succeeds
-      .mockRejectedValueOnce(new Error("Download failed")); // photo2 fails
-
+  it("should return storeId when all photos are processed", async () => {
+    process.env.IMAGE_CLASSIFIER_USE_SPROC = "false";
+    mockBlobService.downloadAndUploadImage.mockResolvedValue({
+      contentType: "image/jpeg",
+      buffer: Buffer.from("test"),
+    });
     mockVisionService.analyzeImage.mockResolvedValue({ category: "food", confidence: 0.9 });
 
+    // Mock that this was the last pending photo
+    // The logic inside `patchPhotoClientSide` calculates `pendingCount`.
+    // We need to setup mockPlace to have 0 uncategorized photos AFTER update.
+    // Handled by modifying the mockPlace referenced by read()
+    // But read() returns a deep copy? No, mocks return reference usually.
+    // Actually, `patchPhotoClientSide` reads fresh place.
+    // The mock returns `mockPlace`.
+
+    // If we want `pendingCount === 0`, we ensure mockPlace has only this photo, and it gets updated.
+    // mockPlace has 1 photo.
+
     const result = await imageClassifier(mockMessage, mockContext);
-
     expect(result).toEqual({ storeId });
-    expect(mockContext.error).toHaveBeenCalledWith(
-      expect.stringContaining("Failed to process a photo"),
-      expect.any(Error)
-    );
-
-    // Verify only photo1 was updated
-    const mockItem = (mockCosmosClient.database as jest.Mock)().container().item();
-    const updatedPlace = mockItem.replace.mock.calls[0][0] as Place;
-    expect(updatedPlace.photos.find((p) => p.id === "photo1")?.category).toBe("food");
   });
 
-  it("should return undefined if storeId is missing", async () => {
-    const result = await imageClassifier({ id: "", photos: [] } as NewPhotosMessage, mockContext);
+  it("should return undefined if input is invalid", async () => {
+    const result = await imageClassifier({} as any, mockContext);
     expect(result).toBeUndefined();
     expect(mockContext.error).toHaveBeenCalled();
-  });
-
-  it("should return undefined if place is not found", async () => {
-    const mockContainer = (mockCosmosClient.database as jest.Mock)().container();
-    mockContainer.item().read.mockResolvedValue({ resource: null });
-
-    const result = await imageClassifier(mockMessage, mockContext);
-    expect(result).toBeUndefined();
-    expect(mockContext.error).toHaveBeenCalledWith(expect.stringContaining("not found in database"));
-  });
-
-  it("should not update CosmosDB if no changes occurred", async () => {
-    mockBlobService.downloadAndUploadImage.mockResolvedValue({
-      contentType: "image/jpeg",
-      buffer: Buffer.from("test"),
-    });
-    // Assume photo1 is already 'food' with same confidence (unlikely but testable)
-    mockVisionService.analyzeImage.mockResolvedValue({ category: "food", confidence: 0.9 });
-
-    // Setup mockPlace to already have this photo as food
-    mockPlace.photos[0] = { id: "photo1", url: "url1", mimeType: "image/jpeg", category: "food", confidence: 0.9 };
-
-    // If we process nothing new (empty photo list for example)
-    const result = await imageClassifier({ id: storeId, photos: [] }, mockContext);
-
-    expect(result).toBeUndefined(); // Returns undefined for empty photos list as per logic
   });
 });

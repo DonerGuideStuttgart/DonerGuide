@@ -78,12 +78,32 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
   identity {
     type = "SystemAssigned"
   }
+
+  app_settings = {
+    "IMAGE_CLASSIFIER_COSMOSDB_ENDPOINT"                                            = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "IMAGE_CLASSIFIER_COSMOSDB_DATABASE_NAME"                                       = azurerm_cosmosdb_sql_database.database.name
+    "IMAGE_CLASSIFIER_COSMOSDB_CONTAINER_NAME"                                      = azurerm_cosmosdb_sql_container.places_container.name
+    "IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_INPUT"                                  = azurerm_servicebus_queue.sb_queue_places.name
+    "IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_INPUT__fullyQualifiedNamespace"  = azurerm_servicebus_namespace.sb_namespace.name
+    "IMAGE_CLASSIFIER_SERVICEBUS_QUEUE_NAME_OUTPUT"                                 = "classified-images"
+    "IMAGE_CLASSIFIER_SERVICEBUS_CONNECTION_STRING_OUTPUT__fullyQualifiedNamespace" = azurerm_servicebus_namespace.sb_namespace.name
+    "IMAGE_CLASSIFIER_STORAGE_ENDPOINT"                                             = azurerm_storage_account.storage_account_functions.primary_blob_endpoint
+    "IMAGE_CLASSIFIER_STORAGE_ACCOUNT_NAME"                                         = azurerm_storage_account.storage_account_functions.name
+    "IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME"                                       = "photos"
+    "IMAGE_CLASSIFIER_VISION_ENDPOINT"                                              = azurerm_cognitive_account.vision_free.endpoint
+  }
 }
 
 
 resource "azurerm_role_assignment" "function_app_role_assignment_image_classifier" {
   scope                = azurerm_storage_account.storage_account_functions.id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "image_classifier_vision_role" {
+  scope                = azurerm_cognitive_account.vision_free.id
+  role_definition_name = "Cognitive Services User"
   principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
 }
 

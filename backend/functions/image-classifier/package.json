@@ -15,10 +15,11 @@
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
+    "@azure-rest/ai-vision-image-analysis": "^1.0.0-beta.3",
     "@azure/cosmos": "^4.8.0",
     "@azure/functions": "^4.0.0",
     "@azure/identity": "^4.13.0",
-    "@azure/storage-blob": "^12.29.1",
+    "@azure/storage-blob": "^12.30.0",
     "axios": "^1.13.2",
     "doner_types": "file:../shared/doner_types"
   },
