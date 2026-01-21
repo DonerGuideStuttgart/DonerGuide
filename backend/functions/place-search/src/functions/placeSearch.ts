@@ -3,7 +3,7 @@
  * later: find additional photos with serpapi.com
  */
 
-import { Container, CosmosClient, PartitionKeyKind, SpatialType } from "@azure/cosmos";
+import { Container, CosmosClient, PartitionKeyKind } from "@azure/cosmos";
 import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Photo, PhotoClassificationMessage, Place } from "doner_types";
 import { GridService } from "../services/grid.service";
