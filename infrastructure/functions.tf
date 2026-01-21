@@ -152,7 +152,7 @@ resource "azurerm_linux_function_app" "llm-analyzer-function" {
     "LLM_ANALYZER_STORAGE_ENDPOINT"                                            = azurerm_storage_account.storage_account_functions.primary_blob_endpoint
     "LLM_ANALYZER_STORAGE_ACCOUNT_NAME"                                        = azurerm_storage_account.storage_account_functions.name
     "LLM_ANALYZER_STORAGE_CONTAINER_NAME"                                      = azurerm_storage_container.sc_classified_images.name
-    "LLM_ANALYZER_FOUNDRY_ENDPOINT"                                            = azurerm_cognitive_account.account_llm.endpoint
+    "LLM_ANALYZER_FOUNDRY_ENDPOINT"                                            = "https://${azurerm_cognitive_account.account_llm.custom_subdomain_name}.openai.azure.com"
     "LLM_ANALYZER_FOUNDRY_DEPLOYMENT_NAME"                                     = azurerm_cognitive_account.account_llm.name
   }
 }
