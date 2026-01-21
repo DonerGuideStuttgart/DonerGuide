@@ -26,7 +26,7 @@ resource "azurerm_cosmosdb_sql_database" "database" {
 }
 
 resource "azurerm_cosmosdb_sql_container" "places_container" {
-  name                  = "places"
+  name                  = "Places"
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.cosmosdb_account.name
   database_name         = azurerm_cosmosdb_sql_database.database.name
@@ -34,11 +34,22 @@ resource "azurerm_cosmosdb_sql_container" "places_container" {
   partition_key_version = "2"
 }
 
-resource "azurerm_cosmosdb_sql_container" "places_playground_container" {
-  name                  = "places-playground"
+resource "azurerm_cosmosdb_sql_container" "grid_cells_container" {
+  name                  = "GridCells"
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.cosmosdb_account.name
   database_name         = azurerm_cosmosdb_sql_database.database.name
   partition_key_paths   = ["/id"]
   partition_key_version = "2"
+
+  indexing_policy {
+    indexing_mode = "consistent"
+    included_path {
+      path = "/*"
+    }
+    spatial_index {
+      path  = "/geometry/*"
+      types = ["Polygon"]
+    }
+  }
 }
