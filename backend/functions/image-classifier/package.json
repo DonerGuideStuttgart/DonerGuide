@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/src/functions/*.js",
   "scripts": {
-    "build": "esbuild src/functions/*.ts --bundle --platform=node --target=node22 --outdir=dist/src/functions --log-level=info --external:@azure/functions --external:@azure/functions-core",
+    "build": "esbuild src/functions/*.ts --bundle --platform=node --target=node22 --outdir=dist/src/functions --log-level=info --external:@azure/functions-core",
     "watch": "tsc -w",
     "clean": "rimraf dist",
     "start": "func start --port 7072",
