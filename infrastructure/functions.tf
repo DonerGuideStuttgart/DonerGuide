@@ -27,6 +27,22 @@ resource "azurerm_linux_function_app" "place-search-function" {
   identity {
     type = "SystemAssigned"
   }
+
+  app_settings = {
+    "PLACE_SEARCH_GRID_VERSION"                                          = "v1"
+    "PLACE_SEARCH_CRON"                                                  = "0 0 0 1 1 *"
+    "PLACE_SEARCH_DRY_RUN"                                               = false
+    "PLACE_SEARCH_STUTTGART_MIN_LAT"                                     = "48.692"
+    "PLACE_SEARCH_STUTTGART_MIN_LON"                                     = "9.038"
+    "PLACE_SEARCH_STUTTGART_MAX_LAT"                                     = "48.866"
+    "PLACE_SEARCH_STUTTGART_MAX_LON"                                     = "9.315"
+    "GOOGLE_PLACES_API_KEY"                                              = "@Microsoft.KeyVault(SecretUri=" + azurerm_key_vault.kv.vault_uri + "/secrets/google-maps-places-api-key)"
+    "PLACE_SEARCH_COSMOSDB_ENDPOINT"                                     = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "PLACE_SEARCH_COSMOSDB_DATABASE_NAME"                                = azurerm_cosmosdb_sql_database.database.name
+    "PLACE_SEARCH_COSMOSDB_CONTAINER_NAME"                               = azurerm_cosmosdb_sql_container.places_container.name
+    "PLACE_SEARCH_SERVICEBUS_QUEUE_NAME"                                 = azurerm_servicebus_queue.sb_queue_places.name
+    "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING__fullyQualifiedNamespace" = azurerm_servicebus_namespace.sb_namespace.name
+  }
 }
 
 resource "azurerm_role_assignment" "function_app_role_assignment" {
