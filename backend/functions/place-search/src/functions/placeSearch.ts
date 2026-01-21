@@ -23,7 +23,7 @@ if (COSMOSDB_KEY) {
 }
 
 const serviceBusOutput = output.serviceBusQueue({
-  queueName: "places",
+  queueName: process.env.PLACE_SEARCH_SERVICEBUS_QUEUE_NAME ?? "places",
   connection: "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING",
 });
 
