@@ -156,6 +156,12 @@ resource "azurerm_role_assignment" "llm_analyzer_sb_role" {
   principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "llm_analyzer_openai_role" {
+  scope                = azurerm_cognitive_account.account_llm.id
+  role_definition_name = "Cognitive Services OpenAI User"
+  principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
+}
+
 
 # --- Cosmos DB Role Assignments ---
 

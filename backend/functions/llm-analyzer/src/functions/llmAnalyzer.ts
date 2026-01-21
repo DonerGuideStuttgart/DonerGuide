@@ -5,7 +5,7 @@ import { AzureOpenAI } from "openai";
 import { analyzeImage } from "../helper/analyzeImage";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { getImages } from "../helper/getImages";
-import { DefaultAzureCredential } from "@azure/identity";
+import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 import { StorageSharedKeyCredential } from "@azure/storage-blob";
 
 const QUEUE_NAME_INPUT = process.env.LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT ?? "classified-images";
@@ -34,8 +34,15 @@ if (COSMOSDB_KEY) {
 const aiClient = new AzureOpenAI({
   endpoint: FOUNDRY_ENDPOINT,
   apiVersion: "2025-04-01-preview",
-  apiKey: FOUNDRY_API_KEY,
   deployment: FOUNDRY_DEPLOYMENT_NAME,
+  ...(FOUNDRY_API_KEY
+    ? { apiKey: FOUNDRY_API_KEY }
+    : {
+        azureADTokenProvider: getBearerTokenProvider(
+          new DefaultAzureCredential(),
+          "https://cognitiveservices.azure.com/.default"
+        ),
+      }),
 });
 
 let containerClient: ContainerClient;
