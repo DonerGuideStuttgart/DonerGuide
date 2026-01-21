@@ -117,6 +117,12 @@ resource "azurerm_role_assignment" "image_classifier_vision_role" {
   principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "image_classifier_cosmos_role" {
+  scope                = azurerm_cosmosdb_account.cosmosdb_account.id
+  role_definition_name = "Cosmos DB Operator"
+  principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
+}
+
 resource "azurerm_linux_function_app" "llm-analyzer-function" {
   name                                     = "${var.prefix}-llm-analyzer-func"
   location                                 = azurerm_resource_group.rg.location
@@ -204,7 +210,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "place_search_cosmos_role" {
 resource "azurerm_cosmosdb_sql_role_assignment" "image_classifier_cosmos_role" {
   resource_group_name = azurerm_resource_group.rg.name
   account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
-  role_definition_id  = azurerm_cosmosdb_sql_role_definition.function_cosmos_access.id
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
   principal_id        = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
   scope               = azurerm_cosmosdb_account.cosmosdb_account.id
 }

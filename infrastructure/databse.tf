@@ -49,20 +49,3 @@ resource "azurerm_cosmosdb_sql_container" "grid_cells_container" {
     }
   }
 }
-
-resource "azurerm_cosmosdb_sql_role_definition" "function_cosmos_access" {
-  resource_group_name = azurerm_resource_group.rg.name
-  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
-  name                = "FunctionCosmosAccess"
-  assignable_scopes   = [azurerm_cosmosdb_account.cosmosdb_account.id]
-
-  permissions {
-    data_actions = [
-      "Microsoft.DocumentDB/databaseAccounts/readMetadata",
-      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*",
-      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*",
-      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
-      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/storedProcedures/*",
-    ]
-  }
-}
