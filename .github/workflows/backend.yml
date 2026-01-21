@@ -51,11 +51,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "22"
+
+      - name: Install Dependencies (Root)
+        working-directory: backend/functions
+        run: npm ci
+
       - name: Build Function
-        working-directory: ${{ matrix.function }}
+        working-directory: backend/functions
         run: |
-          npm ci
-          npm run build
+          WORKSPACE_NAME=$(basename ${{ matrix.function }})
+          npm run build --workspace=$WORKSPACE_NAME
       - name: "Run the Azure Functions action"
         uses: Azure/functions-action@v1
         id: deploy-to-function-app
