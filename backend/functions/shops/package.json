@@ -13,7 +13,9 @@
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@azure/functions": "^4.0.0"
+    "@azure/cosmos": "^4.9.0",
+    "@azure/functions": "^4.0.0",
+    "@azure/identity": "^4.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
