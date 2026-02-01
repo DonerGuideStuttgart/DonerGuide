@@ -20,7 +20,6 @@ project.lock.json
 /data
 .secrets
 appsettings.json
-local.settings.json
 
 node_modules
 dist
@@ -46,3 +45,4 @@ __pycache__/
 __blobstorage__
 __queuestorage__
 __azurite_db*__.json
+
