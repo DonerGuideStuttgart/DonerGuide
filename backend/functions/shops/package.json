@@ -23,6 +23,7 @@
     "@types/node": "^22.0.0",
     "azure-functions-core-tools": "^4.x",
     "rimraf": "^6.1.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "concurrently": "^9.2.1"
   }
 }

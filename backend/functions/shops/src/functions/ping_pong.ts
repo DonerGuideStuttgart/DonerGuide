@@ -9,9 +9,8 @@ app.http("ping_pong", {
   handler: ping_pong,
 });
 
-export function ping_pong(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export function ping_pong(request: HttpRequest, context: InvocationContext): HttpResponseInit {
   return {
-    status: 200,
     body: "pong",
-  };
+  } as HttpResponseInit;
 }

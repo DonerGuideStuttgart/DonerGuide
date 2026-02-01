@@ -3,6 +3,21 @@ include:
 
 services:
 
+  doner_types_builder:
+    image: node:22
+    container_name: doner_types_builder
+    restart: no
+    working_dir: /app
+    volumes:
+      - ./functions:/app
+      - node_modules_shared:/app/shared/doner_types/node_modules
+      - node_dist_shared:/app/shared/doner_types/dist    
+    command: >-
+      sh -c "
+      npm install --prefix shared/doner_types &&
+      npm run build --prefix shared/doner_types
+      "
+
   place-search:
     image: node:22
     container_name: "place-search"
@@ -14,14 +29,15 @@ services:
       - node_dist_place-search:/app/place-search/dist
       - node_dist_shared:/app/shared/doner_types/dist
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
       - azurite
+      - doner_types_builder
     ports:
       - 7071:7071
     env_file:
@@ -40,14 +56,15 @@ services:
       - node_dist_image-classifier:/app/image-classifier/dist
       - node_dist_shared:/app/shared/doner_types/dist
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
       - azurite
+      - doner_types_builder
     ports:
       - 7072:7072
     env_file:
@@ -66,13 +83,14 @@ services:
       - node_dist_llm-analyzer:/app/llm-analyzer/dist
       - node_dist_shared:/app/shared/doner_types/dist
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
+      - doner_types_builder
     ports:
       - 7073:7073
     env_file:
@@ -91,13 +109,14 @@ services:
       - node_dist_shops:/app/shops/dist
       - node_dist_shared:/app/shared/doner_types/dist
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
-        depends_on:
+      npm run dev
+      "
+    depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
+      - doner_types_builder
     ports:
       - 7074:7074
     env_file:
