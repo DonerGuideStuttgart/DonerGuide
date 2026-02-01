@@ -5,6 +5,7 @@ services:
 
   doner_types_builder:
     image: node:22
+    platform: linux/amd64
     container_name: doner_types_builder
     restart: no
     working_dir: /app
@@ -20,6 +21,7 @@ services:
 
   place-search:
     image: node:22
+    platform: linux/amd64
     container_name: "place-search"
     working_dir: /app/place-search
     volumes:
@@ -47,6 +49,7 @@ services:
 
   image-classifier:
     image: node:22
+    platform: linux/amd64
     container_name: "image-classifier"
     working_dir: /app/image-classifier
     volumes:
@@ -74,6 +77,7 @@ services:
 
   llm-analyzer:
     image: node:22
+    platform: linux/amd64
     container_name: "llm-analyzer"
     working_dir: /app/llm-analyzer
     volumes:
@@ -100,6 +104,7 @@ services:
 
   shops:
     image: node:22
+    platform: linux/amd64
     container_name: shops
     working_dir: /app/shops
     volumes:
