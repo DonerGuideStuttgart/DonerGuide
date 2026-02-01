@@ -16,7 +16,7 @@ services:
       - /app/node_modules
     command: >-
       sh -c "
-      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm install --legacy-peer-deps --no-bin-links &&
       npm run build
       "
 
@@ -34,7 +34,7 @@ services:
 
     command: >-
       sh -c "
-      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm install --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -62,7 +62,7 @@ services:
       - /app/image-classifier/dist
     command: >-
       sh -c "
-      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm install --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -90,7 +90,7 @@ services:
       - /app/llm-analyzer/dist
     command: >-
       sh -c "
-      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm install --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -117,7 +117,7 @@ services:
       - /app/shops/dist
     command: >-
       sh -c "
-      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm install --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
