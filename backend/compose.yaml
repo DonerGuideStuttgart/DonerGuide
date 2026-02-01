@@ -12,7 +12,7 @@ services:
     volumes:
       - ./functions:/app
       - /app/shared/doner_types/node_modules
-      - /app/node_modules
+      - node_modules_shared:/app/node_modules
       - doner_types_node_dist:/app/shared/doner_types/dist
       - node_modules_cache:/root/.npm
     command: >-
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./functions:/app
       - doner_types_node_dist:/app/shared/doner_types/dist
-      - /app/node_modules
+      - node_modules_shared:/app/node_modules
       - /app/place-search/node_modules
       - /app/place-search/dist
       - node_modules_cache:/root/.npm
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./functions:/app
       - doner_types_node_dist:/app/shared/doner_types/dist
-      - /app/node_modules
+      - node_modules_shared:/app/node_modules
       - /app/image-classifier/node_modules
       - /app/image-classifier/dist
       - node_modules_cache:/root/.npm
@@ -88,7 +88,7 @@ services:
     volumes:
       - ./functions:/app
       - doner_types_node_dist:/app/shared/doner_types/dist
-      - /app/node_modules
+      - node_modules_shared:/app/node_modules
       - /app/llm-analyzer/node_modules
       - /app/llm-analyzer/dist
       - node_modules_cache:/root/.npm
@@ -116,7 +116,7 @@ services:
     volumes:
       - ./functions:/app
       - doner_types_node_dist:/app/shared/doner_types/dist
-      - /app/node_modules
+      - node_modules_shared:/app/node_modules
       - /app/shops/node_modules
       - /app/shops/dist
       - node_modules_cache:/root/.npm
@@ -139,3 +139,4 @@ services:
 volumes:
   doner_types_node_dist:
   node_modules_cache:
+  node_modules_shared:
