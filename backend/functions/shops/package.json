@@ -4,12 +4,14 @@
   "description": "",
   "main": "dist/src/functions/*.js",
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/functions/*.ts --bundle --platform=node --target=node22 --outdir=dist/src/functions --log-level=info --external:@azure/functions-core",
     "watch": "tsc -w",
     "clean": "rimraf dist",
-    "prestart": "npm run clean && npm run build",
-    "start": "func start",
-    "test": "echo \"No tests yet...\"",
+    "start": "func start --port 7074",
+    "dev": "concurrently --raw 'npm run watch' 'npm run start'",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
