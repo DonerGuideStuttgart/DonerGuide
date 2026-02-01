@@ -5,7 +5,6 @@ services:
 
   doner_types_builder:
     image: node:22
-    platform: linux/amd64
     container_name: doner_types_builder
     restart: no
     working_dir: /app/shared/doner_types
