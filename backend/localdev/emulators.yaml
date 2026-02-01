@@ -1,0 +1,55 @@
+azurite:
+  image: mcr.microsoft.com/azure-storage/azurite
+  container_name: "azurite"
+  hostname: azurite
+  restart: always
+  ports:
+    - "10000:10000"
+    - "10001:10001"
+    - "10002:10002"
+
+cosmosdb-emulator:
+  image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+  container_name: "cosmosdb-emulator"
+  hostname: cosmosdb-emulator
+  restart: always
+  command: ["--gateway-endpoint", "cosmosdb-emulator"]
+  ports:
+    - "8081:8081"
+    - "1234:1234"
+
+servicebus-emulator:
+  image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+  container_name: "servicebus-emulator"
+  hostname: servicebus-emulator
+  restart: always
+  volumes:
+    - ./ServiceBus_Emulator.Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+  ports:
+    - "5672:5672"
+    - "5300:5300"
+  environment:
+    SQL_SERVER: sqledge
+    MSSQL_SA_PASSWORD: "Secure!12346"
+    ACCEPT_EULA: "Y"
+  depends_on:
+    sqledge:
+      condition: service_healthy
+
+sqledge:
+  image: "mcr.microsoft.com/mssql/server:2022-latest"
+  container_name: "sqledge"
+  hostname: sqledge
+  restart: always
+  environment:
+    ACCEPT_EULA: "Y"
+    SA_PASSWORD: "Secure!12346"
+  healthcheck:
+    test:
+      [
+        "CMD-SHELL",
+        "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Secure!12346' -Q 'SELECT 1' -C",
+      ]
+    interval: 10s
+    timeout: 5s
+    retries: 10
