@@ -137,6 +137,5 @@ services:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 volumes:
-  doner_types_node_modules:
   doner_types_node_dist:
   node_modules_cache:
