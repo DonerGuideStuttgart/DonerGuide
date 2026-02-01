@@ -8,15 +8,16 @@ services:
     platform: linux/amd64
     container_name: doner_types_builder
     restart: no
-    working_dir: /app
+    working_dir: /app/shared/doner_types
     volumes:
       - ./functions:/app
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_shared:/app/shared/doner_types/dist    
+      - doner_types_node_modules:/app/shared/doner_types/node_modules
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - /app/node_modules
     command: >-
       sh -c "
-      npm install --prefix shared/doner_types &&
-      npm run build --prefix shared/doner_types
+      npm install --save --legacy-peer-deps --no-bin-links &&
+      npm run build
       "
 
   place-search:
@@ -26,13 +27,14 @@ services:
     working_dir: /app/place-search
     volumes:
       - ./functions:/app
-      - node_modules_place-search:/app/place-search/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_place-search:/app/place-search/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - /app/node_modules
+      - /app/place-search/node_modules
+      - /app/place-search/dist
+
     command: >-
       sh -c "
-      npm install &&
+      npm install --save --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -54,13 +56,13 @@ services:
     working_dir: /app/image-classifier
     volumes:
       - ./functions:/app
-      - node_modules_image-classifier:/app/image-classifier/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_image-classifier:/app/image-classifier/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - /app/node_modules
+      - /app/image-classifier/node_modules
+      - /app/image-classifier/dist
     command: >-
       sh -c "
-      npm install &&
+      npm install --save --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -82,13 +84,13 @@ services:
     working_dir: /app/llm-analyzer
     volumes:
       - ./functions:/app
-      - node_modules_llm-analyzer:/app/llm-analyzer/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_llm-analyzer:/app/llm-analyzer/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - /app/node_modules
+      - /app/llm-analyzer/node_modules
+      - /app/llm-analyzer/dist
     command: >-
       sh -c "
-      npm install &&
+      npm install --save --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -109,13 +111,13 @@ services:
     working_dir: /app/shops
     volumes:
       - ./functions:/app
-      - node_modules_shops:/app/shops/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_shops:/app/shops/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - /app/node_modules
+      - /app/shops/node_modules
+      - /app/shops/dist
     command: >-
       sh -c "
-      npm install &&
+      npm install --save --legacy-peer-deps --no-bin-links &&
       npm run dev
       "
     depends_on:
@@ -129,50 +131,6 @@ services:
     environment:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
-  places-reader:
-    image: node:22
-    container_name: "places-reader"
-    working_dir: /app
-    restart: always
-    volumes:
-      - ./helper/service-bus-reader:/app
-      - node_modules_service-bus-reader:/app/node_modules
-      - node_dist_service-bus-reader:/app/node_modules
-    command: sh -c "npm install && npm start"
-    depends_on:
-      - servicebus-emulator
-    environment:
-      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
-      QUEUE_NAME: "places"
-      BATCH_SIZE: "10"
-  
-  image-classifier-reader:
-    image: node:22
-    container_name: "image-classifier-reader"
-    working_dir: /app
-    restart: always
-    volumes:
-      - ./helper/service-bus-reader:/app
-      - node_modules_service-bus-reader:/app/node_modules
-      - node_dist_service-bus-reader:/app/node_modules
-    command: sh -c "npm install && npm start"
-    depends_on:
-      - servicebus-emulator
-    environment:
-      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
-      QUEUE_NAME: "classified-images"
-      BATCH_SIZE: "10"
-
 volumes:
-  node_modules_place-search:
-  node_modules_image-classifier:
-  node_modules_llm-analyzer:
-  node_modules_service-bus-reader:
-  node_modules_shops:
-  node_modules_shared:
-  node_dist_place-search:
-  node_dist_image-classifier:
-  node_dist_llm-analyzer:
-  node_dist_service-bus-reader:
-  node_dist_shared:
-  node_dist_shops:
+  doner_types_node_modules:
+  doner_types_node_dist:
