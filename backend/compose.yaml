@@ -90,9 +90,11 @@ services:
     depends_on:
       - servicebus-emulator
     environment:
-      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       QUEUE_NAME: "places"
       BATCH_SIZE: "10"
+    profiles:
+      - reader
   
   image-classifier-reader:
     image: node:22
@@ -107,15 +109,18 @@ services:
     depends_on:
       - servicebus-emulator
     environment:
-      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       QUEUE_NAME: "classified-images"
       BATCH_SIZE: "10"
+    profiles:
+      - reader
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     container_name: "azurite"
     hostname: azurite
     restart: always
+    command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0","--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]
     ports:
       - "10000:10000"
       - "10001:10001"
