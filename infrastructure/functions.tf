@@ -34,7 +34,7 @@ resource "azurerm_linux_function_app" "place-search-function" {
   }
 
   app_settings = {
-    "PLACE_SEARCH_GRID_VERSION"                                          = "v1"
+    "PLACE_SEARCH_GRID_VERSION"                                          = "v2"
     "PLACE_SEARCH_CRON"                                                  = "0 0 0 1 1 *"
     "PLACE_SEARCH_DRY_RUN"                                               = false
     "PLACE_SEARCH_STUTTGART_MIN_LAT"                                     = "48.692"
