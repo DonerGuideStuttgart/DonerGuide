@@ -8,7 +8,7 @@ import Phone from '@/assets/icons/phone.svg'
 import Badge from '@/components/badge/Badge'
 import { badgeConfig } from '@/components/badge/badgeConfig'
 import ImageCarousel from '@/components/ImageCarousel'
-import { fetchPlaceBySlug, fetchPlaces } from '@/helpers/api'
+import { fetchPlaceById, fetchPlaceBySlug, fetchPlaces } from '@/helpers/api'
 import {
 	formatTimeRange,
 	getCurrentTimeInfo,
@@ -72,7 +72,7 @@ export async function generateStaticParams() {
 export default async function StoreDetail({ params }: Props) {
 	const { slug } = await params
 
-	const store: Store = await fetchPlaceBySlug(slug)
+	const store: Store = await fetchPlaceById(slug)
 
 	if (!store) {
 		return notFound()

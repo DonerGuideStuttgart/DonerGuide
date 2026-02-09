@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=http;AccountName=test_account_place_search_timer_trigger;AccountKey=secure_key;BlobEndpoint=http://azurite:10000;QueueEndpoint=http://azurite:10001;TableEndpoint=http://azurite:10002;"
+  },
+  "ConnectionStrings": {},
+  "Host": {
+    "LocalHttpPort": 7074,
+    "CORS": "http://localhost:3000",
+    "CORSCredentials": true
+  }
+}

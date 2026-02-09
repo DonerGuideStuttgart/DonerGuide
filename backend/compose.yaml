@@ -1,24 +1,49 @@
+include:
+  - ./localdev/emulators.yaml
+
 services:
+
+  doner_types_builder:
+    image: node:22
+    platform: linux/amd64
+    container_name: doner_types_builder
+    restart: no
+    working_dir: /app/shared/doner_types
+    volumes:
+      - ./functions:/app
+      - /app/shared/doner_types/node_modules
+      - node_modules_shared:/app/node_modules
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - node_modules_cache:/root/.npm
+    command: >-
+      sh -c "
+      npm install --prefix /app &&
+      npm install &&
+      npm run build
+      "
 
   place-search:
     image: node:22
+    platform: linux/amd64
     container_name: "place-search"
     working_dir: /app/place-search
     volumes:
       - ./functions:/app
-      - node_modules_place-search:/app/place-search/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_place-search:/app/place-search/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - node_modules_shared:/app/node_modules
+      - /app/place-search/node_modules
+      - /app/place-search/dist
+      - node_modules_cache:/root/.npm
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
       - azurite
+      - doner_types_builder
     ports:
       - 7071:7071
     env_file:
@@ -28,23 +53,26 @@ services:
 
   image-classifier:
     image: node:22
+    platform: linux/amd64
     container_name: "image-classifier"
     working_dir: /app/image-classifier
     volumes:
       - ./functions:/app
-      - node_modules_image-classifier:/app/image-classifier/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_image-classifier:/app/image-classifier/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - node_modules_shared:/app/node_modules
+      - /app/image-classifier/node_modules
+      - /app/image-classifier/dist
+      - node_modules_cache:/root/.npm
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
       - azurite
+      - doner_types_builder
     ports:
       - 7072:7072
     env_file:
@@ -54,28 +82,60 @@ services:
 
   llm-analyzer:
     image: node:22
+    platform: linux/amd64
     container_name: "llm-analyzer"
     working_dir: /app/llm-analyzer
     volumes:
       - ./functions:/app
-      - node_modules_llm-analyzer:/app/llm-analyzer/node_modules
-      - node_modules_shared:/app/shared/doner_types/node_modules
-      - node_dist_llm-analyzer:/app/llm-analyzer/dist
-      - node_dist_shared:/app/shared/doner_types/dist
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - node_modules_shared:/app/node_modules
+      - /app/llm-analyzer/node_modules
+      - /app/llm-analyzer/dist
+      - node_modules_cache:/root/.npm
     command: >-
-      sh -c "npm install --prefix ../shared/doner_types &&
-      npm run build --prefix ../shared/doner_types &&
+      sh -c "
       npm install &&
-      npm run dev"
+      npm run dev
+      "
     depends_on:
       - servicebus-emulator
       - cosmosdb-emulator
+      - doner_types_builder
     ports:
       - 7073:7073
     env_file:
       - ./functions/llm-analyzer/.env
     environment:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
+  shops:
+    image: node:22
+    platform: linux/amd64
+    container_name: shops
+    working_dir: /app/shops
+    volumes:
+      - ./functions:/app
+      - doner_types_node_dist:/app/shared/doner_types/dist
+      - node_modules_shared:/app/node_modules
+      - /app/shops/node_modules
+      - /app/shops/dist
+      - node_modules_cache:/root/.npm
+    command: >-
+      sh -c "
+      npm install &&
+      npm run dev
+      "
+    depends_on:
+      - servicebus-emulator
+      - cosmosdb-emulator
+      - doner_types_builder
+    ports:
+      - 7074:7074
+    env_file:
+      - ./functions/shops/.env
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
 
   places-reader:
     image: node:22
@@ -122,60 +182,13 @@ services:
     restart: always
     command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0","--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]
     ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-  
-  cosmosdb-emulator:
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-    container_name: "cosmosdb-emulator"
-    hostname: cosmosdb-emulator
-    restart: always
-    command: ["--gateway-endpoint", "cosmosdb-emulator"]
-    ports:
-      - "8081:8081"
-      - "1234:1234"
-
-  servicebus-emulator:
-    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
-    container_name: "servicebus-emulator"
-    hostname: servicebus-emulator
-    restart: always
-    volumes:
-      - ./localdev/ServiceBus_Emulator.Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
-    ports:
-      - "5672:5672"
-      - "5300:5300"
+      - 7074:7074
+    env_file:
+      - ./functions/shops/.env
     environment:
-      SQL_SERVER: sqledge
-      MSSQL_SA_PASSWORD: "Secure!12346"
-      ACCEPT_EULA: "Y"
-    depends_on:
-      sqledge:
-        condition: service_healthy
-    
-  sqledge:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
-    container_name: "sqledge"
-    hostname: sqledge
-    restart: always
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Secure!12346"
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Secure!12346' -Q 'SELECT 1' -C"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 volumes:
-  node_modules_place-search:
-  node_modules_image-classifier:
-  node_modules_llm-analyzer:
-  node_modules_service-bus-reader:
+  doner_types_node_dist:
+  node_modules_cache:
   node_modules_shared:
-  node_dist_place-search:
-  node_dist_image-classifier:
-  node_dist_llm-analyzer:
-  node_dist_service-bus-reader:
-  node_dist_shared:
