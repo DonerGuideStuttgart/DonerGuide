@@ -1,10 +1,10 @@
 import { InvocationContext } from "@azure/functions";
 import { AzureOpenAI } from "openai";
 import { ParsedChatCompletion } from "openai/resources/chat/completions";
-import { StoreAnalysis, storeAnalysisSchema } from "./doner_types";
+import { StoreAnalysis, storeAnalysisSchema } from "doner_types";
 import { getRandomPersona } from "./prompts";
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+ 
 export async function analyzeImage(
   context: InvocationContext,
   aiClient: AzureOpenAI,
@@ -42,4 +42,4 @@ export async function analyzeImage(
 
   return result;
 }
-/* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+ 
