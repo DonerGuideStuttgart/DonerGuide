@@ -35,17 +35,17 @@ resource "cloudflare_dns_record" "api_cname" {
   name    = "api"
   type    = "CNAME"
   ttl     = 1
-  content = azurerm_static_web_app.frontend_app.default_host_name
+  content = azurerm_linux_function_app.shops-function.default_hostname
 }
 
 resource "cloudflare_dns_record" "api_verification" {
   zone_id = "b2a8a9947bfdebca46980e4684d1762e"
-  name    = "api"
+  name    = "asuid.api"
   type    = "TXT"
   ttl     = 1
-  content = azurerm_static_web_app_custom_domain.frontend_domain.validation_token
+  content = azurerm_linux_function_app.shops-function.custom_domain_verification_id
 
-  depends_on = [azurerm_static_web_app_custom_domain.frontend_domain]
-  count      = azurerm_static_web_app_custom_domain.frontend_domain.validation_token != "" ? 1 : 0
+  depends_on = [azurerm_linux_function_app.shops-function]
+  count      = azurerm_linux_function_app.shops-function.custom_domain_verification_id != "" ? 1 : 0
 }
 
