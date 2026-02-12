@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { app, HttpRequest, HttpResponseInit, InvocationContext, Timer } from "@azure/functions";
 
 app.http("ping_pong", {
   methods: ["GET"],
@@ -13,4 +13,13 @@ export function ping_pong(request: HttpRequest, context: InvocationContext): Htt
   return {
     body: "pong",
   } as HttpResponseInit;
+}
+
+app.timer("pre_warm", {
+  schedule: "0 */15 * * * *",
+  handler: pre_warm,
+});
+
+export function pre_warm(myTimer: Timer, context: InvocationContext): void {
+  null;
 }
