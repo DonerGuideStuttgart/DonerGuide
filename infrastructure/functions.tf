@@ -200,6 +200,8 @@ resource "azurerm_app_service_custom_hostname_binding" "shops_function_hostname"
   hostname            = "api.doenerguide-stuttgart.de"
   app_service_name    = azurerm_linux_function_app.shops-function.name
   resource_group_name = azurerm_resource_group.rg.name
+
+  depends_on = [cloudflare_dns_record.api_verification]
 }
 
 resource "azurerm_role_assignment" "function_app_role_assignment_shops" {
