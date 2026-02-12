@@ -61,6 +61,7 @@ jobs:
         working-directory: backend/functions
         run: |
           WORKSPACE_NAME=$(basename ${{ matrix.function }})
+          npm run build --workspace=shared/doner_types
           npm run build --workspace=$WORKSPACE_NAME
       - name: "Run the Azure Functions action"
         uses: Azure/functions-action@v1
