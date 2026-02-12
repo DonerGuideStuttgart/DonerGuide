@@ -163,6 +163,52 @@ resource "azurerm_role_assignment" "function_app_role_assignment_llm_analyzer" {
   principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
 }
 
+resource "azurerm_linux_function_app" "shops-function" {
+  name                                     = "${var.prefix}-shops-func"
+  location                                 = azurerm_resource_group.rg.location
+  resource_group_name                      = azurerm_resource_group.rg.name
+  service_plan_id                          = azurerm_service_plan.service_plan.id
+  ftp_publish_basic_authentication_enabled = false
+  public_network_access_enabled            = true
+
+  site_config {
+    application_stack {
+      node_version = "22"
+    }
+    application_insights_connection_string = azurerm_application_insights.application_insights_shops.connection_string
+
+    cors {
+      allowed_origins = ["*"]
+    }
+  }
+
+  storage_uses_managed_identity = true
+  storage_account_name          = azurerm_storage_account.storage_account_functions.name
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  app_settings = {
+    "SHOPS_COSMOSDB_ENDPOINT"       = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "SHOPS_COSMOSDB_DATABASE_NAME"  = azurerm_cosmosdb_sql_database.database.name
+    "SHOPS_COSMOSDB_CONTAINER_NAME" = azurerm_cosmosdb_sql_container.places_container.name
+  }
+}
+
+resource "azurerm_app_service_custom_hostname_binding" "shops_function_hostname" {
+  hostname            = "api.doenerguide-stuttgart.de"
+  app_service_name    = azurerm_linux_function_app.shops-function.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_role_assignment" "function_app_role_assignment_shops" {
+  scope                = azurerm_storage_account.storage_account_functions.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_linux_function_app.shops-function.identity[0].principal_id
+}
+
+
 
 # --- Service Bus Role Assignments ---
 
