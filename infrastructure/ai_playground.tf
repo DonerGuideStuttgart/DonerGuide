@@ -26,19 +26,3 @@ resource "azurerm_cognitive_deployment" "ai_playground_deployment_llm" {
     version = "2025-08-07"
   }
 }
-
-resource "azurerm_cognitive_deployment" "ai_playground_deployment_image" {
-  name                 = "${var.prefix}-image-deployment-playground"
-  cognitive_account_id = azurerm_cognitive_account.ai_playground_account_llm.id
-
-  sku {
-    name     = "GlobalStandard"
-    capacity = 100
-  }
-
-  model {
-    format  = "OpenAI"
-    name    = "gpt-image-1-mini"
-    version = "2025-08-07"
-  }
-}
