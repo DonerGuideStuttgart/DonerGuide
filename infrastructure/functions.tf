@@ -190,9 +190,9 @@ resource "azurerm_linux_function_app" "shops-function" {
   }
 
   app_settings = {
-    "SHOPS_COSMOSDB_ENDPOINT"       = azurerm_cosmosdb_account.cosmosdb_account.endpoint
-    "SHOPS_COSMOSDB_DATABASE_NAME"  = azurerm_cosmosdb_sql_database.database.name
-    "SHOPS_COSMOSDB_CONTAINER_NAME" = azurerm_cosmosdb_sql_container.places_container.name
+    "SHOP_COSMOSDB_ENDPOINT"      = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "SHOP_COSMOSDB_DATABASE_NAME" = azurerm_cosmosdb_sql_database.database.name
+    "COSMOSDB_CONTAINER_ID"       = azurerm_cosmosdb_sql_container.places_container.name
   }
 }
 
@@ -208,6 +208,14 @@ resource "azurerm_role_assignment" "function_app_role_assignment_shops" {
   scope                = azurerm_storage_account.storage_account_functions.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_function_app.shops-function.identity[0].principal_id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "shops_cosmos_role" {
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_function_app.shops-function.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.cosmosdb_account.id
 }
 
 
