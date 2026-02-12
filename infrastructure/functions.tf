@@ -48,6 +48,16 @@ resource "azurerm_linux_function_app" "place-search-function" {
     "PLACE_SEARCH_SERVICEBUS_QUEUE_NAME"                                 = azurerm_servicebus_queue.sb_queue_places.name
     "PLACE_SEARCH_SERVICEBUS_CONNECTION_STRING__fullyQualifiedNamespace" = "${azurerm_servicebus_namespace.sb_namespace.name}.servicebus.windows.net"
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"],
+      site_config[0].application_stack
+    ]
+  }
+
 }
 
 resource "azurerm_role_assignment" "function_app_role_assignment" {
@@ -102,6 +112,15 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
     "IMAGE_CLASSIFIER_STORAGE_CONTAINER_NAME"                                       = azurerm_storage_container.sc_classified_images.name
     "IMAGE_CLASSIFIER_VISION_ENDPOINT"                                              = azurerm_cognitive_account.vision_paid.endpoint
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"],
+      site_config[0].application_stack
+    ]
+  }
 }
 
 
@@ -155,6 +174,15 @@ resource "azurerm_linux_function_app" "llm-analyzer-function" {
     "LLM_ANALYZER_FOUNDRY_ENDPOINT"                                            = "https://${azurerm_cognitive_account.account_llm.custom_subdomain_name}.cognitiveservices.azure.com/"
     "LLM_ANALYZER_FOUNDRY_DEPLOYMENT_NAME"                                     = azurerm_cognitive_deployment.deployment_llm.name
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"],
+      site_config[0].application_stack
+    ]
+  }
 }
 
 resource "azurerm_role_assignment" "function_app_role_assignment_llm_analyzer" {
@@ -194,6 +222,15 @@ resource "azurerm_linux_function_app" "shops-function" {
     "SHOP_COSMOSDB_DATABASE_NAME" = azurerm_cosmosdb_sql_database.database.name
     "COSMOSDB_CONTAINER_ID"       = azurerm_cosmosdb_sql_container.places_container.name
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"],
+      site_config[0].application_stack
+    ]
+  }
 }
 
 resource "azurerm_app_service_custom_hostname_binding" "shops_function_hostname" {
@@ -201,7 +238,21 @@ resource "azurerm_app_service_custom_hostname_binding" "shops_function_hostname"
   app_service_name    = azurerm_linux_function_app.shops-function.name
   resource_group_name = azurerm_resource_group.rg.name
 
+  lifecycle {
+    ignore_changes = [ssl_state, thumbprint]
+  }
+
   depends_on = [cloudflare_dns_record.api_verification]
+}
+
+resource "azurerm_app_service_managed_certificate" "shops_function_certificate" {
+  custom_hostname_binding_id = azurerm_app_service_custom_hostname_binding.shops_function_hostname.id
+}
+
+resource "azurerm_app_service_certificate_binding" "shops_function_certificate_binding" {
+  hostname_binding_id = azurerm_app_service_custom_hostname_binding.shops_function_hostname.id
+  certificate_id      = azurerm_app_service_managed_certificate.shops_function_certificate.id
+  ssl_state           = "SniEnabled"
 }
 
 resource "azurerm_role_assignment" "function_app_role_assignment_shops" {

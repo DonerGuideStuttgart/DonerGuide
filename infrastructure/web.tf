@@ -3,6 +3,14 @@ resource "azurerm_static_web_app" "frontend_app" {
   location                     = azurerm_resource_group.rg.location
   resource_group_name          = azurerm_resource_group.rg.name
   preview_environments_enabled = false
+
+
+  lifecycle {
+    ignore_changes = [
+      repository_url,
+      repository_branch,
+    ]
+  }
 }
 
 resource "azurerm_static_web_app_custom_domain" "frontend_domain" {
