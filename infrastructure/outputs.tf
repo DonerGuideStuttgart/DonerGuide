@@ -33,3 +33,8 @@ output "function_app_name_shops" {
   value       = azurerm_linux_function_app.shops-function.name
   description = "The name of the shops function app."
 }
+
+output "function_app_name_image_generator" {
+  value       = azurerm_linux_function_app.image-generator-function.name
+  description = "The name of the image generator function app."
+}

@@ -6,6 +6,9 @@ resource "azurerm_service_plan" "service_plan" {
   sku_name            = "Y1"
 }
 
+/**
+ * Place Search Function App
+ */
 
 resource "azurerm_linux_function_app" "place-search-function" {
   name                                     = "${var.prefix}-place-search-func"
@@ -72,6 +75,10 @@ resource "azurerm_role_assignment" "function_app_role_assignment_key_vault" {
   principal_id         = azurerm_linux_function_app.place-search-function.identity[0].principal_id
 }
 
+/**
+ * Image Classifier Function App
+ */
+
 
 resource "azurerm_linux_function_app" "image-classifier-function" {
   name                                     = "${var.prefix}-image-classifier-func"
@@ -123,7 +130,6 @@ resource "azurerm_linux_function_app" "image-classifier-function" {
   }
 }
 
-
 resource "azurerm_role_assignment" "function_app_role_assignment_image_classifier" {
   scope                = azurerm_storage_account.storage_account_functions.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -135,6 +141,10 @@ resource "azurerm_role_assignment" "image_classifier_vision_role" {
   role_definition_name = "Cognitive Services User"
   principal_id         = azurerm_linux_function_app.image-classifier-function.identity[0].principal_id
 }
+
+/**
+ * LLM Analyzer Function App
+ */
 
 resource "azurerm_linux_function_app" "llm-analyzer-function" {
   name                                     = "${var.prefix}-llm-analyzer-func"
@@ -190,6 +200,10 @@ resource "azurerm_role_assignment" "function_app_role_assignment_llm_analyzer" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_function_app.llm-analyzer-function.identity[0].principal_id
 }
+
+/**
+ * Shops Function App
+ */
 
 resource "azurerm_linux_function_app" "shops-function" {
   name                                     = "${var.prefix}-shops-func"
@@ -269,6 +283,81 @@ resource "azurerm_cosmosdb_sql_role_assignment" "shops_cosmos_role" {
   scope               = azurerm_cosmosdb_account.cosmosdb_account.id
 }
 
+/**
+ * Image Generator Function App
+ */
+
+resource "azurerm_linux_function_app" "image-generator-function" {
+  name                                     = "${var.prefix}-image-generator-func"
+  location                                 = azurerm_resource_group.rg.location
+  resource_group_name                      = azurerm_resource_group.rg.name
+  service_plan_id                          = azurerm_service_plan.service_plan.id
+  ftp_publish_basic_authentication_enabled = false
+  public_network_access_enabled            = true
+
+  site_config {
+    application_stack {
+      node_version = "22"
+    }
+    application_insights_connection_string = azurerm_application_insights.application_insights_image_generator.connection_string
+
+    cors {
+      allowed_origins = ["*"]
+    }
+  }
+
+  storage_uses_managed_identity = true
+  storage_account_name          = azurerm_storage_account.storage_account_functions.name
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  app_settings = {
+    "IMAGE_GENERATOR_SERVICEBUS_CONNECTION_STRING_INPUT" = azurerm_servicebus_namespace.sb_namespace.default_primary_connection_string
+    "IMAGE_GENERATOR_COSMOSDB_ENDPOINT"                  = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "IMAGE_GENERATOR_COSMOSDB_DATABASE_NAME"             = azurerm_cosmosdb_sql_database.database.name
+    "IMAGE_GENERATOR_COSMOSDB_CONTAINER_NAME"            = azurerm_cosmosdb_sql_container.places_container.name
+    "IMAGE_GENERATOR_STORAGE_ACCOUNT_NAME"               = azurerm_storage_account.storage_account_functions.name
+    "IMAGE_GENERATOR_STORAGE_CONTAINER_NAME"             = azurerm_storage_container.sc_generated_images.name
+    "IMAGE_GENERATOR_GEMINI_API_KEY"                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.kv.vault_uri}/secrets/google-gemini-api-key)"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"],
+      site_config[0].application_stack
+    ]
+  }
+}
+
+resource "azurerm_role_assignment" "image_generator_sb_role" {
+  scope                = azurerm_servicebus_namespace.sb_namespace.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_linux_function_app.image-generator-function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "image_generator_key_vault_role" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_function_app.image-generator-function.identity[0].principal_id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "image_generator_cosmos_role" {
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
+  role_definition_id  = "${azurerm_cosmosdb_account.cosmosdb_account.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_function_app.image-generator-function.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.cosmosdb_account.id
+}
+
+resource "azurerm_role_assignment" "image_generator_storage_role" {
+  scope                = azurerm_storage_account.storage_account_functions.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_linux_function_app.image-generator-function.identity[0].principal_id
+}
 
 
 # --- Service Bus Role Assignments ---

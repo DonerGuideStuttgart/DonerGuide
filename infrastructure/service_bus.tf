@@ -16,6 +16,6 @@ resource "azurerm_servicebus_queue" "sb_queue_images" {
 }
 
 resource "azurerm_servicebus_queue" "sb_queue_reviews" {
-  name         = "reviews-queue"
+  name         = "image-prompts"
   namespace_id = azurerm_servicebus_namespace.sb_namespace.id
 }

@@ -25,7 +25,7 @@ resource "azurerm_storage_account" "storage_account_generated_images" {
 resource "azurerm_storage_container" "sc_generated_images" {
   name                  = "generatedimages"
   storage_account_id    = azurerm_storage_account.storage_account_generated_images.id
-  container_access_type = "private"
+  container_access_type = "public"
 }
 
 resource "azurerm_storage_account" "storage_account_functions" {

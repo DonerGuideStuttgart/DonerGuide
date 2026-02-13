@@ -1,0 +1,32 @@
+{
+  "name": "image-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "esbuild src/functions/*.ts --bundle --platform=node --target=node22 --outdir=dist/src/functions --log-level=info --external:@azure/functions-core",
+    "watch": "tsc -w",
+    "clean": "rimraf dist",
+    "start": "func start --port 7073",
+    "dev": "concurrently --raw 'npm run watch' 'npm run start'",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "types:check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.9.0",
+    "@azure/functions": "^4.0.0",
+    "@azure/identity": "^4.13.0",
+    "@azure/storage-blob": "^12.29.1",
+    "doner_types": "file:../shared/doner_types"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "azure-functions-core-tools": "^4.x",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.27.2",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3"
+  }
+}

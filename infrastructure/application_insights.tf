@@ -37,3 +37,11 @@ resource "azurerm_application_insights" "application_insights_shops" {
   application_type    = "Node.JS"
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
+
+resource "azurerm_application_insights" "application_insights_image_generator" {
+  name                = "${var.prefix}-application-insights-image-generator"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  application_type    = "Node.JS"
+  workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
+}
