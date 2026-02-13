@@ -51,6 +51,7 @@ jobs:
         run: |
           npm --prefix ../api_mock ci && npm ci --ignore-scripts
           npm --prefix ../api_mock run start & npm run build
+          cp staticwebapp.config.json ./out/staticwebapp.config.json
 
       - name: Deploy Frontend
         uses: Azure/static-web-apps-deploy@v1
