@@ -15,7 +15,7 @@ export interface Location {
 export type Weekday = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 
 export type TimeInterval = {
-  start: number; // Minuten seit Mitternacht
+  start: number;
   end: number;
 };
 
@@ -33,16 +33,12 @@ export type Store = {
   location: Location;
   aiScore: number;
   price?: number;
-
-  // Arrays von Strings (Enums im Frontend)
-  vegetarian: string[]; // z.B. ["VEGETARIAN", "VEGAN"]
-  halal?: string[]; // z.B. ["HALAL"]
-  waitingTime?: string; // z.B. "FAST"
-  paymentMethods: string[]; // z.B. ["CREDIT_CARD", "CASH"]
-
+  vegetarian: string[];
+  halal?: string[];
+  waitingTime?: string;
+  paymentMethods: string[];
   sauceAmount?: number;
   meatRatio?: number;
-
   openingHours: OpeningHours;
   aiSummary: string;
 };
@@ -70,59 +66,66 @@ function mapOpeningHours(dbHours: any): OpeningHours {
     const feKey = dayMapping[dbKey];
     const times = dbHours[dbKey];
 
-    // DB hat: [Start, Ende] (Array mit 2 Zahlen)
-    // FE will: [{ start: Start, end: Ende }] (Array mit Objekten)
+    // DB: [300, 1200] -> FE: [{ start: 300, end: 1200 }]
     if (Array.isArray(times) && times.length === 2 && typeof times[0] === "number") {
       hours[feKey] = [{ start: times[0], end: times[1] }];
     }
   });
 
-  return {
-    hours: hours,
-    timezone: defaultTimezone,
-  };
+  return { hours, timezone: defaultTimezone };
 }
 
-/**
- * Haupt-Mapper
- */
+function scaleScoreToPercent(score: any): number | undefined {
+  if (typeof score !== "number") return undefined;
+  // Wenn Score <= 10 ist, gehen wir von einer 1-5 oder 1-10 Skala aus und skalieren auf 100
+  if (score <= 5) return score * 20;
+  if (score <= 10) return score * 10;
+  return score; // Sonst nehmen wir den Wert direkt (z.B. 65)
+}
+
 export function mapToStore(item: any): Store {
   if (!item) {
     throw new Error("Item is null or undefined");
   }
 
-  // --- 1. District Logic ---
-  const district = item.district ?? item.address?.sublocality ?? "Unbekannt";
+  // Daten aus ai_analysis extrahieren (Fallback)
+  const analysis = item.ai_analysis || {};
 
-  // --- 2. Vegetarian Logic ---
-  const vegetarianTags: string[] = [];
-  if (item.servesVegetarianFood === true || item.servesVegetarianFood === "true") {
-    vegetarianTags.push("VEGETARIAN");
-    // Optional: Wenn es ein separates Feld für vegan gibt
-  }
+  // 1. District
+  const district = item.address?.sublocality ?? item.address?.locality ?? "Unbekannt";
 
-  // --- 3. Payment Methods ---
-  const paymentMethods: string[] = Array.isArray(item.paymentMethods)
-    ? item.paymentMethods.map((pm: string) => pm.toUpperCase())
-    : [];
-
-  // --- 4. Images ---
+  // 2. Images
   const imageUrls: string[] = Array.isArray(item.photos)
     ? item.photos.map((p: any) => p.url).filter((u: any) => typeof u === "string")
     : [];
 
-  // --- 5. Return Object ---
+  // 3. Scores & Ratios
+  const rawAiScore = analysis.score_gesamt ?? 0;
+
+  // Fleisch & Soße:
+  const meatRatio = item.meat_ratio ?? scaleScoreToPercent(analysis.score_belag);
+  const sauceAmount = item.sauce_amount ?? scaleScoreToPercent(analysis.score_verhaeltnis);
+
+  // 4. Vegetarian
+  const vegetarianTags: string[] = [];
+  if (item.servesVegetarianFood === true) {
+    vegetarianTags.push("VEGETARIAN");
+  }
+
+  // 5. Payment Methods
+  const paymentMethods = Array.isArray(item.paymentMethods)
+    ? item.paymentMethods.map((p: string) => p.toUpperCase())
+    : [];
+
   return {
-    slug: item.id,
-
+    slug: item.id, // ID als Slug
     imageUrls: imageUrls,
-
-    name: item.name ?? "Unbekannter Döner",
-    phone: item.internationalPhoneNumber ?? undefined,
+    name: item.name ?? "Unbekannter Laden",
+    phone: item.internationalPhoneNumber ?? item.phone ?? undefined,
     district: district,
 
     location: {
-      googlePlaceId: item.id, // Mock nutzt die ID auch hier
+      googlePlaceId: item.id,
       coordinates: {
         lat: item.latitude ?? 0,
         lng: item.longitude ?? 0,
@@ -135,24 +138,20 @@ export function mapToStore(item: any): Store {
       },
     },
 
-    aiScore: item.ai_score ?? 0,
+    aiScore: rawAiScore,
     price: item.price ?? undefined,
 
     vegetarian: vegetarianTags,
+    halal: item.halal ? [item.halal] : [],
 
     waitingTime: item.waiting_time ? item.waiting_time.toUpperCase() : undefined,
-
     paymentMethods: paymentMethods,
 
-    sauceAmount: item.sauce_amount ?? undefined,
-    meatRatio: item.meat_ratio ?? undefined,
+    sauceAmount: sauceAmount,
+    meatRatio: meatRatio,
 
     openingHours: mapOpeningHours(item.openingHours),
 
-    // AI Summary: Fallback, falls DB leer
-    aiSummary:
-      item.ai_analysis?.text ??
-      item.description ??
-      `Leckerer Döner in ${district} mit einem AI-Score von ${item.ai_score ?? "?"}.`,
+    aiSummary: analysis.bewertungstext ?? item.description ?? "Keine Zusammenfassung verfügbar.",
   };
 }
