@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export class GenAIService {
-  private client: GoogleGenerativeAI | undefined;
+  private client: GoogleGenAI | undefined;
   private modelName: string;
   private isMockMode: boolean;
 
@@ -14,7 +14,7 @@ export class GenAIService {
     if (this.isMockMode) {
       console.warn("GenAIService: No API key found or set to 'mock'. Running in MOCK mode.");
     } else {
-      this.client = new GoogleGenerativeAI(apiKey!);
+      this.client = new GoogleGenAI({ apiKey: apiKey! });
     }
   }
 
@@ -25,7 +25,6 @@ export class GenAIService {
     }
 
     try {
-      const model = this.client.getGenerativeModel({ model: this.modelName });
       // Note: The actual Google GenAI SDK method for image generation might differ slightly based on version.
       // Assuming a standard 'generateContent' or specific image method exists or will exist.
       // For now, adhering to the requirement "per google genai sdk ... generiert".

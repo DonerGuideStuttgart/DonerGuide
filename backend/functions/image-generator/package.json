@@ -19,7 +19,7 @@
     "@azure/functions": "^4.0.0",
     "@azure/identity": "^4.0.0",
     "@azure/storage-blob": "^12.0.0",
-    "@google/generative-ai": "^0.1.3",
+    "@google/genai": "^1.41.0",
     "doner_types": "file:../shared/doner_types"
   },
   "devDependencies": {
