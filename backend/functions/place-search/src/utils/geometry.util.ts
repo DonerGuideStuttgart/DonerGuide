@@ -64,3 +64,21 @@ export function cellIntersectsBoundary(cellBBox: GridCell["boundaryBox"]): boole
   ]);
   return booleanIntersects(cellPolygon, stuttgartFeature);
 }
+
+/** Converts km to latitude degrees (constant everywhere on Earth). */
+export function kmToDegreesLat(km: number): number {
+  return km / 111.32;
+}
+
+/** Converts km to longitude degrees (varies with latitude). */
+export function kmToDegreesLng(km: number, latitude: number): number {
+  return km / (111.32 * Math.cos((latitude * Math.PI) / 180));
+}
+
+/** Returns the real-world side lengths of a bounding box in km. */
+export function getCellSideKm(bbox: GridCell["boundaryBox"]): { latSideKm: number; lonSideKm: number } {
+  const centerLat = (bbox.minLat + bbox.maxLat) / 2;
+  const latSideKm = (bbox.maxLat - bbox.minLat) * 111.32;
+  const lonSideKm = (bbox.maxLon - bbox.minLon) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
+  return { latSideKm, lonSideKm };
+}

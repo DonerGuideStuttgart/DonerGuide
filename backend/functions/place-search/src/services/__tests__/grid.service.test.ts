@@ -4,12 +4,39 @@ import { Container } from "@azure/cosmos";
 import type { GridCell } from "../../types/grid";
 import { cellIntersectsBoundary } from "../../utils/geometry.util";
 
-jest.mock("../../utils/geometry.util", () => ({
-  getStuttgartBBox: () => ({ minLat: 48.0, minLon: 9.0, maxLat: 49.0, maxLon: 10.0 }),
-  cellIntersectsBoundary: jest.fn().mockReturnValue(true),
-}));
+// Provide real implementations for the new geodetic functions, mock only boundary-related ones
+jest.mock("../../utils/geometry.util", () => {
+  const actual = jest.requireActual("../../utils/geometry.util");
+  return {
+    ...actual,
+    getStuttgartBBox: () => ({ minLat: 48.0, minLon: 9.0, maxLat: 49.0, maxLon: 10.0 }),
+    cellIntersectsBoundary: jest.fn().mockReturnValue(true),
+  };
+});
 
 const mockedCellIntersectsBoundary = cellIntersectsBoundary as jest.MockedFunction<typeof cellIntersectsBoundary>;
+
+/** Helper: compute expected grid dimensions for the mock BBox with TARGET_CELL_SIZE_KM = 5 */
+function getExpectedGridDimensions() {
+  const minLat = 48.0,
+    maxLat = 49.0,
+    minLon = 9.0,
+    maxLon = 10.0;
+  const latStep = 5 / 111.32;
+  const rows = Math.ceil((maxLat - minLat) / latStep);
+
+  let totalCells = 0;
+  for (let i = 0; i < rows; i++) {
+    const cellMinLat = minLat + i * latStep;
+    const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
+    const centerLat = (cellMinLat + cellMaxLat) / 2;
+    const lonStep = 5 / (111.32 * Math.cos((centerLat * Math.PI) / 180));
+    const cols = Math.ceil((maxLon - minLon) / lonStep);
+    totalCells += cols;
+  }
+
+  return { rows, totalCells };
+}
 
 describe("GridService", () => {
   let mockContainer: jest.Mocked<Container>;
@@ -30,14 +57,16 @@ describe("GridService", () => {
   });
 
   describe("initializeGrid", () => {
-    it("should create 16 cells if grid is empty", async () => {
+    it("should create km-based grid cells when grid is empty", async () => {
       mockContainer.items.query = jest.fn().mockReturnValue({
         fetchAll: jest.fn().mockResolvedValue({ resources: [0] }),
       });
 
       await gridService.initializeGrid("v1");
 
-      expect(mockContainer.items.upsert).toHaveBeenCalledTimes(16);
+      const { totalCells } = getExpectedGridDimensions();
+      expect(mockContainer.items.upsert).toHaveBeenCalledTimes(totalCells);
+
       const firstCell = (mockContainer.items.upsert as jest.Mock).mock.calls[0][0];
       expect(firstCell.gridVersion).toBe("v1");
       expect(firstCell.level).toBe(0);
@@ -64,14 +93,35 @@ describe("GridService", () => {
       let callCount = 0;
       mockedCellIntersectsBoundary.mockImplementation(() => {
         callCount++;
-        // Return false for every other cell (8 out of 16 skipped)
         return callCount % 2 === 0;
       });
 
       await gridService.initializeGrid("v1");
 
-      expect(mockedCellIntersectsBoundary).toHaveBeenCalledTimes(16);
-      expect(mockContainer.items.upsert).toHaveBeenCalledTimes(8);
+      const { totalCells } = getExpectedGridDimensions();
+      expect(mockedCellIntersectsBoundary).toHaveBeenCalledTimes(totalCells);
+      expect(mockContainer.items.upsert).toHaveBeenCalledTimes(Math.floor(totalCells / 2));
+    });
+
+    it("should produce cells with approximately equal real-world side lengths", async () => {
+      mockContainer.items.query = jest.fn().mockReturnValue({
+        fetchAll: jest.fn().mockResolvedValue({ resources: [0] }),
+      });
+
+      await gridService.initializeGrid("v1");
+
+      // Check a cell from the middle of the grid
+      const calls = (mockContainer.items.upsert as jest.Mock).mock.calls;
+      const midCell = calls[Math.floor(calls.length / 2)][0] as GridCell;
+      const { minLat, maxLat, minLon, maxLon } = midCell.boundaryBox;
+
+      const centerLat = (minLat + maxLat) / 2;
+      const latSideKm = (maxLat - minLat) * 111.32;
+      const lonSideKm = (maxLon - minLon) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
+
+      // Both sides should be approximately TARGET_CELL_SIZE_KM (5 km), within tolerance
+      expect(latSideKm).toBeCloseTo(5, 0);
+      expect(lonSideKm).toBeCloseTo(5, 0);
     });
   });
 
@@ -110,8 +160,8 @@ describe("GridService", () => {
         boundaryBox: {
           minLat: 48.0,
           minLon: 9.0,
-          maxLat: 48.2, // Lat diff 0.2
-          maxLon: 9.1, // Lon diff 0.1
+          maxLat: 48.2, // Lat diff 0.2 → ~22.3 km
+          maxLon: 9.1, // Lon diff 0.1 → ~7.4 km
         },
         geometry: { type: "Polygon", coordinates: [] },
         resultsCount: 60,
@@ -123,7 +173,8 @@ describe("GridService", () => {
       mockContainer.items.upsert = jest.fn().mockResolvedValue({});
     });
 
-    it("should split along latitude if it's the longer side", async () => {
+    it("should split along latitude when lat side is longer in km", async () => {
+      // latSideKm ≈ 22.3 km, lonSideKm ≈ 7.4 km → split lat
       await gridService.splitCell(mockCell as GridCell);
 
       expect(mockContainer.items.create).toHaveBeenCalledTimes(2);
@@ -144,9 +195,10 @@ describe("GridService", () => {
       expect(child1.boundaryBox.maxLat).toBe(48.1);
       expect(child2.boundaryBox.minLat).toBe(48.1);
     });
-    it("should split along longitude if it's the longer side", async () => {
-      mockCell.boundaryBox.maxLat = 48.1; // Lat diff 0.1
-      mockCell.boundaryBox.maxLon = 9.3; // Lon diff 0.3
+
+    it("should split along longitude when lon side is longer in km", async () => {
+      mockCell.boundaryBox.maxLat = 48.1; // Lat diff 0.1 → ~11.1 km
+      mockCell.boundaryBox.maxLon = 9.3; // Lon diff 0.3 → ~22.2 km
 
       await gridService.splitCell(mockCell as GridCell);
 
@@ -156,6 +208,29 @@ describe("GridService", () => {
       // midLon = 9.15
       expect(child1.boundaryBox.maxLon).toBe(9.15);
       expect(child2.boundaryBox.minLon).toBe(9.15);
+    });
+
+    it("should use geodetic km comparison, not degree comparison for split axis", async () => {
+      // A cell where lonDiff > latDiff in degrees, but latSideKm > lonSideKm in reality
+      // latDiff = 0.05° → ~5.57 km, lonDiff = 0.06° → ~4.44 km (at ~48° latitude)
+      mockCell.boundaryBox = {
+        minLat: 48.0,
+        minLon: 9.0,
+        maxLat: 48.05,
+        maxLon: 9.06,
+      };
+
+      await gridService.splitCell(mockCell as GridCell);
+
+      const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
+      const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
+
+      // Should split along latitude (the longer real-world side), not longitude
+      expect(child1.boundaryBox.maxLat).toBe(48.025);
+      expect(child2.boundaryBox.minLat).toBe(48.025);
+      // Longitude should remain unchanged
+      expect(child1.boundaryBox.maxLon).toBe(9.06);
+      expect(child2.boundaryBox.maxLon).toBe(9.06);
     });
 
     it("should mark as COMPLETED if MAX_LEVEL is reached", async () => {
