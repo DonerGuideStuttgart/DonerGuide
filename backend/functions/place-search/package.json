@@ -20,7 +20,7 @@
     "@turf/boolean-intersects": "^7.3.4",
     "@turf/helpers": "^7.3.4",
     "doner_types": "file:../shared/doner_types",
-    "uuid": "^11"
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
