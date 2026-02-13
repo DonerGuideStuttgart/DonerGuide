@@ -17,10 +17,6 @@ services:
         "0.0.0.0",
         "--skipApiVersionCheck",
       ]
-    ports:
-      - 7074:7074
-    environment:
-      NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
   cosmosdb-emulator:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview

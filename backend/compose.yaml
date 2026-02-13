@@ -129,9 +129,9 @@ services:
       - cosmosdb-emulator
       - doner_types_builder
     ports:
-      - 7073:7073
+      - 7075:7075
     env_file:
-      - ./functions/llm-analyzer/.env
+      - ./functions/image-generator/.env
     environment:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
