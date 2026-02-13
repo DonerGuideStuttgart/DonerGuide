@@ -5,8 +5,9 @@ import { BlobService } from "../services/BlobService";
 import { GenAIService } from "../services/GenAIService";
 import { randomUUID } from "node:crypto";
 import type { Place, Photo } from "doner_types";
+import { imagePrompt } from "../helper/prompts";
 
-// Service instances (lazy init or top-level)
+// Service instances (lazy init)
 let cosmosClient: CosmosClient;
 let blobService: BlobService;
 let genAIService: GenAIService;
@@ -14,7 +15,7 @@ let genAIService: GenAIService;
 function initialize() {
   if (!cosmosClient) {
     const endpoint = process.env.IMAGE_GENERATOR_COSMOSDB_ENDPOINT ?? "http://localhost:8081";
-    const key = process.env.IMAGE_GENERATOR_COSMOSDB_KEY; // Optional
+    const key = process.env.IMAGE_GENERATOR_COSMOSDB_KEY;
     if (key) {
       cosmosClient = new CosmosClient({ endpoint, key });
     } else {
@@ -36,26 +37,17 @@ app.serviceBusQueue("imageGenerator", {
 });
 
 export async function imageGenerator(message: unknown, context: InvocationContext): Promise<void> {
-  const msg = message as { prompt: string; placeId: string };
+  const msg = message as { placeId: string };
   context.log("Processing image generation request", msg);
 
-  if (!msg.prompt || !msg.placeId) {
-    context.error("Invalid message: missing prompt or placeId");
+  if (!msg.placeId) {
+    context.error("Invalid message: missing placeId");
     return;
   }
 
   try {
     initialize();
 
-    // 1. Generate Image
-    const imageBuffer = await genAIService.generateImage(msg.prompt);
-
-    // 2. Upload to Blob Storage
-    const photoId = randomUUID();
-    await blobService.ensureContainerExists();
-    const blobUrl = await blobService.uploadImage(photoId, imageBuffer, "image/png");
-
-    // 3. Update Cosmos DB
     const databaseId = process.env.IMAGE_GENERATOR_COSMOSDB_DATABASE_NAME ?? "DoenerGuideDB";
     const containerId = process.env.IMAGE_GENERATOR_COSMOSDB_CONTAINER_NAME ?? "Places";
     const container = cosmosClient.database(databaseId).container(containerId);
@@ -65,6 +57,21 @@ export async function imageGenerator(message: unknown, context: InvocationContex
       context.error(`Place ${msg.placeId} not found`);
       return;
     }
+
+    if (!place.ai_analysis?.bewertungstext) {
+      context.error(`Place ${msg.placeId} has no bewertungstext in ai_analysis`);
+      return;
+    }
+
+    const fullPrompt = `${imagePrompt}\n\nBewertung:\n${place.ai_analysis.bewertungstext}`;
+
+    context.log("Generated prompt:", fullPrompt);
+
+    const imageBuffer = await genAIService.generateImage(fullPrompt);
+
+    const photoId = randomUUID();
+    await blobService.ensureContainerExists();
+    const blobUrl = await blobService.uploadImage(photoId, imageBuffer, "image/png");
 
     const newPhoto: Photo = {
       id: photoId,
@@ -84,6 +91,6 @@ export async function imageGenerator(message: unknown, context: InvocationContex
     context.log(`Successfully generated and saved photo ${photoId} for place ${msg.placeId}`);
   } catch (error) {
     context.error("Error in imageGenerator:", error);
-    throw error; // Retry
+    throw error;
   }
 }
