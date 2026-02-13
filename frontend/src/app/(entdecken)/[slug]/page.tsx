@@ -29,7 +29,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { slug } = await params
-	const store = await fetchPlaceBySlug(slug)
+	const store = await fetchPlaceById(slug)
 
 	if (!store) {
 		return {
