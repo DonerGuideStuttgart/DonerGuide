@@ -16,8 +16,6 @@ if (COSMOSDB_KEY) {
 }
 
 export async function getAllShops(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-  context.log("Filtere Shops...");
-
   try {
     const database = client.database(COSMOSDB_DATABASE_NAME);
     const container = database.container(CONTAINER_ID);
