@@ -42,11 +42,7 @@ export function buildStoreQuery(filters: FilterParams, sort?: string) {
 }
 
 const fetchOptions: RequestInit = {
-	cache: 'no-store',
-	headers: {
-		'Cache-Control': 'no-cache, no-store, must-revalidate',
-		Pragma: 'no-cache',
-	},
+	next: { revalidate: 60 }, // Revalidate every 60 seconds (ISR)
 }
 
 export async function fetchPlaces(query: string) {
