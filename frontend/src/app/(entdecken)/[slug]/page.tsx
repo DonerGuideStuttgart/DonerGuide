@@ -60,29 +60,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	}
 }
 
-// Generate static paths for all stores at build time
 export async function generateStaticParams() {
-	try {
-		const base = process.env.NEXT_PUBLIC_API_URL || '/api'
-		// Fetch all stores without pagination to get all slugs
-		const response = await fetch(`${base}/places?limit=1000`)
-		if (!response.ok) {
-			console.warn('Failed to fetch stores for static generation')
-			return []
-		}
+	const data = await fetchPlaces('')
+	const places = data.items || []
 
-		const data = await response.json()
-		const stores = data.places || []
-
-		console.log(`Generating static params for ${stores.length} stores`)
-
-		return stores.map((store: { place_id: string }) => ({
-			slug: store.place_id,
-		}))
-	} catch (error) {
-		console.error('Error generating static params:', error)
-		return []
-	}
+	return places.map((place: StoreBase) => ({
+		slug: place.slug,
+	}))
 }
 
 export default async function StoreDetail({ params }: Props) {
