@@ -8,12 +8,6 @@
 			"/ChIJ*"
 		]
 	},
-	"routes": [
-		{
-			"route": "/ChIJ*",
-			"allowedRoles": ["anonymous"]
-		}
-	],
 	"mimeTypes": {
 		".json": "application/json",
 		".html": "text/html"
