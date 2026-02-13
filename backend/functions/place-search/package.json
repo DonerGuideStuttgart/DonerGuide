@@ -16,13 +16,15 @@
     "@azure/cosmos": "^4.8.0",
     "@azure/functions": "^4.0.0",
     "@azure/identity": "^4.13.0",
+    "@turf/bbox": "^7.3.4",
+    "@turf/boolean-intersects": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "doner_types": "file:../shared/doner_types",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.0.0",
-    "@types/uuid": "^10.0.0",
     "azure-functions-core-tools": "^4.x",
     "concurrently": "^9.2.1",
     "esbuild": "^0.27.2",

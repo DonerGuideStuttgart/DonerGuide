@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GridService } from "./grid.service";
+import { GridService } from "../grid.service";
 import { Container } from "@azure/cosmos";
-import type { GridCell } from "../types/grid";
+import type { GridCell } from "../../types/grid";
+import { cellIntersectsBoundary } from "../../utils/geometry.util";
+
+jest.mock("../../utils/geometry.util", () => ({
+  getStuttgartBBox: () => ({ minLat: 48.0, minLon: 9.0, maxLat: 49.0, maxLon: 10.0 }),
+  cellIntersectsBoundary: jest.fn().mockReturnValue(true),
+}));
+
+const mockedCellIntersectsBoundary = cellIntersectsBoundary as jest.MockedFunction<typeof cellIntersectsBoundary>;
 
 describe("GridService", () => {
   let mockContainer: jest.Mocked<Container>;
@@ -17,10 +25,8 @@ describe("GridService", () => {
       },
     } as any;
     gridService = new GridService(mockContainer);
-    process.env.PLACE_SEARCH_STUTTGART_MIN_LAT = "48.0";
-    process.env.PLACE_SEARCH_STUTTGART_MIN_LON = "9.0";
-    process.env.PLACE_SEARCH_STUTTGART_MAX_LAT = "49.0";
-    process.env.PLACE_SEARCH_STUTTGART_MAX_LON = "10.0";
+    mockedCellIntersectsBoundary.mockReset();
+    mockedCellIntersectsBoundary.mockReturnValue(true);
   });
 
   describe("initializeGrid", () => {
@@ -48,6 +54,24 @@ describe("GridService", () => {
       await gridService.initializeGrid("v1");
 
       expect(mockContainer.items.upsert).not.toHaveBeenCalled();
+    });
+
+    it("should skip cells outside Stuttgart boundary", async () => {
+      mockContainer.items.query = jest.fn().mockReturnValue({
+        fetchAll: jest.fn().mockResolvedValue({ resources: [0] }),
+      });
+
+      let callCount = 0;
+      mockedCellIntersectsBoundary.mockImplementation(() => {
+        callCount++;
+        // Return false for every other cell (8 out of 16 skipped)
+        return callCount % 2 === 0;
+      });
+
+      await gridService.initializeGrid("v1");
+
+      expect(mockedCellIntersectsBoundary).toHaveBeenCalledTimes(16);
+      expect(mockContainer.items.upsert).toHaveBeenCalledTimes(8);
     });
   });
 
@@ -145,6 +169,32 @@ describe("GridService", () => {
           id: "parent-id",
           status: "COMPLETED",
         })
+      );
+    });
+
+    it("should only create children that intersect boundary", async () => {
+      let callCount = 0;
+      mockedCellIntersectsBoundary.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first candidate passes
+      });
+
+      await gridService.splitCell(mockCell as GridCell);
+
+      expect(mockContainer.items.create).toHaveBeenCalledTimes(1);
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "parent-id", status: "SPLIT" })
+      );
+    });
+
+    it("should mark parent as SPLIT even when no children intersect", async () => {
+      mockedCellIntersectsBoundary.mockReturnValue(false);
+
+      await gridService.splitCell(mockCell as GridCell);
+
+      expect(mockContainer.items.create).not.toHaveBeenCalled();
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "parent-id", status: "SPLIT" })
       );
     });
   });
