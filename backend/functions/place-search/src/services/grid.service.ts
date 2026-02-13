@@ -1,6 +1,7 @@
 import { Container } from "@azure/cosmos";
 import { v4 as uuidv4 } from "uuid";
 import { GridCell } from "../types/grid";
+import { getStuttgartBBox, cellIntersectsBoundary } from "../utils/geometry.util";
 
 export class GridService {
   constructor(private container: Container) {}
@@ -17,10 +18,7 @@ export class GridService {
       return;
     }
 
-    const minLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LAT ?? "48.692");
-    const minLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MIN_LON ?? "9.038");
-    const maxLat = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LAT ?? "48.866");
-    const maxLon = parseFloat(process.env.PLACE_SEARCH_STUTTGART_MAX_LON ?? "9.315");
+    const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
     const latStep = (maxLat - minLat) / 4;
     const lonStep = (maxLon - minLon) / 4;
@@ -33,6 +31,16 @@ export class GridService {
         const cellMaxLat = minLat + (i + 1) * latStep;
         const cellMinLon = minLon + j * lonStep;
         const cellMaxLon = minLon + (j + 1) * lonStep;
+
+        const bbox = {
+          minLat: cellMinLat,
+          minLon: cellMinLon,
+          maxLat: cellMaxLat,
+          maxLon: cellMaxLon,
+        };
+
+        // Only create cells that intersect the Stuttgart boundary
+        if (!cellIntersectsBoundary(bbox)) continue;
 
         const cell: GridCell = {
           id: uuidv4(),
@@ -51,12 +59,7 @@ export class GridService {
               ],
             ],
           },
-          boundaryBox: {
-            minLat: cellMinLat,
-            minLon: cellMinLon,
-            maxLat: cellMaxLat,
-            maxLon: cellMaxLon,
-          },
+          boundaryBox: bbox,
           resultsCount: 0,
           foundPlaceIds: [],
           lastProcessedAt: "2000-01-01T00:00:00Z", // Use a static old date without lots of trailing zeros
@@ -125,37 +128,39 @@ export class GridService {
     const latDiff = maxLat - minLat;
     const lonDiff = maxLon - minLon;
 
-    const childCells: GridCell[] = [];
+    // Candidate bounding boxes for the two halves of the split
+    const candidateBBoxes: GridCell["boundaryBox"][] = [];
     const newLevel = cell.level + 1;
 
     if (latDiff >= lonDiff) {
       // Split Latitude
       const midLat = minLat + latDiff / 2;
 
-      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, maxLat: midLat }, newLevel));
-      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, minLat: midLat }, newLevel));
+      candidateBBoxes.push({ ...cell.boundaryBox, maxLat: midLat });
+      candidateBBoxes.push({ ...cell.boundaryBox, minLat: midLat });
     } else {
       // Split Longitude
       const midLon = minLon + lonDiff / 2;
 
-      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, maxLon: midLon }, newLevel));
-      childCells.push(this.createChildCell(cell, { ...cell.boundaryBox, minLon: midLon }, newLevel));
+      candidateBBoxes.push({ ...cell.boundaryBox, maxLon: midLon });
+      candidateBBoxes.push({ ...cell.boundaryBox, minLon: midLon });
     }
+
+    // Only keep child cells that intersect the city boundary
+    const childCells = candidateBBoxes
+      .filter((bbox) => cellIntersectsBoundary(bbox))
+      .map((bbox) => this.createChildCell(cell, bbox, newLevel));
 
     // Mark parent as SPLIT
     cell.status = "SPLIT";
     cell.lastProcessedAt = new Date().toISOString();
 
-    // Atomic-like update: Create children first, then update parent
-    // (CosmosDB throughput permitting, we could use batch but simple loop is fine for 2 items)
     for (const child of childCells) {
       await this.container.items.create(child);
     }
     await this.container.items.upsert(cell);
 
-    console.log(
-      `[GridService] Cell ${cell.id} split into ${childCells[0]?.id ?? "unknown"} and ${childCells[1]?.id ?? "unknown"} (Level ${String(newLevel)})`
-    );
+    console.log(`[GridService] Cell ${cell.id} split into ${childCells.length} children (Level ${newLevel})`);
   }
 
   private createChildCell(parent: GridCell, bbox: GridCell["boundaryBox"], level: number): GridCell {

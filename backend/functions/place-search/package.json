@@ -16,6 +16,9 @@
     "@azure/cosmos": "^4.8.0",
     "@azure/functions": "^4.0.0",
     "@azure/identity": "^4.13.0",
+    "@turf/bbox": "^7.3.4",
+    "@turf/boolean-intersects": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "doner_types": "file:../shared/doner_types",
     "uuid": "^11"
   },
