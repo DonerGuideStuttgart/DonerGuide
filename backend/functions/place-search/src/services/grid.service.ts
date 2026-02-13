@@ -8,8 +8,7 @@ import {
   kmToDegreesLng,
   getCellSideKm,
 } from "../utils/geometry.util";
-
-const TARGET_CELL_SIZE_KM = 5;
+import { GRID_CONFIG } from "../config/gridConfig";
 
 export class GridService {
   constructor(private container: Container) {}
@@ -28,7 +27,7 @@ export class GridService {
 
     const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
-    const latStep = kmToDegreesLat(TARGET_CELL_SIZE_KM);
+    const latStep = kmToDegreesLat(GRID_CONFIG.baseCellSizeKm);
     const rows = Math.ceil((maxLat - minLat) / latStep);
 
     const cells: GridCell[] = [];
@@ -38,7 +37,7 @@ export class GridService {
       const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
       const centerLat = (cellMinLat + cellMaxLat) / 2;
 
-      const lonStep = kmToDegreesLng(TARGET_CELL_SIZE_KM, centerLat);
+      const lonStep = kmToDegreesLng(GRID_CONFIG.baseCellSizeKm, centerLat);
       const cols = Math.ceil((maxLon - minLon) / lonStep);
 
       for (let j = 0; j < cols; j++) {
@@ -127,10 +126,10 @@ export class GridService {
    * If MAX_LEVEL is reached, marks as COMPLETED with overflow.
    */
   async splitCell(cell: GridCell): Promise<void> {
-    const MAX_LEVEL = 10;
+    const { maxDepth, minCellSizeM } = GRID_CONFIG.subdivision;
 
-    if (cell.level >= MAX_LEVEL) {
-      console.warn(`[GridService] MAX_LEVEL reached for cell ${cell.id}. Marking as COMPLETED (Overflow).`);
+    if (cell.level >= maxDepth) {
+      console.warn(`[GridService] maxDepth reached for cell ${cell.id}. Marking as COMPLETED (Overflow).`);
       cell.status = "COMPLETED";
       cell.lastProcessedAt = new Date().toISOString();
       await this.container.items.upsert(cell);
@@ -146,6 +145,19 @@ export class GridService {
     const newLevel = cell.level + 1;
 
     const { latSideKm, lonSideKm } = getCellSideKm(cell.boundaryBox);
+
+    // Check if child cells would be smaller than minCellSizeM
+    const minSideKm = Math.min(latSideKm, lonSideKm);
+    const childMinSideM = (minSideKm / 2) * 1000; // halving the shorter side
+    if (childMinSideM < minCellSizeM) {
+      console.warn(
+        `[GridService] Child cell would be ${String(Math.round(childMinSideM))}m, below minCellSizeM (${String(minCellSizeM)}m). Marking cell ${cell.id} as COMPLETED.`
+      );
+      cell.status = "COMPLETED";
+      cell.lastProcessedAt = new Date().toISOString();
+      await this.container.items.upsert(cell);
+      return;
+    }
     if (latSideKm >= lonSideKm) {
       // Split Latitude
       const midLat = minLat + latDiff / 2;

@@ -8,6 +8,7 @@ import { app, InvocationContext, output, Timer } from "@azure/functions";
 import type { Photo, PhotoClassificationMessage, Place } from "doner_types";
 import { GridService } from "../services/grid.service";
 import { GoogleMapsService } from "../services/google-maps.service";
+import { GRID_CONFIG } from "../config/gridConfig";
 
 import { DefaultAzureCredential } from "@azure/identity";
 
@@ -163,7 +164,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
       })
       .filter((id) => id !== "");
 
-    if (googlePlaces.length >= 60) {
+    if (googlePlaces.length >= GRID_CONFIG.subdivision.threshold) {
       context.log(`Cell ${cell.id} has ${String(googlePlaces.length)} results. Splitting...`);
       await gridService.splitCell(cell);
     } else {

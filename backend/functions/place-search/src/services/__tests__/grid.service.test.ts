@@ -4,6 +4,17 @@ import { Container } from "@azure/cosmos";
 import type { GridCell } from "../../types/grid";
 import { cellIntersectsBoundary } from "../../utils/geometry.util";
 
+jest.mock("../../config/gridConfig", () => ({
+  GRID_CONFIG: {
+    baseCellSizeKm: 5,
+    subdivision: {
+      threshold: 60,
+      maxDepth: 10,
+      minCellSizeM: 50,
+    },
+  },
+}));
+
 // Provide real implementations for the new geodetic functions, mock only boundary-related ones
 jest.mock("../../utils/geometry.util", () => {
   const actual = jest.requireActual("../../utils/geometry.util");
@@ -233,8 +244,29 @@ describe("GridService", () => {
       expect(child2.boundaryBox.maxLon).toBe(9.06);
     });
 
-    it("should mark as COMPLETED if MAX_LEVEL is reached", async () => {
+    it("should mark as COMPLETED if maxDepth is reached", async () => {
       mockCell.level = 10;
+
+      await gridService.splitCell(mockCell as GridCell);
+
+      expect(mockContainer.items.create).not.toHaveBeenCalled();
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "parent-id",
+          status: "COMPLETED",
+        })
+      );
+    });
+
+    it("should mark as COMPLETED if child cell would be below minCellSizeM", async () => {
+      // Create a tiny cell where the shorter side is ~55m (0.0005° lat ≈ 55.7m)
+      // Halving gives ~27.8m which is below minCellSizeM of 50m
+      mockCell.boundaryBox = {
+        minLat: 48.0,
+        minLon: 9.0,
+        maxLat: 48.0005, // ~55.7m
+        maxLon: 9.001, // ~74.2m
+      };
 
       await gridService.splitCell(mockCell as GridCell);
 
