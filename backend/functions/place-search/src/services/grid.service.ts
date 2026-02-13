@@ -155,12 +155,16 @@ export class GridService {
     cell.status = "SPLIT";
     cell.lastProcessedAt = new Date().toISOString();
 
+    // Atomic-like update: Create children first, then update parent
+    // (CosmosDB throughput permitting, we could use batch but simple loop is fine for 2 items)
     for (const child of childCells) {
       await this.container.items.create(child);
     }
     await this.container.items.upsert(cell);
 
-    console.log(`[GridService] Cell ${cell.id} split into ${childCells.length} children (Level ${newLevel})`);
+    console.log(
+      `[GridService] Cell ${cell.id} split into ${childCells.map((c, index) => `${index}. Child: ${c.id}`)} (Level ${newLevel})`
+    );
   }
 
   private createChildCell(parent: GridCell, bbox: GridCell["boundaryBox"], level: number): GridCell {
