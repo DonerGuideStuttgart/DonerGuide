@@ -2,7 +2,6 @@ include:
   - ./localdev/emulators.yaml
 
 services:
-
   doner_types_builder:
     image: node:22
     platform: linux/amd64
@@ -136,7 +135,6 @@ services:
     environment:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
-
   places-reader:
     image: node:22
     container_name: "places-reader"
@@ -155,7 +153,7 @@ services:
       BATCH_SIZE: "10"
     profiles:
       - reader
-  
+
   image-classifier-reader:
     image: node:22
     container_name: "image-classifier-reader"
@@ -174,19 +172,6 @@ services:
       BATCH_SIZE: "10"
     profiles:
       - reader
-
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
-    container_name: "azurite"
-    hostname: azurite
-    restart: always
-    command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0","--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]
-    ports:
-      - 7074:7074
-    env_file:
-      - ./functions/shops/.env
-    environment:
-      NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 volumes:
   doner_types_node_dist:
