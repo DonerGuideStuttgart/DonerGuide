@@ -7,6 +7,7 @@ export interface StoreAnalysis {
   score_fleischanteil: number;
   score_soßenanteil: number;
   score_gesamt: number;
+  image_prompt: string;
 }
 
 export const storeAnalysisSchema: ResponseFormatJSONSchema = {
@@ -52,6 +53,10 @@ export const storeAnalysisSchema: ResponseFormatJSONSchema = {
           minimum: 1,
           maximum: 100,
         },
+        image_prompt: {
+          type: "string",
+          description: "Der Prompt für die Bildgenerierung",
+        },
       },
       required: [
         "bewertungstext",
@@ -60,6 +65,7 @@ export const storeAnalysisSchema: ResponseFormatJSONSchema = {
         "score_fleischanteil",
         "score_soßenanteil",
         "score_gesamt",
+        "image_prompt",
       ],
       additionalProperties: false,
     },
