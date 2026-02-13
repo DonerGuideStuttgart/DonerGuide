@@ -4,10 +4,13 @@ services:
     container_name: "azurite"
     hostname: azurite
     restart: always
+    command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0","--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]
     ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
+      - 7074:7074
+    env_file:
+      - ./functions/shops/.env
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
   cosmosdb-emulator:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
