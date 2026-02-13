@@ -1,4 +1,6 @@
-export const imagePrompt = `Erstelle mir ein fotorealistisches Bild von einen Döner. 
-                           Der Döner hat nach einen Testessen einen Bewertungtext bekommen. 
-                           Fließe die Bewertung bei der Darstellung des Döners mit ein. Achte darauf visuelle Merkmale, 
-                           die in den Text enthalten sind, im Bild zu berücksichtigen.`;
+export const imagePrompt = `Erstelle ein fotorealistisches Bild von einem Döner Kebab in Fladenbrot, basierend auf folgender Bewertung.
+
+                            VISUELLE ANFORDERUNGEN:
+                            - Nahaufnahme/Anschnitt-Perspektive um Schichtung und Füllung zu zeigen
+                            - Natürliches Tageslicht, professionelle Food-Fotografie
+                            - Fotorealistisch, 8K Qualität, shallow depth of field für appetitliche Präsentation`;
