@@ -4,6 +4,7 @@ import {
   kmToDegreesLat,
   kmToDegreesLng,
   getCellSideKm,
+  KM_PER_DEGREE_LAT,
 } from "../geometry.util";
 
 describe("geometry.util", () => {
@@ -69,16 +70,16 @@ describe("geometry.util", () => {
 
   describe("kmToDegreesLat", () => {
     it("should convert km to latitude degrees", () => {
-      // 111.32 km = 1 degree of latitude
-      expect(kmToDegreesLat(111.32)).toBeCloseTo(1.0, 5);
-      expect(kmToDegreesLat(5)).toBeCloseTo(5 / 111.32, 5);
+      // KM_PER_DEGREE_LAT km = 1 degree of latitude
+      expect(kmToDegreesLat(KM_PER_DEGREE_LAT)).toBeCloseTo(1.0, 5);
+      expect(kmToDegreesLat(5)).toBeCloseTo(5 / KM_PER_DEGREE_LAT, 5);
     });
   });
 
   describe("kmToDegreesLng", () => {
     it("should convert km to longitude degrees at the equator", () => {
-      // At equator (0°), 1° lon ≈ 111.32 km
-      expect(kmToDegreesLng(111.32, 0)).toBeCloseTo(1.0, 4);
+      // At equator (0°), 1° lon ≈ KM_PER_DEGREE_LAT km
+      expect(kmToDegreesLng(KM_PER_DEGREE_LAT, 0)).toBeCloseTo(1.0, 4);
     });
 
     it("should return larger degree values at higher latitudes", () => {
@@ -100,10 +101,10 @@ describe("geometry.util", () => {
       const bbox = { minLat: 48.0, minLon: 9.0, maxLat: 49.0, maxLon: 10.0 };
       const { latSideKm, lonSideKm } = getCellSideKm(bbox);
 
-      // 1° lat ≈ 111.32 km
-      expect(latSideKm).toBeCloseTo(111.32, 1);
-      // 1° lon at 48.5° ≈ 111.32 * cos(48.5°) ≈ 73.7 km
-      expect(lonSideKm).toBeCloseTo(111.32 * Math.cos((48.5 * Math.PI) / 180), 1);
+      // 1° lat ≈ KM_PER_DEGREE_LAT km
+      expect(latSideKm).toBeCloseTo(KM_PER_DEGREE_LAT, 1);
+      // 1° lon at 48.5° ≈ KM_PER_DEGREE_LAT * cos(48.5°) ≈ 73.7 km
+      expect(lonSideKm).toBeCloseTo(KM_PER_DEGREE_LAT * Math.cos((48.5 * Math.PI) / 180), 1);
     });
 
     it("should show that lon side is shorter than lat side at Stuttgart latitude", () => {

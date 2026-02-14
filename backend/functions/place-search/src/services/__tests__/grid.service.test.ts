@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GridService } from "../grid.service";
+import { GridService, TARGET_CELL_SIZE_KM } from "../grid.service";
 import { Container } from "@azure/cosmos";
 import type { GridCell } from "../../types/grid";
-import { cellIntersectsBoundary } from "../../utils/geometry.util";
+import { cellIntersectsBoundary, KM_PER_DEGREE_LAT } from "../../utils/geometry.util";
 
 // Provide real implementations for the new geodetic functions, mock only boundary-related ones
 jest.mock("../../utils/geometry.util", () => {
@@ -16,13 +16,13 @@ jest.mock("../../utils/geometry.util", () => {
 
 const mockedCellIntersectsBoundary = cellIntersectsBoundary as jest.MockedFunction<typeof cellIntersectsBoundary>;
 
-/** Helper: compute expected grid dimensions for the mock BBox with TARGET_CELL_SIZE_KM = 5 */
+/** Helper: compute expected grid dimensions for the mock BBox */
 function getExpectedGridDimensions() {
   const minLat = 48.0,
     maxLat = 49.0,
     minLon = 9.0,
     maxLon = 10.0;
-  const latStep = 5 / 111.32;
+  const latStep = TARGET_CELL_SIZE_KM / KM_PER_DEGREE_LAT;
   const rows = Math.ceil((maxLat - minLat) / latStep);
 
   let totalCells = 0;
@@ -30,7 +30,7 @@ function getExpectedGridDimensions() {
     const cellMinLat = minLat + i * latStep;
     const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
     const centerLat = (cellMinLat + cellMaxLat) / 2;
-    const lonStep = 5 / (111.32 * Math.cos((centerLat * Math.PI) / 180));
+    const lonStep = TARGET_CELL_SIZE_KM / (KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180));
     const cols = Math.ceil((maxLon - minLon) / lonStep);
     totalCells += cols;
   }
@@ -116,12 +116,12 @@ describe("GridService", () => {
       const { minLat, maxLat, minLon, maxLon } = midCell.boundaryBox;
 
       const centerLat = (minLat + maxLat) / 2;
-      const latSideKm = (maxLat - minLat) * 111.32;
-      const lonSideKm = (maxLon - minLon) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
+      const latSideKm = (maxLat - minLat) * KM_PER_DEGREE_LAT;
+      const lonSideKm = (maxLon - minLon) * KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180);
 
-      // Both sides should be approximately TARGET_CELL_SIZE_KM (5 km), within tolerance
-      expect(latSideKm).toBeCloseTo(5, 0);
-      expect(lonSideKm).toBeCloseTo(5, 0);
+      // Both sides should be approximately TARGET_CELL_SIZE_KM, within tolerance
+      expect(latSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
+      expect(lonSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
     });
   });
 

@@ -9,14 +9,15 @@ import {
   getCellSideKm,
 } from "../utils/geometry.util";
 
-const TARGET_CELL_SIZE_KM = 5;
+export const TARGET_CELL_SIZE_KM = 5;
 
 export class GridService {
   constructor(private container: Container) {}
 
   /**
    * Initializes the grid if the version has changed or no cells exist.
-   * Creates a 4x4 level 0 grid for Stuttgart.
+   * Creates a level 0 grid for Stuttgart with cells of approximately
+   * {@link TARGET_CELL_SIZE_KM} km side length using geodetic calculations.
    */
   async initializeGrid(gridVersion: string): Promise<void> {
     const query = `SELECT VALUE COUNT(c.id) FROM c WHERE c.gridVersion = '${gridVersion}'`;
