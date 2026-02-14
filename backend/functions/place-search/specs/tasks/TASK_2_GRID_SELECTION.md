@@ -6,7 +6,7 @@ Implementierung der Logik zum Erstellen des Start-Grids und der Auswahl der näc
 
 ## Details
 
-- [ ] Implementiere `initializeGrid()`: Erzeugt 16 initiale Root-Zellen (4x4 Grid) auf Level 0, wenn die `gridVersion` in der DB nicht mit der Config übereinstimmt.
+- [ ] Implementiere `initializeGrid()`: Erzeugt initiale Root-Zellen (ca. `TARGET_CELL_SIZE_KM` Seitenlänge, dynamisch berechnet via `KM_PER_DEGREE_LAT`) auf Level 0, wenn die `gridVersion` in der DB nicht mit der Config übereinstimmt.
 - [ ] Implementiere `getNextCell()`:
   - Suche Zellen, die nicht `status: 'SPLIT'` sind.
   - Sortiere nach `lastProcessedAt ASC` (älteste/null zuerst).

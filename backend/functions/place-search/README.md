@@ -13,7 +13,7 @@ Diese Azure Function ist der zentrale Crawler des DönerGuides. Sie erfasst syst
 
 Um das Limit der Google API (max. 60 Ergebnisse pro Suche) zu umgehen und eine flächendeckende Erfassung zu garantieren, nutzt der Crawler ein dynamisches Grid-System:
 
-1. **Initialisierung**: Das Zielgebiet wird in ein Start-Grid (z. B. 4x4 Zellen) unterteilt.
+1. **Initialisierung**: Das Zielgebiet wird in ein Start-Grid unterteilt, dessen Zellen ca. `TARGET_CELL_SIZE_KM` (5 km) Seitenlänge haben. Die Zellenanzahl ergibt sich dynamisch aus geodätischen Berechnungen (`KM_PER_DEGREE_LAT`).
 2. **Zyklische Verarbeitung**: Pro Durchlauf wird die Zelle ausgewählt, die am längsten nicht mehr bearbeitet wurde (`lastProcessedAt` ASC).
 3. **Suche & Split (Divide & Conquer)**:
    - Die Funktion sucht in der `boundaryBox` der Zelle nach Läden.
