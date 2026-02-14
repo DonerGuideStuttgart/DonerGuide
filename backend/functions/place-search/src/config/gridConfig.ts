@@ -12,6 +12,13 @@ export const GRID_CONFIG = {
     /** Minimale Zellseitenlänge in Metern — darunter wird nicht mehr gesplittet */
     minCellSizeM: 50,
   },
+
+  merge: {
+    /** Max combined results for merged cells — conservative buffer below split threshold */
+    maxMergedResults: 40,
+    /** Max side length of a merged cell in km */
+    maxMergedCellSizeKm: 15,
+  },
 } as const;
 
 validateGridConfig(GRID_CONFIG);

@@ -12,6 +12,10 @@ jest.mock("../../config/gridConfig", () => ({
       maxDepth: 10,
       minCellSizeM: 50,
     },
+    merge: {
+      maxMergedResults: 40,
+      maxMergedCellSizeKm: 15,
+    },
   },
 }));
 

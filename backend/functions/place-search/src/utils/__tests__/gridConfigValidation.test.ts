@@ -8,6 +8,10 @@ function validConfig() {
       maxDepth: 10,
       minCellSizeM: 50,
     },
+    merge: {
+      maxMergedResults: 40,
+      maxMergedCellSizeKm: 15,
+    },
   };
 }
 
@@ -64,6 +68,30 @@ describe("validateGridConfig", () => {
     expect(() => validateGridConfig(config)).toThrow("minCellSizeM");
   });
 
+  it("should throw if maxMergedResults is 0", () => {
+    const config = validConfig();
+    config.merge.maxMergedResults = 0;
+    expect(() => validateGridConfig(config)).toThrow("maxMergedResults");
+  });
+
+  it("should throw if maxMergedResults exceeds 60", () => {
+    const config = validConfig();
+    config.merge.maxMergedResults = 61;
+    expect(() => validateGridConfig(config)).toThrow("maxMergedResults");
+  });
+
+  it("should throw if maxMergedCellSizeKm is below 1", () => {
+    const config = validConfig();
+    config.merge.maxMergedCellSizeKm = 0.5;
+    expect(() => validateGridConfig(config)).toThrow("maxMergedCellSizeKm");
+  });
+
+  it("should throw if maxMergedCellSizeKm exceeds 50", () => {
+    const config = validConfig();
+    config.merge.maxMergedCellSizeKm = 51;
+    expect(() => validateGridConfig(config)).toThrow("maxMergedCellSizeKm");
+  });
+
   it("should accept boundary values", () => {
     const config = {
       baseCellSizeKm: 0.1,
@@ -71,6 +99,10 @@ describe("validateGridConfig", () => {
         threshold: 1,
         maxDepth: 1,
         minCellSizeM: 10,
+      },
+      merge: {
+        maxMergedResults: 1,
+        maxMergedCellSizeKm: 1,
       },
     };
     expect(() => validateGridConfig(config)).not.toThrow();
@@ -81,6 +113,10 @@ describe("validateGridConfig", () => {
         threshold: 60,
         maxDepth: 15,
         minCellSizeM: 5000,
+      },
+      merge: {
+        maxMergedResults: 60,
+        maxMergedCellSizeKm: 50,
       },
     };
     expect(() => validateGridConfig(configMax)).not.toThrow();
