@@ -14,8 +14,3 @@ variable "place_search_cron" {
   type        = string
   default     = "0 0 * * * *"
 }
-
-variable "gemini_api_key" {
-  description = "API key for Gemini"
-  type        = string
-}
