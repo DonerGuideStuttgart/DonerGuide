@@ -96,7 +96,7 @@ export function mapToStore(item: any): Store {
 
   // 2. Images
   const imageUrls: string[] = Array.isArray(item.public_photos)
-    ? item.photos.map((p: any) => p.url).filter((u: any) => typeof u === "string")
+    ? item.public_photos.map((p: any) => p.url).filter((u: any) => typeof u === "string")
     : [];
 
   // 3. Scores & Ratios
