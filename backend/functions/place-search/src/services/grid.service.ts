@@ -29,22 +29,24 @@ export class GridService {
 
     const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
-    const latStep = kmToDegreesLat(TARGET_CELL_SIZE_KM);
-    const rows = Math.ceil((maxLat - minLat) / latStep);
+    const nominalLatStep = kmToDegreesLat(TARGET_CELL_SIZE_KM);
+    const rows = Math.max(1, Math.round((maxLat - minLat) / nominalLatStep));
+    const latStep = (maxLat - minLat) / rows;
 
     const cells: GridCell[] = [];
 
     for (let i = 0; i < rows; i++) {
       const cellMinLat = minLat + i * latStep;
-      const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
+      const cellMaxLat = minLat + (i + 1) * latStep;
       const centerLat = (cellMinLat + cellMaxLat) / 2;
 
-      const lonStep = kmToDegreesLng(TARGET_CELL_SIZE_KM, centerLat);
-      const cols = Math.ceil((maxLon - minLon) / lonStep);
+      const nominalLonStep = kmToDegreesLng(TARGET_CELL_SIZE_KM, centerLat);
+      const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
+      const lonStep = (maxLon - minLon) / cols;
 
       for (let j = 0; j < cols; j++) {
         const cellMinLon = minLon + j * lonStep;
-        const cellMaxLon = Math.min(minLon + (j + 1) * lonStep, maxLon);
+        const cellMaxLon = minLon + (j + 1) * lonStep;
 
         const bbox = {
           minLat: cellMinLat,
