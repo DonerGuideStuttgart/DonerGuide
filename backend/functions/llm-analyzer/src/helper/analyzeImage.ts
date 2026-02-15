@@ -4,7 +4,6 @@ import { ParsedChatCompletion } from "openai/resources/chat/completions";
 import { StoreAnalysis, storeAnalysisSchema } from "doner_types";
 import { getRandomPersona } from "./prompts";
 
- 
 export async function analyzeImage(
   context: InvocationContext,
   aiClient: AzureOpenAI,
@@ -30,7 +29,7 @@ export async function analyzeImage(
       },
     ],
     max_completion_tokens: 2000,
-    model: "gpt-4o",
+    model: "gpt-5-mini",
     response_format: storeAnalysisSchema,
   });
 
@@ -42,4 +41,3 @@ export async function analyzeImage(
 
   return result;
 }
- 

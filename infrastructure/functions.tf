@@ -173,16 +173,18 @@ resource "azurerm_linux_function_app" "llm-analyzer-function" {
   }
 
   app_settings = {
-    "LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT"                                 = azurerm_servicebus_queue.sb_queue_images.name
-    "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_INPUT__fullyQualifiedNamespace" = "${azurerm_servicebus_namespace.sb_namespace.name}.servicebus.windows.net"
-    "LLM_ANALYZER_COSMOSDB_ENDPOINT"                                           = azurerm_cosmosdb_account.cosmosdb_account.endpoint
-    "LLM_ANALYZER_COSMOSDB_DATABASE_NAME"                                      = azurerm_cosmosdb_sql_database.database.name
-    "LLM_ANALYZER_COSMOSDB_CONTAINER_NAME"                                     = azurerm_cosmosdb_sql_container.places_container.name
-    "LLM_ANALYZER_STORAGE_ENDPOINT"                                            = azurerm_storage_account.storage_account_functions.primary_blob_endpoint
-    "LLM_ANALYZER_STORAGE_ACCOUNT_NAME"                                        = azurerm_storage_account.storage_account_functions.name
-    "LLM_ANALYZER_STORAGE_CONTAINER_NAME"                                      = azurerm_storage_container.sc_classified_images.name
-    "LLM_ANALYZER_FOUNDRY_ENDPOINT"                                            = "https://${azurerm_cognitive_account.account_llm.custom_subdomain_name}.cognitiveservices.azure.com/"
-    "LLM_ANALYZER_FOUNDRY_DEPLOYMENT_NAME"                                     = azurerm_cognitive_deployment.deployment_llm.name
+    "LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_INPUT"                                  = azurerm_servicebus_queue.sb_queue_images.name
+    "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_INPUT__fullyQualifiedNamespace"  = "${azurerm_servicebus_namespace.sb_namespace.name}.servicebus.windows.net"
+    "LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_OUTPUT"                                 = azurerm_servicebus_queue.sb_queue_image_prompts.name
+    "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_OUTPUT__fullyQualifiedNamespace" = "${azurerm_servicebus_namespace.sb_namespace.name}.servicebus.windows.net"
+    "LLM_ANALYZER_COSMOSDB_ENDPOINT"                                            = azurerm_cosmosdb_account.cosmosdb_account.endpoint
+    "LLM_ANALYZER_COSMOSDB_DATABASE_NAME"                                       = azurerm_cosmosdb_sql_database.database.name
+    "LLM_ANALYZER_COSMOSDB_CONTAINER_NAME"                                      = azurerm_cosmosdb_sql_container.places_container.name
+    "LLM_ANALYZER_STORAGE_ENDPOINT"                                             = azurerm_storage_account.storage_account_functions.primary_blob_endpoint
+    "LLM_ANALYZER_STORAGE_ACCOUNT_NAME"                                         = azurerm_storage_account.storage_account_functions.name
+    "LLM_ANALYZER_STORAGE_CONTAINER_NAME"                                       = azurerm_storage_container.sc_classified_images.name
+    "LLM_ANALYZER_FOUNDRY_ENDPOINT"                                             = "https://${azurerm_cognitive_account.account_llm.custom_subdomain_name}.cognitiveservices.azure.com/"
+    "LLM_ANALYZER_FOUNDRY_DEPLOYMENT_NAME"                                      = azurerm_cognitive_deployment.deployment_llm.name
   }
 
   lifecycle {
@@ -315,10 +317,12 @@ resource "azurerm_linux_function_app" "image-generator-function" {
 
   app_settings = {
     "IMAGE_GENERATOR_SERVICEBUS_CONNECTION_STRING_INPUT" = azurerm_servicebus_namespace.sb_namespace.default_primary_connection_string
+    "IMAGE_GENERATOR_SERVICEBUS_QUEUE_NAME"              = azurerm_servicebus_queue.sb_queue_image_prompts.name
     "IMAGE_GENERATOR_COSMOSDB_ENDPOINT"                  = azurerm_cosmosdb_account.cosmosdb_account.endpoint
     "IMAGE_GENERATOR_COSMOSDB_DATABASE_NAME"             = azurerm_cosmosdb_sql_database.database.name
     "IMAGE_GENERATOR_COSMOSDB_CONTAINER_NAME"            = azurerm_cosmosdb_sql_container.places_container.name
-    "IMAGE_GENERATOR_STORAGE_ACCOUNT_NAME"               = azurerm_storage_account.storage_account_functions.name
+    "IMAGE_GENERATOR_STORAGE_ENDPOINT"                   = azurerm_storage_account.storage_account_generated_images.primary_blob_endpoint
+    "IMAGE_GENERATOR_STORAGE_ACCOUNT_NAME"               = azurerm_storage_account.storage_account_generated_images.name
     "IMAGE_GENERATOR_STORAGE_CONTAINER_NAME"             = azurerm_storage_container.sc_generated_images.name
     "IMAGE_GENERATOR_GEMINI_API_KEY"                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.kv.vault_uri}/secrets/google-gemini-api-key)"
   }
@@ -354,7 +358,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "image_generator_cosmos_role" {
 }
 
 resource "azurerm_role_assignment" "image_generator_storage_role" {
-  scope                = azurerm_storage_account.storage_account_functions.id
+  scope                = azurerm_storage_account.storage_account_generated_images.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_function_app.image-generator-function.identity[0].principal_id
 }

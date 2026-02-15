@@ -36,7 +36,6 @@ function initializeServices() {
   return { client, blobService, visionService };
 }
 
-
 /**
  * Resets the services (used for testing).
  */
@@ -110,8 +109,8 @@ export async function imageClassifier(
 
     // 2. Download and Analyze
     await bs.ensureContainerExists();
-    const { contentType, buffer } = await bs.downloadAndUploadImage(url, photoId);
-    const analysis = await vs.analyzeImage(buffer);
+    const { contentType, buffer } = await bs.downloadAndUploadImage(url, photoId, context);
+    const analysis = await vs.analyzeImage(buffer, context);
 
     const finalCategory = analysis.category;
     if (finalCategory === "discard") {

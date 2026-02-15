@@ -1,6 +1,6 @@
 import { CosmosClient, Item } from "@azure/cosmos";
-import { app, InvocationContext } from "@azure/functions";
-import { Place } from "doner_types";
+import { app, InvocationContext, output } from "@azure/functions";
+import { Place, NewPromptMessage } from "doner_types";
 import { AzureOpenAI } from "openai";
 import { analyzeImage } from "../helper/analyzeImage";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
@@ -67,9 +67,13 @@ app.serviceBusQueue("llmAnalyzer", {
   connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_INPUT",
   queueName: QUEUE_NAME_INPUT,
   handler: llmAnalyzer,
+  return: output.serviceBusQueue({
+    queueName: process.env.LLM_ANALYZER_SERVICEBUS_QUEUE_NAME_OUTPUT ?? "image-prompts",
+    connection: "LLM_ANALYZER_SERVICEBUS_CONNECTION_STRING_OUTPUT",
+  }),
 });
 
-export async function llmAnalyzer(storeId: { storeId: string }, context: InvocationContext): Promise<void> {
+export async function llmAnalyzer(storeId: { storeId: string }, context: InvocationContext): Promise<NewPromptMessage> {
   context.log("LLM Analyzer function ran at", new Date().toISOString());
 
   const database = (await client.databases.createIfNotExists({ id: COSMOSDB_DATABASE_NAME })).database;
@@ -100,4 +104,9 @@ export async function llmAnalyzer(storeId: { storeId: string }, context: Invocat
       },
     ],
   });
+
+  return {
+    placeId: storeId.storeId,
+    prompt: analysisResult.image_prompt,
+  };
 }
