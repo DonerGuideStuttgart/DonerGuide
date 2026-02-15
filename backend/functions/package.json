@@ -9,7 +9,8 @@
     "place-search",
     "image-classifier",
     "llm-analyzer",
-    "shops"
+    "shops",
+    "image-generator"
   ],
   "scripts": {
     "lint": "eslint . --cache",
