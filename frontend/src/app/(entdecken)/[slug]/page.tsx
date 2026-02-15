@@ -29,7 +29,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { slug } = await params
-	const store = await fetchPlaceBySlug(slug)
+	const store = await fetchPlaceById(slug)
 
 	if (!store) {
 		return {
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-	const data = await fetchPlaces('')
+	const data = await fetchPlaces('limit=1000') // Fetch all places
 	const places = data.items || []
 
 	return places.map((place: StoreBase) => ({
