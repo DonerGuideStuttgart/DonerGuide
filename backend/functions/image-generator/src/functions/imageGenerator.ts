@@ -32,7 +32,7 @@ function initialize() {
 
 app.serviceBusQueue("imageGenerator", {
   connection: "IMAGE_GENERATOR_SERVICEBUS_CONNECTION_STRING_INPUT",
-  queueName: "%IMAGE_GENERATOR_SERVICEBUS_QUEUE_NAME%",
+  queueName: process.env.IMAGE_GENERATOR_SERVICEBUS_QUEUE_NAME ?? "image-prompts",
   handler: imageGenerator,
 });
 
