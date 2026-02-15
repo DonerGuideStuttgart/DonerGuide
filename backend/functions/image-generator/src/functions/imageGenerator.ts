@@ -67,7 +67,7 @@ export async function imageGenerator(message: unknown, context: InvocationContex
 
     context.log("Generated prompt:", fullPrompt);
 
-    const imageBuffer = await genAIService.generateImage(fullPrompt);
+    const imageBuffer = await genAIService.generateImage(fullPrompt, context);
 
     const photoId = randomUUID();
     await blobService.ensureContainerExists();

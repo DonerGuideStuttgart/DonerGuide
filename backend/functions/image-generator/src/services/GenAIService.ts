@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { GenerateContentResponse } from "@google/genai";
+import { InvocationContext } from "@azure/functions";
 
 export class GenAIService {
   private client: GoogleGenAI | undefined;
@@ -19,9 +20,9 @@ export class GenAIService {
     }
   }
 
-  public async generateImage(prompt: string): Promise<Buffer> {
+  public async generateImage(prompt: string, context: InvocationContext): Promise<Buffer> {
     if (this.isMockMode || !this.client) {
-      console.log(`[MOCK] Generating image for prompt: "${prompt}"`);
+      context.log(`[MOCK] Generating image for prompt: "${prompt}"`);
       return this.getMockImage();
     }
 
@@ -33,7 +34,7 @@ export class GenAIService {
 
       for (const part of response.candidates?.[0].content?.parts ?? []) {
         if (part.text) {
-          console.log(part.text);
+          context.log(part.text);
         } else if (part.inlineData?.data) {
           return Buffer.from(part.inlineData.data, "base64");
         }
@@ -41,7 +42,7 @@ export class GenAIService {
 
       throw new Error("No image data found in response from GenAI");
     } catch (error) {
-      console.error("GenAIService: Error generating image:", error);
+      context.error("GenAIService: Error generating image:", error);
       throw error;
     }
   }

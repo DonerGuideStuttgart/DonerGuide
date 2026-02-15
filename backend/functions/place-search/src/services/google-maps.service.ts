@@ -1,5 +1,6 @@
 import type { Place, Photo } from "doner_types";
 import { PaymentMethods } from "doner_types";
+import { InvocationContext } from "@azure/functions";
 
 export interface GooglePlaceResponse {
   places?: Record<string, unknown>[];
@@ -45,10 +46,11 @@ export class GoogleMapsService {
     minLon: number,
     maxLat: number,
     maxLon: number,
+    context: InvocationContext,
     pageToken?: string
   ): Promise<GooglePlaceResponse> {
     if (this.isDryRun) {
-      return this.getMockData(minLat, minLon, maxLat, maxLon, pageToken);
+      return this.getMockData(minLat, minLon, maxLat, maxLon, context, pageToken);
     }
 
     const url = "https://places.googleapis.com/v1/places:searchText";
@@ -102,14 +104,15 @@ export class GoogleMapsService {
     minLat: number,
     minLon: number,
     maxLat: number,
-    maxLon: number
+    maxLon: number,
+    context: InvocationContext
   ): Promise<Record<string, unknown>[]> {
     const allPlaces: Record<string, unknown>[] = [];
     let pageToken: string | undefined = undefined;
     let pageCount = 0;
 
     do {
-      const response = await this.searchPlaces(minLat, minLon, maxLat, maxLon, pageToken);
+      const response = await this.searchPlaces(minLat, minLon, maxLat, maxLon, context, pageToken);
       if (response.places) {
         allPlaces.push(...response.places);
       }
@@ -249,11 +252,12 @@ export class GoogleMapsService {
     _minLon: number,
     _maxLat: number,
     _maxLon: number,
+    context: InvocationContext,
     pageToken?: string
   ): GooglePlaceResponse {
     if (pageToken === "end") return { places: [] };
 
-    console.log(
+    context.log(
       `[GoogleMapsService] MOCK: Searching in [${String(_minLat)}, ${String(_minLon)}] to [${String(_maxLat)}, ${String(_maxLon)}], pageToken: ${pageToken ?? ""}`
     );
 
