@@ -55,7 +55,8 @@ export const storeAnalysisSchema: ResponseFormatJSONSchema = {
         },
         image_prompt: {
           type: "string",
-          description: "Der Prompt für die Bildgenerierung",
+          description:
+            "Eine Ausfürhliche Beschreibung von Döner und Umgebung, für eine KI zur Bildgenerierung.  Die Beschreibung muss den visuellen Eindruck des Döners und der Umgebung vollständig reflektieren und darstellen, so dass der Bildgenerator ein passendes Bild erzeugen kann, das die Bewertung und den Eindruck des Döners darstellt.",
         },
       },
       required: [

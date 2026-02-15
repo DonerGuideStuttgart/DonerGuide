@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { GenerateContentResponse } from "@google/genai";
 
 export class GenAIService {
   private client: GoogleGenAI | undefined;
@@ -25,28 +26,20 @@ export class GenAIService {
     }
 
     try {
-      // Note: The actual Google GenAI SDK method for image generation might differ slightly based on version.
-      // Assuming a standard 'generateContent' or specific image method exists or will exist.
-      // For now, adhering to the requirement "per google genai sdk ... generiert".
-      // If the SDK strictly only supports text-to-text/multimodal-to-text currently in this version,
-      // we might need to adjust. However, assuming "nano-banana" implies an image model.
+      const response: GenerateContentResponse = await this.client.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: prompt,
+      });
 
-      // Placeholder for actual SDK call. adjusting based on common patterns or assuming usage of a specific model capability
-      // The current @google/genai SDK is often used for Gemini. Image generation might be via a specific model endpoint.
+      for (const part of response.candidates?.[0].content?.parts ?? []) {
+        if (part.text) {
+          console.log(part.text);
+        } else if (part.inlineData?.data) {
+          return Buffer.from(part.inlineData.data, "base64");
+        }
+      }
 
-      // START MOCK IMPLEMENTATION FOR SDK CALL (UNTIL CONFIRMED SDK SIGNATURE)
-      // Real implementation would look like:
-      // const result = await model.generateContent(prompt);
-      // const response = await result.response;
-      // ... extract image data ...
-
-      // For boilerplate purposes, I will throw if not mock, to prompt user to verify SDK usage
-      // or returning mock data effectively if we can't verify the exact SDK signature for image gen right now.
-
-      console.log(`Generating image with model ${this.modelName} for prompt: "${prompt}"`);
-      // TODO: Replace with actual SDK call when precise model signature is known.
-      // For now, falling back to mock to ensure boilerplate compiles and runs safely.
-      return this.getMockImage();
+      throw new Error("No image data found in response from GenAI");
     } catch (error) {
       console.error("GenAIService: Error generating image:", error);
       throw error;

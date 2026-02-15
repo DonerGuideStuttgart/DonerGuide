@@ -63,7 +63,7 @@ export async function imageGenerator(message: unknown, context: InvocationContex
       return;
     }
 
-    const fullPrompt = `${imagePrompt}\n\nBewertung:\n${place.ai_analysis.bewertungstext}`;
+    const fullPrompt = `${imagePrompt}\n\nBewertung:\n${place.ai_analysis.bewertungstext}\n\n Bildinformationen:\n${place.ai_analysis.image_prompt}`;
 
     context.log("Generated prompt:", fullPrompt);
 
@@ -78,7 +78,6 @@ export async function imageGenerator(message: unknown, context: InvocationContex
       url: blobUrl,
       mimeType: "image/png",
       category: "ai_generated",
-      confidence: 1.0,
     };
 
     if (!place.public_photos) {
