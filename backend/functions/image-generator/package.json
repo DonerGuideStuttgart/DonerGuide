@@ -15,19 +15,19 @@
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.0.0",
+    "@azure/cosmos": "^4.9.0",
     "@azure/functions": "^4.0.0",
-    "@azure/identity": "^4.0.0",
-    "@azure/storage-blob": "^12.0.0",
+    "@azure/identity": "^4.13.0",
+    "@azure/storage-blob": "^12.30.0",
     "@google/genai": "^1.41.0",
     "doner_types": "file:../shared/doner_types"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "azure-functions-core-tools": "^4.x",
-    "concurrently": "^9.0.0",
-    "esbuild": "^0.20.0",
-    "rimraf": "^5.0.0",
-    "typescript": "^5.0.0"
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.27.2",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3"
   }
 }
