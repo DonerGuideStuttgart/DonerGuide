@@ -19,6 +19,7 @@ jobs:
           - backend/functions/image-classifier
           - backend/functions/llm-analyzer
           - backend/functions/shops
+          - backend/functions/image-generator
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout GitHub Action"
