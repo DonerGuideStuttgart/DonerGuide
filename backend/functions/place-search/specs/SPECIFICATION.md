@@ -42,13 +42,13 @@ interface GridCell {
 ## 4. Konfiguration & Konstanten
 
 - `MAX_LEVEL`: 10 (Verhindert unendliches Splitten bei extremer Punktdichte).
-- `INITIAL_GRID_SIZE`: 4x4 (16 Root-Zellen auf Level 0).
+- `TARGET_CELL_SIZE_KM`: 5 (Ziel-Seitenlänge der Level-0-Zellen in km; Zellenanzahl wird dynamisch über geodätische Berechnungen mit `KM_PER_DEGREE_LAT` ermittelt).
 
 ## 5. Kernalgorithmen
 
 ### A. Auswahl-Logik (Zyklische Priorisierung)
 
-1. **Grid-Check:** Finde Zellen mit `gridVersion` != `CURRENT_VERSION`. Falls keine vorhanden oder Version veraltet: Initialisiere neues Grid (16 Root-Zellen auf Level 0) basierend auf den konfigurierten Boundaries.
+1. **Grid-Check:** Finde Zellen mit `gridVersion` != `CURRENT_VERSION`. Falls keine vorhanden oder Version veraltet: Initialisiere neues Grid (Root-Zellen mit ca. `TARGET_CELL_SIZE_KM` Seitenlänge auf Level 0) basierend auf den Stuttgart-Stadtgrenzen und geodätischen Berechnungen.
 2. **Task-Auswahl:** Suche nächste zu bearbeitende Zelle (`status != 'SPLIT'`):
    - **Filter:** `status != 'SPLIT'` (Bearbeite `PENDING`, `COMPLETED` und "stale" `PROCESSING` Zellen).
    - **Sortierung:** `lastProcessedAt ASC` (Älteste oder nie bearbeitete Zellen zuerst). Dies sorgt für eine endlose zyklische Aktualisierung aller Blätter des Grids.

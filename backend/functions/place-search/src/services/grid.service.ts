@@ -15,7 +15,8 @@ export class GridService {
 
   /**
    * Initializes the grid if the version has changed or no cells exist.
-   * Creates a 4x4 level 0 grid for Stuttgart.
+   * Creates a level 0 grid for Stuttgart with cells of approximately
+   * {@link TARGET_CELL_SIZE_KM} km side length using geodetic calculations.
    */
   async initializeGrid(gridVersion: string): Promise<void> {
     const query = `SELECT VALUE COUNT(c.id) FROM c WHERE c.gridVersion = '${gridVersion}'`;
@@ -27,22 +28,24 @@ export class GridService {
 
     const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
-    const latStep = kmToDegreesLat(GRID_CONFIG.baseCellSizeKm);
-    const rows = Math.ceil((maxLat - minLat) / latStep);
+    const nominalLatStep = kmToDegreesLat(GRID_CONFIG.baseCellSizeKm);
+    const rows = Math.max(1, Math.round((maxLat - minLat) / nominalLatStep));
+    const latStep = (maxLat - minLat) / rows;
 
     const cells: GridCell[] = [];
 
     for (let i = 0; i < rows; i++) {
       const cellMinLat = minLat + i * latStep;
-      const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
+      const cellMaxLat = minLat + (i + 1) * latStep;
       const centerLat = (cellMinLat + cellMaxLat) / 2;
 
-      const lonStep = kmToDegreesLng(GRID_CONFIG.baseCellSizeKm, centerLat);
-      const cols = Math.ceil((maxLon - minLon) / lonStep);
+      const nominalLonStep = kmToDegreesLng(GRID_CONFIG.baseCellSizeKm, centerLat);
+      const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
+      const lonStep = (maxLon - minLon) / cols;
 
       for (let j = 0; j < cols; j++) {
         const cellMinLon = minLon + j * lonStep;
-        const cellMaxLon = Math.min(minLon + (j + 1) * lonStep, maxLon);
+        const cellMaxLon = minLon + (j + 1) * lonStep;
 
         const bbox = {
           minLat: cellMinLat,

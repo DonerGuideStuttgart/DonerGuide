@@ -2,7 +2,7 @@ import { validateGridConfig } from "../utils/gridConfigValidation";
 
 export const GRID_CONFIG = {
   /** Initiale Zellgröße in km für das Startgrid */
-  baseCellSizeKm: 5,
+  baseCellSizeKm: 8,
 
   subdivision: {
     /** Ab dieser Ergebnisanzahl wird gesplittet (Google Places API paginiert max 60) */
