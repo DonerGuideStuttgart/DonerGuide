@@ -28,10 +28,11 @@ import {
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const TARGET_CELL_SIZE_KM = 5.3;
+const TARGET_CELL_SIZE_KM = 8;
 const MAX_LEVEL = 10;
 const MAX_PAGES_PER_CELL = 3;
 const SPLIT_THRESHOLD = 55;
+const API_DELAY_MS = 200;
 
 const BENCHMARK_CONFIG = {
   /** Original: 4x4 grid, degree-based splitting, no boundary filter */
@@ -43,6 +44,8 @@ const BENCHMARK_CONFIG = {
   /** Load cells from file if available (true = warm-start, false = fresh start) */
   resumeFromFile: true,
 };
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ─── Lightweight API search (minimal FieldMask) ─────────────────────────────
 
@@ -105,6 +108,10 @@ async function searchAllPagesLightweight(
 
     pageToken = data.nextPageToken;
     pageCount++;
+
+    if (pageToken && pageCount < MAX_PAGES_PER_CELL) {
+      await sleep(API_DELAY_MS);
+    }
   } while (pageToken && pageCount < MAX_PAGES_PER_CELL);
 
   return { placeIds: allPlaceIds, pageCount };
@@ -410,7 +417,8 @@ async function runBenchmark(
 
   let processed = 0;
   while (pending.length > 0) {
-    const cell = pending.shift()!;
+    const cell = pending.shift();
+    if (!cell) break;
     processed++;
 
     const { placeIds, pageCount } = await searchAllPagesLightweight(apiKey, cell.boundaryBox);
@@ -449,6 +457,10 @@ async function runBenchmark(
     }
 
     cell.lastProcessedAt = new Date().toISOString();
+
+    if (pending.length > 0) {
+      await sleep(API_DELAY_MS);
+    }
   }
 
   // Only save leaf cells (COMPLETED) — the final grid for warm-start runs.
@@ -574,7 +586,7 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error("Benchmark failed:", err);
   process.exit(1);
 });
