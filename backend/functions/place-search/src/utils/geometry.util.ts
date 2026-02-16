@@ -4,6 +4,8 @@ import { multiPolygon, polygon } from "@turf/helpers";
 import stuttgartBorders from "../data/stuttgart_borders.json";
 import type { GridCell } from "../types/grid";
 
+export const KM_PER_DEGREE_LAT = 111.32;
+
 const stuttgartFeature = multiPolygon(stuttgartBorders.coordinates);
 
 /**
@@ -65,20 +67,20 @@ export function cellIntersectsBoundary(cellBBox: GridCell["boundaryBox"]): boole
   return booleanIntersects(cellPolygon, stuttgartFeature);
 }
 
-/** Converts km to latitude degrees (constant everywhere on Earth). */
+/** Converts km to latitude degrees using {@link KM_PER_DEGREE_LAT} (constant everywhere on Earth). */
 export function kmToDegreesLat(km: number): number {
-  return km / 111.32;
+  return km / KM_PER_DEGREE_LAT;
 }
 
-/** Converts km to longitude degrees (varies with latitude). */
+/** Converts km to longitude degrees using {@link KM_PER_DEGREE_LAT} (varies with latitude). */
 export function kmToDegreesLng(km: number, latitude: number): number {
-  return km / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  return km / (KM_PER_DEGREE_LAT * Math.cos((latitude * Math.PI) / 180));
 }
 
-/** Returns the real-world side lengths of a bounding box in km. */
+/** Returns the real-world side lengths of a bounding box in km using {@link KM_PER_DEGREE_LAT}. */
 export function getCellSideKm(bbox: GridCell["boundaryBox"]): { latSideKm: number; lonSideKm: number } {
   const centerLat = (bbox.minLat + bbox.maxLat) / 2;
-  const latSideKm = (bbox.maxLat - bbox.minLat) * 111.32;
-  const lonSideKm = (bbox.maxLon - bbox.minLon) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
+  const latSideKm = (bbox.maxLat - bbox.minLat) * KM_PER_DEGREE_LAT;
+  const lonSideKm = (bbox.maxLon - bbox.minLon) * KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180);
   return { latSideKm, lonSideKm };
 }
