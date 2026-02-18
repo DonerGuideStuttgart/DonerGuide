@@ -33,6 +33,7 @@ resource "azurerm_container_app" "api_mock" {
         "https://doenerguide-stuttgart.de/",
         "http://doenerguide-stuttgart.de/"
       ]
+      allowed_headers = ["*"]
     }
 
     traffic_weight {

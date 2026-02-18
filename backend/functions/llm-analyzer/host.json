@@ -16,7 +16,7 @@
     "serviceBus": {
       "clientRetryOptions": {
         "mode": "exponential",
-        "delay": "00:00:02.00",
+        "delay": "00:00:30.00",
         "maxRetries": 4
       }
     }

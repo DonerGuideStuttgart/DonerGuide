@@ -3,6 +3,7 @@ import { StoreBase } from '@/types/store'
 import { useRef, useState } from 'react'
 import Map, { MapRef, Marker } from 'react-map-gl/mapbox'
 import { StoreMarkerPopup } from './StoreMarkerPopup'
+import MapPin from '@/assets/logo/map_pin.svg'
 
 interface StoreMapProps {
 	stores: StoreBase[]
@@ -45,32 +46,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
 						latitude={store.location.coordinates.lat}
 						longitude={store.location.coordinates.lng}
 						anchor="bottom"
-						onClick={(e: {
-							originalEvent: { stopPropagation: () => void }
-						}) => {
+						onClick={(e) => {
 							e.originalEvent.stopPropagation()
 							setSelectedStore(store)
 						}}
 					>
 						<div className="cursor-pointer transform transition-transform hover:scale-110">
-							{/* Custom marker icon matching DaisyUI theme */}
-							<svg
-								width="32"
-								height="40"
-								viewBox="-2 -2 36 44"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								{/* Pin shape */}
-								<path
-									d="M16 0C7.16 0 0 7.16 0 16C0 28 16 40 16 40C16 40 32 28 32 16C32 7.16 24.84 0 16 0Z"
-									fill="#fb783a"
-									stroke="#341c0a"
-									strokeWidth="2"
-								/>
-								{/* Inner circle */}
-								<circle cx="16" cy="16" r="6" fill="#341c0a" />
-							</svg>
+							<MapPin height="40" width="20" />
 						</div>
 					</Marker>
 				))}

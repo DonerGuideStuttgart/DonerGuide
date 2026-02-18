@@ -136,6 +136,58 @@ services:
     environment:
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
+
+  places-reader:
+    image: node:22
+    container_name: "places-reader"
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./helper/service-bus-reader:/app
+      - node_modules_service-bus-reader:/app/node_modules
+      - node_dist_service-bus-reader:/app/node_modules
+    command: sh -c "npm install && npm start"
+    depends_on:
+      - servicebus-emulator
+    environment:
+      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      QUEUE_NAME: "places"
+      BATCH_SIZE: "10"
+    profiles:
+      - reader
+  
+  image-classifier-reader:
+    image: node:22
+    container_name: "image-classifier-reader"
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./helper/service-bus-reader:/app
+      - node_modules_service-bus-reader:/app/node_modules
+      - node_dist_service-bus-reader:/app/node_modules
+    command: sh -c "npm install && npm start"
+    depends_on:
+      - servicebus-emulator
+    environment:
+      SERVICEBUS_CONNECTION_STRING: "Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      QUEUE_NAME: "classified-images"
+      BATCH_SIZE: "10"
+    profiles:
+      - reader
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
+    restart: always
+    command: ["azurite", "-l", "/data", "--blobHost", "0.0.0.0","--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--skipApiVersionCheck"]
+    ports:
+      - 7074:7074
+    env_file:
+      - ./functions/shops/.env
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
 volumes:
   doner_types_node_dist:
   node_modules_cache:

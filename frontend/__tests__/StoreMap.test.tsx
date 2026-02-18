@@ -1,6 +1,6 @@
 import StoreMap from '@/components/Map/StoreMap'
 import type { StoreBase } from '@/types/store'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 
 // Mock StoreMarkerPopup
 jest.mock('@/components/Map/StoreMarkerPopup', () => ({

@@ -24,11 +24,11 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Export Azure Static Web Apps API Token and Backend Mock URL
         id: export-token
@@ -40,11 +40,13 @@ jobs:
           echo "api_token=$TOKEN" >> $GITHUB_OUTPUT
           MOCK_URL=$(terraform output -raw api_mock_url)
           echo "api_mock_url=$MOCK_URL" >> $GITHUB_OUTPUT
+          API_URL=$(terraform output -raw api_url)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
 
       - name: Build Frontend
         working-directory: frontend
         env:
-          NEXT_PUBLIC_API_URL: ${{ steps.export-token.outputs.api_mock_url }}
+          NEXT_PUBLIC_API_URL: ${{ steps.export-token.outputs.api_url }}
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
         run: |
           npm --prefix ../api_mock ci && npm ci --ignore-scripts

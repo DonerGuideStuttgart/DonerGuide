@@ -33,7 +33,7 @@ if (COSMOSDB_KEY) {
 
 const aiClient = new AzureOpenAI({
   endpoint: FOUNDRY_ENDPOINT,
-  apiVersion: "2025-04-01-preview",
+  apiVersion: "2024-12-01-preview",
   deployment: FOUNDRY_DEPLOYMENT_NAME,
   ...(FOUNDRY_API_KEY
     ? { apiKey: FOUNDRY_API_KEY }

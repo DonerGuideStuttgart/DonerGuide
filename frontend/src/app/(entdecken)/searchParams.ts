@@ -30,8 +30,8 @@ const waitingTimes = Object.keys(WAITING_TIME_LABELS) as WaitingTime[]
 const payments = Object.keys(PAYMENT_LABELS) as PaymentMethod[]
 
 // Pagination configuration
-export const INITIAL_LIMIT = 5
-export const LOAD_MORE_COUNT = 2
+export const INITIAL_LIMIT = 20
+export const LOAD_MORE_COUNT = 20
 
 export const exploreParsers = {
 	limit: parseAsInteger.withDefault(INITIAL_LIMIT),
