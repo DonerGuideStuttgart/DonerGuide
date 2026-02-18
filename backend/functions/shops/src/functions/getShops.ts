@@ -1,7 +1,7 @@
 import { CosmosClient, SqlQuerySpec } from "@azure/cosmos";
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
-import { mapToStore } from "./mapper";
+import { mapToStore, TimeInterval, Weekday } from "./mapper";
 
 const COSMOSDB_ENDPOINT = process.env.SHOP_COSMOSDB_ENDPOINT ?? "";
 const COSMOSDB_KEY = process.env.SHOP_COSMOSDB_KEY;
@@ -34,6 +34,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
     const priceMin = request.query.get("price_min");
     const priceMax = request.query.get("price_max");
     const vegetarian = request.query.get("vegetarian")?.toLowerCase();
+    const openHoursFilter = request.query.get("open_hours"); // open_this_evening, open_late, open_now
 
     const sauceMin = request.query.get("sauce_amount_min") ? parseInt(request.query.get("sauce_amount_min")!) : 0;
     const sauceMax = request.query.get("sauce_amount_max") ? parseInt(request.query.get("sauce_amount_max")!) : 100;
@@ -73,12 +74,58 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
 
     // 5. FILTERUNG
     processedItems = processedItems.filter((item) => {
+      // --- Bestehende Filter ---
       if (district) {
         const searchTerms = district.split(",").map((d) => d.trim().toLowerCase());
         if (!item.district) return false;
         const itemDistLower = item.district.toLowerCase();
         if (!searchTerms.some((term) => itemDistLower.includes(term))) return false;
       }
+
+      if (item.sauceAmount !== undefined && (item.sauceAmount < sauceMin || item.sauceAmount > sauceMax)) return false;
+      if (item.meatRatio !== undefined && (item.meatRatio < meatMin || item.meatRatio > meatMax)) return false;
+
+      if (openHoursFilter) {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Europe/Berlin",
+          hour: "numeric",
+          minute: "numeric",
+          weekday: "short",
+        });
+
+        const parts = formatter.formatToParts(now);
+        const hour = parseInt(parts.find((p) => p.type === "hour")?.value || "0");
+        const minute = parseInt(parts.find((p) => p.type === "minute")?.value || "0");
+
+        // Wochentag in Kleinschreibung umwandeln (mon, tue, etc.)
+        const dayName = parts.find((p) => p.type === "weekday")?.value.toLowerCase() as Weekday;
+
+        const currentMin = hour * 60 + minute;
+
+        // Fix für den TS-Fehler: Zugriff über Record-Casting erlauben
+        const hoursObj = item.openingHours.hours as Record<string, any[] | undefined>;
+        const intervals = hoursObj[dayName] || [];
+
+        if (openHoursFilter === "open_now") {
+          // Exakte Prüfung ohne Toleranz
+          const isOpen = intervals.some((inv) => currentMin >= inv.start && currentMin <= inv.end);
+          if (!isOpen) return false;
+        }
+
+        if (openHoursFilter === "open_this_evening") {
+          // Mindestens bis 22:00 Uhr offen (1320 Minuten)
+          const staysOpenLate = intervals.some((inv) => inv.end >= 1320);
+          if (!staysOpenLate) return false;
+        }
+
+        if (openHoursFilter === "open_late") {
+          // Bis mindestens 02:00 Uhr morgens (1560 Minuten oder am Folgetag früh)
+          const staysOpenVeryLate = intervals.some((inv) => inv.end >= 1560 || inv.end <= 240);
+          if (!staysOpenVeryLate) return false;
+        }
+      }
+
       if (item.sauceAmount !== undefined && (item.sauceAmount < sauceMin || item.sauceAmount > sauceMax)) return false;
       if (item.meatRatio !== undefined && (item.meatRatio < meatMin || item.meatRatio > meatMax)) return false;
       return true;
@@ -90,6 +137,21 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       const scoreB = b.aiScore || 0;
       const priceA = a.price === undefined || a.price === null ? 0 : a.price;
       const priceB = b.price === undefined || b.price === null ? 0 : b.price;
+      const hasImagesA = a.imageUrls && a.imageUrls.length > 0;
+      const hasImagesB = b.imageUrls && b.imageUrls.length > 0;
+
+      switch (sort) {
+        // BESTER SCORE ZUERST
+        case "relevance": {
+          // 1. Kriterium: Hat Bilder? (Läden mit Bildern kommen zuerst)
+          if (hasImagesA !== hasImagesB) {
+            return hasImagesB ? 1 : -1;
+          }
+          // 2. Kriterium: Höherer AI Score
+          return scoreB - scoreA;
+        }
+        case "ai_score_desc":
+        case "score_desc":
 
       switch (sort) {
         // BESTER SCORE ZUERST

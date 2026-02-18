@@ -103,8 +103,8 @@ export function mapToStore(item: any): Store {
   const rawAiScore = analysis.score_gesamt ?? 0;
 
   // Fleisch & Soße:
-  const meatRatio = item.meat_ratio ?? scaleScoreToPercent(analysis.score_belag);
-  const sauceAmount = item.sauce_amount ?? scaleScoreToPercent(analysis.score_verhaeltnis);
+  const meatRatio = item.meat_ratio ?? scaleScoreToPercent(analysis.score_fleischanteil);
+  const sauceAmount = item.sauce_amount ?? scaleScoreToPercent(analysis.score_soßenanteil);
 
   // 4. Vegetarian
   const vegetarianTags: string[] = [];
