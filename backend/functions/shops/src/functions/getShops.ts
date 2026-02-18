@@ -35,6 +35,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
     const priceMax = request.query.get("price_max");
     const vegetarian = request.query.get("vegetarian")?.toLowerCase();
     const openHoursFilter = request.query.get("open_hours"); // open_this_evening, open_late, open_now
+
     const sauceMin = request.query.get("sauce_amount_min") ? parseInt(request.query.get("sauce_amount_min")!) : 0;
     const sauceMax = request.query.get("sauce_amount_max") ? parseInt(request.query.get("sauce_amount_max")!) : 100;
     const meatMin = request.query.get("meat_ratio_min") ? parseInt(request.query.get("meat_ratio_min")!) : 0;
@@ -125,6 +126,8 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
         }
       }
 
+      if (item.sauceAmount !== undefined && (item.sauceAmount < sauceMin || item.sauceAmount > sauceMax)) return false;
+      if (item.meatRatio !== undefined && (item.meatRatio < meatMin || item.meatRatio > meatMax)) return false;
       return true;
     });
 
@@ -149,6 +152,12 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
         }
         case "ai_score_desc":
         case "score_desc":
+
+      switch (sort) {
+        // BESTER SCORE ZUERST
+        case "relevance":
+        case "ai_score_desc":
+        case "score_desc": // <--- HIER HABE ICH DEIN LOG-FORMAT HINZUGEFÜGT
           return scoreB - scoreA;
 
         // SCHLECHTESTER SCORE ZUERST

@@ -7,6 +7,8 @@ describe("GridService", () => {
   let mockContainer: jest.Mocked<Container>;
   let gridService: GridService;
 
+  let mockContext: any;
+
   beforeEach(() => {
     mockContainer = {
       items: {
@@ -15,6 +17,13 @@ describe("GridService", () => {
         }),
         upsert: jest.fn().mockResolvedValue({}),
       },
+    } as any;
+    mockContext = {
+      log: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
     } as any;
     gridService = new GridService(mockContainer);
     process.env.PLACE_SEARCH_STUTTGART_MIN_LAT = "48.0";
@@ -58,7 +67,7 @@ describe("GridService", () => {
         fetchAll: jest.fn().mockResolvedValue({ resources: [mockCell] }),
       });
 
-      const cell = await gridService.getNextCell("v1");
+      const cell = await gridService.getNextCell("v1", mockContext);
 
       expect(cell).toEqual(mockCell);
     });
@@ -68,7 +77,7 @@ describe("GridService", () => {
         fetchAll: jest.fn().mockResolvedValue({ resources: [] }),
       });
 
-      const cell = await gridService.getNextCell("v1");
+      const cell = await gridService.getNextCell("v1", mockContext);
 
       expect(cell).toBeNull();
     });
@@ -100,7 +109,7 @@ describe("GridService", () => {
     });
 
     it("should split along latitude if it's the longer side", async () => {
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).toHaveBeenCalledTimes(2);
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
@@ -124,7 +133,7 @@ describe("GridService", () => {
       mockCell.boundaryBox.maxLat = 48.1; // Lat diff 0.1
       mockCell.boundaryBox.maxLon = 9.3; // Lon diff 0.3
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
       const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
@@ -137,7 +146,7 @@ describe("GridService", () => {
     it("should mark as COMPLETED if MAX_LEVEL is reached", async () => {
       mockCell.level = 10;
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).not.toHaveBeenCalled();
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(

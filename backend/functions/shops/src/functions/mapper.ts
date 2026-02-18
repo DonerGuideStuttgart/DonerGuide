@@ -95,8 +95,8 @@ export function mapToStore(item: any): Store {
   const district = item.address?.sublocality ?? item.address?.locality ?? "Unbekannt";
 
   // 2. Images
-  const imageUrls: string[] = Array.isArray(item.photos)
-    ? item.photos.map((p: any) => p.url).filter((u: any) => typeof u === "string")
+  const imageUrls: string[] = Array.isArray(item.public_photos)
+    ? item.public_photos.map((p: any) => p.url).filter((u: any) => typeof u === "string")
     : [];
 
   // 3. Scores & Ratios
