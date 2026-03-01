@@ -154,7 +154,7 @@ export class GridService {
     const minSideKm = Math.min(latSideKm, lonSideKm);
     const childMinSideM = (minSideKm / 2) * 1000; // halving the shorter side
     if (childMinSideM < minCellSizeM) {
-      console.warn(
+      context.warn(
         `[GridService] Child cell would be ${String(Math.round(childMinSideM))}m, below minCellSizeM (${String(minCellSizeM)}m). Marking cell ${cell.id} as COMPLETED.`
       );
       cell.status = "COMPLETED";
