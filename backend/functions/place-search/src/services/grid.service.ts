@@ -1,5 +1,6 @@
 import { Container } from "@azure/cosmos";
 import { v4 as uuidv4 } from "uuid";
+import { InvocationContext } from "@azure/functions";
 import { GridCell } from "../types/grid";
 import {
   getStuttgartBBox,
@@ -11,7 +12,7 @@ import {
 import { GRID_CONFIG } from "../config/gridConfig";
 
 export class GridService {
-  constructor(private container: Container) {}
+  constructor(private container: Container) { }
 
   /**
    * Initializes the grid if the version has changed or no cells exist.
@@ -93,7 +94,7 @@ export class GridService {
    * Finds the oldest cell that is not SPLIT.
    * Also considers stale PROCESSING cells (> 30 mins).
    */
-  async getNextCell(gridVersion: string): Promise<GridCell | null> {
+  async getNextCell(gridVersion: string, context: InvocationContext): Promise<GridCell | null> {
     const staleThreshold = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
     const query = `
@@ -107,7 +108,7 @@ export class GridService {
     const { resources: cells } = await this.container.items.query<GridCell>({ query }).fetchAll();
 
     if (cells.length > 0 && cells[0].status === "PROCESSING") {
-      console.log(
+      context.log(
         `[GridService] Zombie-Reset: Picking up stale cell ${cells[0].id} (Last processed: ${cells[0].lastProcessedAt})`
       );
     }
@@ -128,11 +129,11 @@ export class GridService {
    * Splits a cell into two child cells along its longest axis.
    * If MAX_LEVEL is reached, marks as COMPLETED with overflow.
    */
-  async splitCell(cell: GridCell): Promise<void> {
+  async splitCell(cell: GridCell, context: InvocationContext): Promise<void> {
     const { maxDepth, minCellSizeM } = GRID_CONFIG.subdivision;
 
     if (cell.level >= maxDepth) {
-      console.warn(`[GridService] maxDepth reached for cell ${cell.id}. Marking as COMPLETED (Overflow).`);
+      context.warn(`[GridService] MAX_LEVEL reached for cell ${cell.id}. Marking as COMPLETED (Overflow).`);
       cell.status = "COMPLETED";
       cell.lastProcessedAt = new Date().toISOString();
       await this.container.items.upsert(cell);
@@ -191,8 +192,8 @@ export class GridService {
     }
     await this.container.items.upsert(cell);
 
-    console.log(
-      `[GridService] Cell ${cell.id} split into ${childCells.map((c, index) => `${index}. Child: ${c.id}`)} (Level ${newLevel})`
+    context.log(
+      `[GridService] Cell ${cell.id} split into ${childCells[0]?.id ?? "unknown"} and ${childCells[1]?.id ?? "unknown"} (Level ${String(newLevel)})`
     );
   }
 

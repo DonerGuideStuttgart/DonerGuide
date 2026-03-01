@@ -12,5 +12,5 @@ variable "cloudflare_api_token" {
 variable "place_search_cron" {
   description = "Cron expression for place search function"
   type        = string
-  default     = "0 0 * * * *"
+  default     = "0 0 0 1 1 *"
 }

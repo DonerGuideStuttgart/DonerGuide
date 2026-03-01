@@ -25,6 +25,7 @@ export interface Place {
     streetAddress?: string;
   };
   photos: Photo[];
+  public_photos?: Photo[];
   ai_analysis?: StoreAnalysis;
   paymentMethods?: PaymentMethods[]; // e.g., ["CASH", "CREDIT_CARD", "DEBIT_CARD", "NFC"]
   takeout?: boolean;

@@ -12,6 +12,9 @@
                     },
                     {
                         "Name": "reviews-generated"
+                    },
+                    {
+                        "Name": "image-prompts"
                     }
                 ],
                 "Topics": []

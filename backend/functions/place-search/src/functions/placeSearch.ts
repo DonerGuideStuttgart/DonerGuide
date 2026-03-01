@@ -76,7 +76,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
     await gridService.initializeGrid(GRID_VERSION);
 
     // 2. Get Next Cell
-    const cell = await gridService.getNextCell(GRID_VERSION);
+    const cell = await gridService.getNextCell(GRID_VERSION, context);
     if (!cell) {
       context.log("No cell to process.");
       return;
@@ -99,7 +99,8 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
         cell.boundaryBox.minLat,
         cell.boundaryBox.minLon,
         cell.boundaryBox.maxLat,
-        cell.boundaryBox.maxLon
+        cell.boundaryBox.maxLon,
+        context
       );
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -166,7 +167,7 @@ export async function placeSearch(myTimer: Timer, context: InvocationContext): P
 
     if (googlePlaces.length >= GRID_CONFIG.subdivision.threshold) {
       context.log(`Cell ${cell.id} has ${String(googlePlaces.length)} results. Splitting...`);
-      await gridService.splitCell(cell);
+      await gridService.splitCell(cell, context);
     } else {
       context.log(`Cell ${cell.id} search completed.`);
       cell.status = "COMPLETED";
