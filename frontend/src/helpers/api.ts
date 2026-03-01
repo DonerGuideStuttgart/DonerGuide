@@ -41,6 +41,10 @@ export function buildStoreQuery(filters: FilterParams, sort?: string) {
 	return searchParams.toString()
 }
 
+const fetchOptions: RequestInit = {
+	next: { revalidate: 3600 }, // Revalidate every hour (adjust as needed)
+}
+
 export async function fetchPlaces(query: string) {
 	const base = process.env.NEXT_PUBLIC_API_URL || '/api' // default to local proxy
 	const url = `${base}/places${query ? `?${query}` : ''}`
@@ -51,14 +55,14 @@ export async function fetchPlaces(query: string) {
 
 export async function fetchPlaceById(id: string) {
 	const base = process.env.NEXT_PUBLIC_API_URL || '/api'
-	const res = await fetch(`${base}/places/${id}`)
+	const res = await fetch(`${base}/places/${id}`, fetchOptions)
 	if (!res.ok) throw new Error('Failed to fetch place')
 	return await res.json()
 }
 
 export async function fetchPlaceBySlug(slug: string) {
 	const base = process.env.NEXT_PUBLIC_API_URL || '/api'
-	const res = await fetch(`${base}/places/by-slug/${slug}`)
+	const res = await fetch(`${base}/places/by-slug/${slug}`, fetchOptions)
 	if (res.status === 404) return null
 	if (!res.ok) throw new Error('Failed to fetch place')
 	return await res.json()

@@ -1,6 +1,7 @@
 import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { DefaultAzureCredential } from "@azure/identity";
 import axios from "axios";
+import { InvocationContext } from "@azure/functions";
 
 export class BlobService {
   private containerClient: ContainerClient;
@@ -47,7 +48,11 @@ export class BlobService {
    * @param photoId The ID to use as the blob name.
    * @returns The mime type and the image buffer.
    */
-  public async downloadAndUploadImage(url: string, photoId: string): Promise<{ contentType: string; buffer: Buffer }> {
+  public async downloadAndUploadImage(
+    url: string,
+    photoId: string,
+    context: InvocationContext
+  ): Promise<{ contentType: string; buffer: Buffer }> {
     try {
       const response = await axios.get(url, {
         responseType: "arraybuffer",
@@ -67,7 +72,7 @@ export class BlobService {
 
       return { contentType, buffer };
     } catch (error) {
-      console.error(`Failed to process photo ${photoId} from ${url}:`, error);
+      context.error(`Failed to process photo ${photoId} from ${url}:`, error);
       throw error;
     }
   }

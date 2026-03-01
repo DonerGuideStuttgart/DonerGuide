@@ -19,6 +19,7 @@ jobs:
           - backend/functions/image-classifier
           - backend/functions/llm-analyzer
           - backend/functions/shops
+          - backend/functions/image-generator
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout GitHub Action"
@@ -49,6 +50,9 @@ jobs:
             echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
           elif [[ ${{ matrix.function }} == "backend/functions/shops" ]]; then
             FUNCTION_APP_NAME=$(terraform output -raw function_app_name_shops)
+            echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
+          elif [[ ${{ matrix.function }} == "backend/functions/image-generator" ]]; then
+            FUNCTION_APP_NAME=$(terraform output -raw function_app_name_image_generator)
             echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
           fi
 
