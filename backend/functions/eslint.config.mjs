@@ -35,6 +35,9 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      "@typescript-eslint/restrict-template-expressions": "off",
+    },
   },
 
   // Test files - disable type-checked rules to avoid project service issues
