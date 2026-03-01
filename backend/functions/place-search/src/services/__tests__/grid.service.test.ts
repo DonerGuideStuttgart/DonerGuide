@@ -240,7 +240,7 @@ describe("GridService", () => {
         maxLon: 9.06,
       };
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
       const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
@@ -277,7 +277,7 @@ describe("GridService", () => {
         maxLon: 9.001, // ~74.2m
       };
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).not.toHaveBeenCalled();
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
@@ -295,7 +295,7 @@ describe("GridService", () => {
         return callCount === 1; // Only first candidate passes
       });
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).toHaveBeenCalledTimes(1);
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
@@ -306,7 +306,7 @@ describe("GridService", () => {
     it("should mark parent as SPLIT even when no children intersect", async () => {
       mockedCellIntersectsBoundary.mockReturnValue(false);
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).not.toHaveBeenCalled();
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
