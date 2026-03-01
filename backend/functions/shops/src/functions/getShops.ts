@@ -16,7 +16,7 @@ if (COSMOSDB_KEY) {
 }
 
 // CACHE SETUP
-const queryCache = new Map<string, { data: any[], expiresAt: number }>();
+const queryCache = new Map<string, { data: any[]; expiresAt: number }>();
 const CACHE_TTL_MS = 2 * 60 * 1000; // 2 Minuten
 
 export async function getAllShops(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
@@ -85,7 +85,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       // Im Cache speichern
       queryCache.set(cacheKey, {
         data: rawItems,
-        expiresAt: now + CACHE_TTL_MS
+        expiresAt: now + CACHE_TTL_MS,
       });
     }
 
@@ -196,7 +196,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
     return {
       status: 200,
       headers: {
-        "Cache-Control": "public, max-age=60"
+        "Cache-Control": "public, max-age=60",
       },
       jsonBody: {
         items: pagedItems,

@@ -2,14 +2,23 @@ import { Container } from "@azure/cosmos";
 import { v4 as uuidv4 } from "uuid";
 import { InvocationContext } from "@azure/functions";
 import { GridCell } from "../types/grid";
-import { getStuttgartBBox, cellIntersectsBoundary } from "../utils/geometry.util";
+import {
+  getStuttgartBBox,
+  cellIntersectsBoundary,
+  kmToDegreesLat,
+  kmToDegreesLng,
+  getCellSideKm,
+} from "../utils/geometry.util";
+
+export const TARGET_CELL_SIZE_KM = 5;
 
 export class GridService {
-  constructor(private container: Container) {}
+  constructor(private container: Container) { }
 
   /**
    * Initializes the grid if the version has changed or no cells exist.
-   * Creates a 4x4 level 0 grid for Stuttgart.
+   * Creates a level 0 grid for Stuttgart with cells of approximately
+   * {@link TARGET_CELL_SIZE_KM} km side length using geodetic calculations.
    */
   async initializeGrid(gridVersion: string): Promise<void> {
     const query = `SELECT VALUE COUNT(c.id) FROM c WHERE c.gridVersion = '${gridVersion}'`;
@@ -21,15 +30,22 @@ export class GridService {
 
     const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
-    const latStep = (maxLat - minLat) / 4;
-    const lonStep = (maxLon - minLon) / 4;
+    const nominalLatStep = kmToDegreesLat(TARGET_CELL_SIZE_KM);
+    const rows = Math.max(1, Math.round((maxLat - minLat) / nominalLatStep));
+    const latStep = (maxLat - minLat) / rows;
 
     const cells: GridCell[] = [];
 
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        const cellMinLat = minLat + i * latStep;
-        const cellMaxLat = minLat + (i + 1) * latStep;
+    for (let i = 0; i < rows; i++) {
+      const cellMinLat = minLat + i * latStep;
+      const cellMaxLat = minLat + (i + 1) * latStep;
+      const centerLat = (cellMinLat + cellMaxLat) / 2;
+
+      const nominalLonStep = kmToDegreesLng(TARGET_CELL_SIZE_KM, centerLat);
+      const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
+      const lonStep = (maxLon - minLon) / cols;
+
+      for (let j = 0; j < cols; j++) {
         const cellMinLon = minLon + j * lonStep;
         const cellMaxLon = minLon + (j + 1) * lonStep;
 
@@ -133,7 +149,8 @@ export class GridService {
     const candidateBBoxes: GridCell["boundaryBox"][] = [];
     const newLevel = cell.level + 1;
 
-    if (latDiff >= lonDiff) {
+    const { latSideKm, lonSideKm } = getCellSideKm(cell.boundaryBox);
+    if (latSideKm >= lonSideKm) {
       // Split Latitude
       const midLat = minLat + latDiff / 2;
 
