@@ -15,6 +15,10 @@ if (COSMOSDB_KEY) {
   client = new CosmosClient({ endpoint: COSMOSDB_ENDPOINT, aadCredentials: new DefaultAzureCredential() });
 }
 
+// CACHE SETUP
+const queryCache = new Map<string, { data: any[]; expiresAt: number }>();
+const CACHE_TTL_MS = 2 * 60 * 1000; // 2 Minuten
+
 export async function getAllShops(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   try {
     const database = client.database(COSMOSDB_DATABASE_NAME);
@@ -26,7 +30,6 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
     const offset = parseInt(request.query.get("offset") || "0");
     const sort = request.query.get("sort") || "relevance";
 
-    // Debugging Log (damit du siehst, was ankommt)
     context.log(`Sortier-Modus: "${sort}"`);
 
     const district = request.query.get("district");
@@ -65,15 +68,32 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
 
     const querySpec: SqlQuerySpec = { query: queryText, parameters: parameters };
 
-    // 3. DATEN ABRUFEN
-    const { resources: rawItems } = await container.items.query(querySpec).fetchAll();
+    // 3. DATEN ABRUFEN (MIT CACHE)
+    let rawItems: any[] = [];
+    const cacheKey = JSON.stringify(querySpec);
+    const cachedEntry = queryCache.get(cacheKey);
+    const now = Date.now();
+
+    if (cachedEntry && cachedEntry.expiresAt > now) {
+      context.log("CACHE HIT: Daten aus dem RAM geladen");
+      rawItems = cachedEntry.data;
+    } else {
+      context.log("CACHE MISS: Daten aus Cosmos DB geladen");
+      const { resources } = await container.items.query(querySpec).fetchAll();
+      rawItems = resources;
+
+      // Im Cache speichern
+      queryCache.set(cacheKey, {
+        data: rawItems,
+        expiresAt: now + CACHE_TTL_MS,
+      });
+    }
 
     // 4. MAPPING
     let processedItems = rawItems.map(mapToStore);
 
     // 5. FILTERUNG
     processedItems = processedItems.filter((item) => {
-      // --- Bestehende Filter ---
       if (district) {
         const searchTerms = district.split(",").map((d) => d.trim().toLowerCase());
         if (!item.district) return false;
@@ -85,7 +105,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       if (item.meatRatio !== undefined && (item.meatRatio < meatMin || item.meatRatio > meatMax)) return false;
 
       if (openHoursFilter) {
-        const now = new Date();
+        const nowTime = new Date();
         const formatter = new Intl.DateTimeFormat("en-GB", {
           timeZone: "Europe/Berlin",
           hour: "numeric",
@@ -93,33 +113,27 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
           weekday: "short",
         });
 
-        const parts = formatter.formatToParts(now);
+        const parts = formatter.formatToParts(nowTime);
         const hour = parseInt(parts.find((p) => p.type === "hour")?.value || "0");
         const minute = parseInt(parts.find((p) => p.type === "minute")?.value || "0");
 
-        // Wochentag in Kleinschreibung umwandeln (mon, tue, etc.)
         const dayName = parts.find((p) => p.type === "weekday")?.value.toLowerCase() as Weekday;
-
         const currentMin = hour * 60 + minute;
 
-        // Fix für den TS-Fehler: Zugriff über Record-Casting erlauben
         const hoursObj = item.openingHours.hours as Record<string, any[] | undefined>;
         const intervals = hoursObj[dayName] || [];
 
         if (openHoursFilter === "open_now") {
-          // Exakte Prüfung ohne Toleranz
           const isOpen = intervals.some((inv) => currentMin >= inv.start && currentMin <= inv.end);
           if (!isOpen) return false;
         }
 
         if (openHoursFilter === "open_this_evening") {
-          // Mindestens bis 22:00 Uhr offen (1320 Minuten)
           const staysOpenLate = intervals.some((inv) => inv.end >= 1320);
           if (!staysOpenLate) return false;
         }
 
         if (openHoursFilter === "open_late") {
-          // Bis mindestens 02:00 Uhr morgens (1560 Minuten oder am Folgetag früh)
           const staysOpenVeryLate = intervals.some((inv) => inv.end >= 1560 || inv.end <= 240);
           if (!staysOpenVeryLate) return false;
         }
@@ -128,7 +142,7 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       return true;
     });
 
-    // 6. SORTIERUNG (KORRIGIERT)
+    // 6. SORTIERUNG
     processedItems.sort((a, b) => {
       const scoreA = a.aiScore || 0;
       const scoreB = b.aiScore || 0;
@@ -138,37 +152,30 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       const hasImagesB = b.imageUrls && b.imageUrls.length > 0;
 
       switch (sort) {
-        // BESTER SCORE ZUERST
         case "relevance": {
-          // 1. Kriterium: Hat Bilder? (Läden mit Bildern kommen zuerst)
           if (hasImagesA !== hasImagesB) {
             return hasImagesB ? 1 : -1;
           }
-          // 2. Kriterium: Höherer AI Score
           return scoreB - scoreA;
         }
         case "ai_score_desc":
         case "score_desc":
           return scoreB - scoreA;
 
-        // SCHLECHTESTER SCORE ZUERST
         case "ai_score_asc":
-        case "score_asc": // <--- HIER EBENFALLS
+        case "score_asc":
           return scoreA - scoreB;
 
-        // BILLIGSTER PREIS ZUERST
         case "price_asc": {
           const pA = priceA === 0 ? 9999 : priceA;
           const pB = priceB === 0 ? 9999 : priceB;
           return pA - pB;
         }
 
-        // TEUERSTER PREIS ZUERST
         case "price_desc":
           return priceB - priceA;
 
         default:
-          // Fallback: Relevance
           return scoreB - scoreA;
       }
     });
@@ -185,8 +192,12 @@ export async function getAllShops(request: HttpRequest, context: InvocationConte
       currentPage = Math.floor(offset / limit) + 1;
     }
 
+    // HTTP RESPONSE MIT CACHE HEADERS
     return {
       status: 200,
+      headers: {
+        "Cache-Control": "public, max-age=60",
+      },
       jsonBody: {
         items: pagedItems,
         meta: {
