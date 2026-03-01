@@ -5,10 +5,15 @@ interface GridConfig {
     maxDepth: number;
     minCellSizeM: number;
   };
+  merge: {
+    maxMergedResults: number;
+    maxMergedCellSizeKm: number;
+    resultsPerPage: number;
+  };
 }
 
 export function validateGridConfig(config: GridConfig): void {
-  const { baseCellSizeKm, subdivision } = config;
+  const { baseCellSizeKm, subdivision, merge } = config;
 
   if (baseCellSizeKm < 0.1 || baseCellSizeKm > 50) {
     throw new Error(`GRID_CONFIG.baseCellSizeKm must be between 0.1 and 50, got ${String(baseCellSizeKm)}`);
@@ -26,5 +31,21 @@ export function validateGridConfig(config: GridConfig): void {
     throw new Error(
       `GRID_CONFIG.subdivision.minCellSizeM must be between 10 and 5000, got ${String(subdivision.minCellSizeM)}`
     );
+  }
+
+  if (merge.maxMergedResults < 1 || merge.maxMergedResults > 60) {
+    throw new Error(
+      `GRID_CONFIG.merge.maxMergedResults must be between 1 and 60, got ${String(merge.maxMergedResults)}`
+    );
+  }
+
+  if (merge.maxMergedCellSizeKm < 1 || merge.maxMergedCellSizeKm > 50) {
+    throw new Error(
+      `GRID_CONFIG.merge.maxMergedCellSizeKm must be between 1 and 50, got ${String(merge.maxMergedCellSizeKm)}`
+    );
+  }
+
+  if (!Number.isInteger(merge.resultsPerPage) || merge.resultsPerPage < 1) {
+    throw new Error(`GRID_CONFIG.merge.resultsPerPage must be a positive integer, got ${String(merge.resultsPerPage)}`);
   }
 }
