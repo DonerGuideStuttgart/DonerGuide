@@ -1,8 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GridService, TARGET_CELL_SIZE_KM } from "../grid.service";
+import { GridService } from "../grid.service";
 import { Container } from "@azure/cosmos";
 import type { GridCell } from "../../types/grid";
 import { cellIntersectsBoundary, KM_PER_DEGREE_LAT } from "../../utils/geometry.util";
+
+jest.mock("../../config/gridConfig", () => ({
+  GRID_CONFIG: {
+    baseCellSizeKm: 5,
+    subdivision: {
+      threshold: 60,
+      maxDepth: 10,
+      minCellSizeM: 50,
+    },
+  },
+}));
 
 // Provide real implementations for the new geodetic functions, mock only boundary-related ones
 jest.mock("../../utils/geometry.util", () => {
@@ -16,22 +27,26 @@ jest.mock("../../utils/geometry.util", () => {
 
 const mockedCellIntersectsBoundary = cellIntersectsBoundary as jest.MockedFunction<typeof cellIntersectsBoundary>;
 
+/** Matches the baseCellSizeKm value used in the GRID_CONFIG mock above */
+const MOCK_BASE_CELL_SIZE_KM = 5;
+
 /** Helper: compute expected grid dimensions for the mock BBox */
 function getExpectedGridDimensions() {
   const minLat = 48.0,
     maxLat = 49.0,
     minLon = 9.0,
     maxLon = 10.0;
-  const latStep = TARGET_CELL_SIZE_KM / KM_PER_DEGREE_LAT;
-  const rows = Math.ceil((maxLat - minLat) / latStep);
+  const nominalLatStep = MOCK_BASE_CELL_SIZE_KM / KM_PER_DEGREE_LAT;
+  const rows = Math.max(1, Math.round((maxLat - minLat) / nominalLatStep));
+  const latStep = (maxLat - minLat) / rows;
 
   let totalCells = 0;
   for (let i = 0; i < rows; i++) {
     const cellMinLat = minLat + i * latStep;
-    const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
+    const cellMaxLat = minLat + (i + 1) * latStep;
     const centerLat = (cellMinLat + cellMaxLat) / 2;
-    const lonStep = TARGET_CELL_SIZE_KM / (KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180));
-    const cols = Math.ceil((maxLon - minLon) / lonStep);
+    const nominalLonStep = MOCK_BASE_CELL_SIZE_KM / (KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180));
+    const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
     totalCells += cols;
   }
 
@@ -128,9 +143,9 @@ describe("GridService", () => {
       const latSideKm = (maxLat - minLat) * KM_PER_DEGREE_LAT;
       const lonSideKm = (maxLon - minLon) * KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180);
 
-      // Both sides should be approximately TARGET_CELL_SIZE_KM, within tolerance
-      expect(latSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
-      expect(lonSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
+      // Both sides should be approximately MOCK_BASE_CELL_SIZE_KM, within tolerance
+      expect(latSideKm).toBeCloseTo(MOCK_BASE_CELL_SIZE_KM, 0);
+      expect(lonSideKm).toBeCloseTo(MOCK_BASE_CELL_SIZE_KM, 0);
     });
   });
 
@@ -229,7 +244,7 @@ describe("GridService", () => {
         maxLon: 9.06,
       };
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       const child1 = (mockContainer.items.create as jest.Mock).mock.calls[0][0];
       const child2 = (mockContainer.items.create as jest.Mock).mock.calls[1][0];
@@ -242,8 +257,29 @@ describe("GridService", () => {
       expect(child2.boundaryBox.maxLon).toBe(9.06);
     });
 
-    it("should mark as COMPLETED if MAX_LEVEL is reached", async () => {
+    it("should mark as COMPLETED if maxDepth is reached", async () => {
       mockCell.level = 10;
+
+      await gridService.splitCell(mockCell as GridCell, mockContext);
+
+      expect(mockContainer.items.create).not.toHaveBeenCalled();
+      expect(mockContainer.items.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "parent-id",
+          status: "COMPLETED",
+        })
+      );
+    });
+
+    it("should mark as COMPLETED if child cell would be below minCellSizeM", async () => {
+      // Create a tiny cell where the shorter side is ~55m (0.0005° lat ≈ 55.7m)
+      // Halving gives ~27.8m which is below minCellSizeM of 50m
+      mockCell.boundaryBox = {
+        minLat: 48.0,
+        minLon: 9.0,
+        maxLat: 48.0005, // ~55.7m
+        maxLon: 9.001, // ~74.2m
+      };
 
       await gridService.splitCell(mockCell as GridCell, mockContext);
 
@@ -263,7 +299,7 @@ describe("GridService", () => {
         return callCount === 1; // Only first candidate passes
       });
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).toHaveBeenCalledTimes(1);
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
@@ -274,7 +310,7 @@ describe("GridService", () => {
     it("should mark parent as SPLIT even when no children intersect", async () => {
       mockedCellIntersectsBoundary.mockReturnValue(false);
 
-      await gridService.splitCell(mockCell as GridCell);
+      await gridService.splitCell(mockCell as GridCell, mockContext);
 
       expect(mockContainer.items.create).not.toHaveBeenCalled();
       expect(mockContainer.items.upsert).toHaveBeenCalledWith(
