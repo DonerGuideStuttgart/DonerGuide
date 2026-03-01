@@ -163,7 +163,7 @@ export class GridService {
     }
     await this.container.items.upsert(cell);
 
-    console.log(
+    context.log(
       `[GridService] Cell ${cell.id} split into ${childCells[0]?.id ?? "unknown"} and ${childCells[1]?.id ?? "unknown"} (Level ${String(newLevel)})`
     );
   }
