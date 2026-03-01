@@ -8,6 +8,7 @@ interface GridConfig {
   merge: {
     maxMergedResults: number;
     maxMergedCellSizeKm: number;
+    resultsPerPage: number;
   };
 }
 
@@ -42,5 +43,9 @@ export function validateGridConfig(config: GridConfig): void {
     throw new Error(
       `GRID_CONFIG.merge.maxMergedCellSizeKm must be between 1 and 50, got ${String(merge.maxMergedCellSizeKm)}`
     );
+  }
+
+  if (!Number.isInteger(merge.resultsPerPage) || merge.resultsPerPage < 1) {
+    throw new Error(`GRID_CONFIG.merge.resultsPerPage must be a positive integer, got ${String(merge.resultsPerPage)}`);
   }
 }

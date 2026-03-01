@@ -25,10 +25,14 @@ import {
   kmToDegreesLng,
   getCellSideKm,
 } from "../utils/geometry.util";
+import { MergeService } from "../services/merge.service";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+const mergeService = new MergeService({} as any); // Dummy container since we only need the in-memory merge logic
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const TARGET_CELL_SIZE_KM = 8;
+const TARGET_CELL_SIZE_KM = 7;
 const MAX_LEVEL = 10;
 const MAX_PAGES_PER_CELL = 3;
 const SPLIT_THRESHOLD = 55;
@@ -40,9 +44,11 @@ const BENCHMARK_CONFIG = {
   /** Branch 99: 4x4 grid + boundary filter, degree-based splitting + boundary filter */
   branch99BoundaryFilter: false,
   /** Current: geodetic TARGET_CELL_SIZE_KM grid, km-based splitting, boundary filter */
-  geodeticTargetSize: true,
+  geodeticTargetSize: false,
+  /** Geodetic + Merge: cold-start → merge leaf cells → warm-start on merged grid */
+  geodeticWithMerge: true,
   /** Load cells from file if available (true = warm-start, false = fresh start) */
-  resumeFromFile: true,
+  resumeFromFile: false,
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -192,7 +198,12 @@ function createGrid4x4(): GridCell[] {
 }
 
 /** Geodetic strategy: grid with TARGET_CELL_SIZE_KM side length + boundary filter. */
-function createGridTargetSize(targetKm: number): GridCell[] {
+function createGridTargetSize(targetKm: number): {
+  cells: GridCell[];
+  totalBeforeFilter: number;
+  rows: number;
+  cols: number;
+} {
   const { minLat, minLon, maxLat, maxLon } = getStuttgartBBox();
 
   const nominalLatStep = kmToDegreesLat(targetKm);
@@ -200,6 +211,8 @@ function createGridTargetSize(targetKm: number): GridCell[] {
   const latStep = (maxLat - minLat) / rows;
 
   const cells: GridCell[] = [];
+  let totalBeforeFilter = 0;
+  let maxCols = 0;
   for (let i = 0; i < rows; i++) {
     const cellMinLat = minLat + i * latStep;
     const cellMaxLat = minLat + (i + 1) * latStep;
@@ -208,6 +221,7 @@ function createGridTargetSize(targetKm: number): GridCell[] {
     const nominalLonStep = kmToDegreesLng(targetKm, centerLat);
     const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
     const lonStep = (maxLon - minLon) / cols;
+    maxCols = Math.max(maxCols, cols);
 
     for (let j = 0; j < cols; j++) {
       const cellMinLon = minLon + j * lonStep;
@@ -220,46 +234,39 @@ function createGridTargetSize(targetKm: number): GridCell[] {
         maxLon: cellMaxLon,
       };
 
+      totalBeforeFilter++;
       if (cellIntersectsBoundary(bbox)) {
         cells.push(makeCell(bbox, 0));
       }
     }
   }
-  return cells;
+  return { cells, totalBeforeFilter, rows, cols: maxCols };
 }
 
 // ─── Grid info logging ──────────────────────────────────────────────────────
 
-function logGridInfo(cells: GridCell[]): void {
+function logGridInfo(cells: GridCell[], totalBeforeFilter?: number, gridRows?: number, gridCols?: number): void {
   if (cells.length === 0) return;
-
-  // Group cells by row (same minLat)
-  const rowMap = new Map<number, GridCell[]>();
-  for (const cell of cells) {
-    const key = cell.boundaryBox.minLat;
-    if (!rowMap.has(key)) rowMap.set(key, []);
-    rowMap.get(key)!.push(cell);
-  }
-
-  const rows = [...rowMap.entries()].sort(([a], [b]) => a - b);
-  const totalRows = rows.length;
-  const colCounts = rows.map(([, cells]) => cells.length);
-  const allSameCols = colCounts.every((c) => c === colCounts[0]);
 
   // Calculate cell size from first cell
   const firstCell = cells[0];
   const { latSideKm, lonSideKm } = getCellSideKm(firstCell.boundaryBox);
 
-  if (allSameCols) {
-    console.log(
-      `  Grid: ${totalRows}×${colCounts[0]} = ${totalRows * colCounts[0]} cells (${cells.length} after boundary filter)`
-    );
+  const total = totalBeforeFilter ?? cells.length;
+  const filtered = total - cells.length;
+
+  if (gridRows !== undefined && gridCols !== undefined) {
+    console.log(`  Grid: ${gridRows}×${gridCols} = ${total} cells`);
   } else {
-    console.log(
-      `  Grid: ${totalRows} rows × [${colCounts.join(", ")}] cols = ${colCounts.reduce((a, b) => a + b, 0)} cells (${cells.length} after boundary filter)`
-    );
+    console.log(`  Grid: ${total} cells`);
   }
   console.log(`  Cell size: ~${latSideKm.toFixed(1)}km × ~${lonSideKm.toFixed(1)}km`);
+
+  if (filtered > 0) {
+    console.log(`  Boundary filter: ${filtered} cells removed → ${cells.length} cells remaining`);
+  } else {
+    console.log(`  Boundary filter: no cells removed (all ${cells.length} cells intersect boundary)`);
+  }
 }
 
 // ─── Cell splitting strategies ───────────────────────────────────────────────
@@ -303,7 +310,16 @@ function splitCellDegreeBoundary(cell: GridCell): GridCell[] {
     candidateBBoxes.push({ ...cell.boundaryBox, minLon: midLon });
   }
 
-  return candidateBBoxes.filter((bbox) => cellIntersectsBoundary(bbox)).map((bbox) => makeCell(bbox, cell.level + 1));
+  const children = candidateBBoxes
+    .filter((bbox) => cellIntersectsBoundary(bbox))
+    .map((bbox) => makeCell(bbox, cell.level + 1));
+  const filtered = candidateBBoxes.length - children.length;
+  if (filtered > 0) {
+    console.log(
+      `    ↳ Boundary filter removed ${filtered}/${candidateBBoxes.length} child cells at L${cell.level + 1}`
+    );
+  }
+  return children;
 }
 
 /** Geodetic (current): km-based comparison via getCellSideKm + boundary filter. */
@@ -325,7 +341,16 @@ function splitCellGeodetic(cell: GridCell): GridCell[] {
     candidateBBoxes.push({ ...cell.boundaryBox, minLon: midLon });
   }
 
-  return candidateBBoxes.filter((bbox) => cellIntersectsBoundary(bbox)).map((bbox) => makeCell(bbox, cell.level + 1));
+  const children = candidateBBoxes
+    .filter((bbox) => cellIntersectsBoundary(bbox))
+    .map((bbox) => makeCell(bbox, cell.level + 1));
+  const filtered = candidateBBoxes.length - children.length;
+  if (filtered > 0) {
+    console.log(
+      `    ↳ Boundary filter removed ${filtered}/${candidateBBoxes.length} child cells at L${cell.level + 1}`
+    );
+  }
+  return children;
 }
 
 // ─── File I/O helpers ────────────────────────────────────────────────────────
@@ -531,8 +556,8 @@ async function main(): Promise<void> {
 
   // --- Strategy 3: Geodetic (current) ---
   if (BENCHMARK_CONFIG.geodeticTargetSize) {
-    const grid = createGridTargetSize(TARGET_CELL_SIZE_KM);
-    logGridInfo(grid);
+    const { cells: grid, totalBeforeFilter, rows: gRows, cols: gCols } = createGridTargetSize(TARGET_CELL_SIZE_KM);
+    logGridInfo(grid, totalBeforeFilter, gRows, gCols);
     const result = await runBenchmark(
       apiKey,
       `Geodetic (${TARGET_CELL_SIZE_KM}km, km split + boundary)`,
@@ -540,6 +565,48 @@ async function main(): Promise<void> {
       splitCellGeodetic
     );
     results.push(result);
+  }
+
+  // --- Strategy 4: Geodetic + Merge ---
+  if (BENCHMARK_CONFIG.geodeticWithMerge) {
+    const strategyLabel = `Geodetic+Merge (${TARGET_CELL_SIZE_KM}km)`;
+
+    // 1. Create geodetic grid
+    const { cells: grid, totalBeforeFilter, rows: gRows, cols: gCols } = createGridTargetSize(TARGET_CELL_SIZE_KM);
+    logGridInfo(grid, totalBeforeFilter, gRows, gCols);
+
+    // 2. Cold-Start: run benchmark with splits (same as geodeticTargetSize)
+    const coldResult = await runBenchmark(apiKey, `${strategyLabel} Cold-Start`, grid, splitCellGeodetic);
+
+    // 3. Load leaf cells from the file that runBenchmark() just saved
+    const leafCells = loadCells(getDataFilePath(coldResult.strategyName));
+    if (!leafCells || leafCells.length === 0) {
+      console.error("Error: No leaf cells found after cold-start run.");
+    } else {
+      // 4. Merge leaf cells (in-memory, no API calls)
+      const mergedCells = mergeService.performMerges(leafCells);
+      const cellsSaved = leafCells.length - mergedCells.length;
+      console.log(`\n  Merge: ${leafCells.length} → ${mergedCells.length} cells (${cellsSaved} saved)`);
+
+      // 5. Warm-Start: re-run benchmark on merged cells (no splits expected)
+      // Reset merged cells to PENDING state for the warm-start run
+      for (const cell of mergedCells) {
+        cell.status = "PENDING";
+        cell.resultsCount = 0;
+        cell.foundPlaceIds = [];
+      }
+
+      const warmResult = await runBenchmark(
+        apiKey,
+        `${strategyLabel} Warm-Start (merged)`,
+        mergedCells,
+        splitCellGeodetic
+      );
+      results.push(warmResult);
+
+      // Also push cold-start result for comparison
+      results.push(coldResult);
+    }
   }
 
   // --- Results table ---

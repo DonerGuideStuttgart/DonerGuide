@@ -39,6 +39,11 @@ export class MergeService {
 
         if (combinedResultsCount > maxMergedResults) continue;
 
+        // Only merge if it actually reduces total API requests (pagination-aware)
+        const mergedPages = this.pagesNeeded(combinedResultsCount);
+        const separatePages = this.pagesNeeded(cellA.resultsCount) + this.pagesNeeded(cellB.resultsCount);
+        if (mergedPages >= separatePages) continue;
+
         let sharedAxis: "lat" | "lon" | null = null;
         if (shareFullLatEdge(cellA.boundaryBox, cellB.boundaryBox)) {
           sharedAxis = "lat";
@@ -64,8 +69,18 @@ export class MergeService {
       }
     }
 
-    // Sort by combined results count ascending (lowest first)
-    candidates.sort((a, b) => a.combinedResultsCount - b.combinedResultsCount);
+    // Sort by requests saved descending (highest savings first)
+    candidates.sort((a, b) => {
+      const savedA =
+        this.pagesNeeded(a.cellA.resultsCount) +
+        this.pagesNeeded(a.cellB.resultsCount) -
+        this.pagesNeeded(a.combinedResultsCount);
+      const savedB =
+        this.pagesNeeded(b.cellA.resultsCount) +
+        this.pagesNeeded(b.cellB.resultsCount) -
+        this.pagesNeeded(b.combinedResultsCount);
+      return savedB - savedA;
+    });
     return candidates;
   }
 
@@ -137,6 +152,12 @@ export class MergeService {
       mergedCellCount: optimizedCells.length,
       cellsSaved,
     };
+  }
+
+  /** Number of API requests needed to fetch all results for a cell. */
+  private pagesNeeded(resultsCount: number): number {
+    if (resultsCount <= 0) return 1; // at least 1 request to discover 0 results
+    return Math.ceil(resultsCount / GRID_CONFIG.merge.resultsPerPage);
   }
 
   private createMergedCell(pair: MergeCandidatePair): GridCell {

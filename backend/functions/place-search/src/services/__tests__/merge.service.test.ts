@@ -14,6 +14,7 @@ jest.mock("../../config/gridConfig", () => ({
     merge: {
       maxMergedResults: 40,
       maxMergedCellSizeKm: 15,
+      resultsPerPage: 20,
     },
   },
 }));
@@ -90,17 +91,17 @@ describe("MergeService", () => {
       const cellA = createCell({
         id: "a",
         boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
-        resultsCount: 10,
+        resultsCount: 8,
       });
       const cellB = createCell({
         id: "b",
         boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
-        resultsCount: 15,
+        resultsCount: 12,
       });
 
       const candidates = mergeService.findMergeCandidates([cellA, cellB]);
       expect(candidates).toHaveLength(1);
-      expect(candidates[0].combinedResultsCount).toBe(25);
+      expect(candidates[0].combinedResultsCount).toBe(20);
       expect(candidates[0].sharedAxis).toBe("lat");
     });
 
@@ -191,27 +192,81 @@ describe("MergeService", () => {
       expect(candidates).toHaveLength(0);
     });
 
-    it("should sort candidates by combined results count ascending", () => {
+    it("should reject cells crossing a page boundary with no request savings (18 + 7 = 25)", () => {
       const cellA = createCell({
         id: "a",
         boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
-        resultsCount: 15,
+        resultsCount: 18,
+      });
+      const cellB = createCell({
+        id: "b",
+        boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
+        resultsCount: 7,
+      });
+
+      // 18→1 page, 7→1 page, 25→2 pages: no saving (2 >= 2)
+      const candidates = mergeService.findMergeCandidates([cellA, cellB]);
+      expect(candidates).toHaveLength(0);
+    });
+
+    it("should merge cells that fit in one page combined (8 + 10 = 18)", () => {
+      const cellA = createCell({
+        id: "a",
+        boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
+        resultsCount: 8,
       });
       const cellB = createCell({
         id: "b",
         boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
         resultsCount: 10,
       });
+
+      // 8→1 page, 10→1 page, 18→1 page: saves 1 request (1 < 2)
+      const candidates = mergeService.findMergeCandidates([cellA, cellB]);
+      expect(candidates).toHaveLength(1);
+      expect(candidates[0].combinedResultsCount).toBe(18);
+    });
+
+    it("should merge zero-result cells correctly (0 + 5 = 5)", () => {
+      const cellA = createCell({
+        id: "a",
+        boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
+        resultsCount: 0,
+      });
+      const cellB = createCell({
+        id: "b",
+        boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
+        resultsCount: 5,
+      });
+
+      // 0→1 page, 5→1 page, 5→1 page: saves 1 request (1 < 2)
+      const candidates = mergeService.findMergeCandidates([cellA, cellB]);
+      expect(candidates).toHaveLength(1);
+      expect(candidates[0].combinedResultsCount).toBe(5);
+    });
+
+    it("should sort candidates by requests saved descending", () => {
+      // A(5) + B(5) = 10 → saves 1 request (2 pages → 1 page)
+      const cellA = createCell({
+        id: "a",
+        boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
+        resultsCount: 5,
+      });
+      const cellB = createCell({
+        id: "b",
+        boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
+        resultsCount: 5,
+      });
+      // B(5) + C(0) = 5 → saves 1 request (2 pages → 1 page)
       const cellC = createCell({
         id: "c",
         boundaryBox: { minLat: 48.1, minLon: 9.0, maxLat: 48.15, maxLon: 9.05 },
-        resultsCount: 2,
+        resultsCount: 0,
       });
 
       const candidates = mergeService.findMergeCandidates([cellA, cellB, cellC]);
-      // B+C = 12, A+B = 25
+      // All valid candidates save 1 request each
       expect(candidates.length).toBeGreaterThanOrEqual(2);
-      expect(candidates[0].combinedResultsCount).toBeLessThanOrEqual(candidates[1].combinedResultsCount);
     });
   });
 
@@ -220,17 +275,17 @@ describe("MergeService", () => {
       const cellA = createCell({
         id: "a",
         boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
-        resultsCount: 10,
+        resultsCount: 8,
       });
       const cellB = createCell({
         id: "b",
         boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
-        resultsCount: 15,
+        resultsCount: 12,
       });
 
       const result = mergeService.performMerges([cellA, cellB]);
       expect(result).toHaveLength(1);
-      expect(result[0].resultsCount).toBe(25);
+      expect(result[0].resultsCount).toBe(20);
       expect(result[0].boundaryBox).toEqual({
         minLat: 48.0,
         minLon: 9.0,
@@ -355,12 +410,12 @@ describe("MergeService", () => {
         createCell({
           id: "a",
           boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
-          resultsCount: 10,
+          resultsCount: 8,
         }),
         createCell({
           id: "b",
           boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
-          resultsCount: 15,
+          resultsCount: 12,
         }),
         createCell({
           id: "c",
@@ -401,12 +456,12 @@ describe("MergeService", () => {
         createCell({
           id: "a",
           boundaryBox: { minLat: 48.0, minLon: 9.0, maxLat: 48.05, maxLon: 9.05 },
-          resultsCount: 10,
+          resultsCount: 8,
         }),
         createCell({
           id: "b",
           boundaryBox: { minLat: 48.05, minLon: 9.0, maxLat: 48.1, maxLon: 9.05 },
-          resultsCount: 15,
+          resultsCount: 12,
         }),
       ];
 
@@ -422,7 +477,7 @@ describe("MergeService", () => {
       await mergeService.optimizeGrid("v1", "v2");
 
       const upsertedCell = (mockContainer.items.upsert as jest.Mock).mock.calls[0][0] as GridCell;
-      expect(upsertedCell.resultsCount).toBe(25);
+      expect(upsertedCell.resultsCount).toBe(20);
       expect(upsertedCell.foundPlaceIds).toEqual([]);
     });
   });
