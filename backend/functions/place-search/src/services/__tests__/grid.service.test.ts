@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GridService, TARGET_CELL_SIZE_KM } from "../grid.service";
+import { GridService } from "../grid.service";
 import { Container } from "@azure/cosmos";
 import type { GridCell } from "../../types/grid";
 import { cellIntersectsBoundary, KM_PER_DEGREE_LAT } from "../../utils/geometry.util";
@@ -27,22 +27,26 @@ jest.mock("../../utils/geometry.util", () => {
 
 const mockedCellIntersectsBoundary = cellIntersectsBoundary as jest.MockedFunction<typeof cellIntersectsBoundary>;
 
+/** Matches the baseCellSizeKm value used in the GRID_CONFIG mock above */
+const MOCK_BASE_CELL_SIZE_KM = 5;
+
 /** Helper: compute expected grid dimensions for the mock BBox */
 function getExpectedGridDimensions() {
   const minLat = 48.0,
     maxLat = 49.0,
     minLon = 9.0,
     maxLon = 10.0;
-  const latStep = TARGET_CELL_SIZE_KM / KM_PER_DEGREE_LAT;
-  const rows = Math.ceil((maxLat - minLat) / latStep);
+  const nominalLatStep = MOCK_BASE_CELL_SIZE_KM / KM_PER_DEGREE_LAT;
+  const rows = Math.max(1, Math.round((maxLat - minLat) / nominalLatStep));
+  const latStep = (maxLat - minLat) / rows;
 
   let totalCells = 0;
   for (let i = 0; i < rows; i++) {
     const cellMinLat = minLat + i * latStep;
-    const cellMaxLat = Math.min(minLat + (i + 1) * latStep, maxLat);
+    const cellMaxLat = minLat + (i + 1) * latStep;
     const centerLat = (cellMinLat + cellMaxLat) / 2;
-    const lonStep = TARGET_CELL_SIZE_KM / (KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180));
-    const cols = Math.ceil((maxLon - minLon) / lonStep);
+    const nominalLonStep = MOCK_BASE_CELL_SIZE_KM / (KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180));
+    const cols = Math.max(1, Math.round((maxLon - minLon) / nominalLonStep));
     totalCells += cols;
   }
 
@@ -139,9 +143,9 @@ describe("GridService", () => {
       const latSideKm = (maxLat - minLat) * KM_PER_DEGREE_LAT;
       const lonSideKm = (maxLon - minLon) * KM_PER_DEGREE_LAT * Math.cos((centerLat * Math.PI) / 180);
 
-      // Both sides should be approximately TARGET_CELL_SIZE_KM, within tolerance
-      expect(latSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
-      expect(lonSideKm).toBeCloseTo(TARGET_CELL_SIZE_KM, 0);
+      // Both sides should be approximately MOCK_BASE_CELL_SIZE_KM, within tolerance
+      expect(latSideKm).toBeCloseTo(MOCK_BASE_CELL_SIZE_KM, 0);
+      expect(lonSideKm).toBeCloseTo(MOCK_BASE_CELL_SIZE_KM, 0);
     });
   });
 
