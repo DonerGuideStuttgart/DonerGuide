@@ -4,6 +4,13 @@ import { PaymentMethods } from "doner_types";
 describe("GoogleMapsService", () => {
   let service: GoogleMapsService;
   const apiKey = "test-api-key";
+  const mockContext = {
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+    info: jest.fn(),
+  } as any;
 
   beforeEach(() => {
     service = new GoogleMapsService(apiKey, false);
@@ -19,7 +26,7 @@ describe("GoogleMapsService", () => {
         json: jest.fn().mockResolvedValue(mockResponse),
       });
 
-      const result = await service.searchPlaces(48.0, 9.0, 49.0, 10.0);
+      const result = await service.searchPlaces(48.0, 9.0, 49.0, 10.0, mockContext);
 
       expect(global.fetch).toHaveBeenCalledWith(
         "https://places.googleapis.com/v1/places:searchText",
@@ -43,7 +50,7 @@ describe("GoogleMapsService", () => {
         text: jest.fn().mockResolvedValue("API Key Invalid"),
       });
 
-      await expect(service.searchPlaces(48.0, 9.0, 49.0, 10.0)).rejects.toThrow(
+      await expect(service.searchPlaces(48.0, 9.0, 49.0, 10.0, mockContext)).rejects.toThrow(
         "Google Places API error: 403 Forbidden - API Key Invalid"
       );
     });
@@ -75,7 +82,7 @@ describe("GoogleMapsService", () => {
         });
       global.fetch = mockFetch;
 
-      const results = await service.searchAllPages(48.0, 9.0, 49.0, 10.0);
+      const results = await service.searchAllPages(48.0, 9.0, 49.0, 10.0, mockContext);
 
       expect(mockFetch).toHaveBeenCalledTimes(3);
       expect(results).toHaveLength(3);

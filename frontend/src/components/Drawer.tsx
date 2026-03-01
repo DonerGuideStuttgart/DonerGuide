@@ -46,7 +46,6 @@ export default function Drawer({ isOpen, onClose, children, title }: Props) {
 						</button>
 					</div>
 
-					{/* Content */}
 					<div className="flex-1 overflow-y-auto">{children}</div>
 				</div>
 			</div>

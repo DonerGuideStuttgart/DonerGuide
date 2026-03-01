@@ -32,7 +32,7 @@ export default function Explore() {
 				: `Entdecke die ${stores.length} besten Döner in Stuttgart`
 
 	return (
-		<>
+		<div className="overflow-hidden">
 			{/* Header with Title */}
 			<header className="flex items-center justify-between mb-2 lg:mb-0">
 				<h1 className="text-2xl font-bold">{title}</h1>
@@ -213,6 +213,6 @@ export default function Explore() {
 				</section>
 			</Drawer>
 			{/* Filter Drawer Mobile End */}
-		</>
+		</div>
 	)
 }

@@ -5,3 +5,4 @@ export * from "./src/Photo";
 export * from "./src/Place";
 export * from "./src/StoreAnalysis";
 export * from "./src/WaitingTime";
+export * from "./src/NewPromptMessage";

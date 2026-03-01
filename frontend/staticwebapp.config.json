@@ -1,5 +1,18 @@
 {
 	"navigationFallback": {
-		"rewrite": "/index.html"
+		"rewrite": "/index.html",
+		"exclude": [
+			"/_next/*",
+			"/favicon.ico",
+			"*.{css,js,json,png,jpg,jpeg,gif,svg,ico,xml,txt,woff,woff2,ttf,eot}",
+			"/ChIJ*"
+		]
+	},
+	"mimeTypes": {
+		".json": "application/json",
+		".html": "text/html"
+	},
+	"globalHeaders": {
+		"cache-control": "public, max-age=3600, must-revalidate"
 	}
 }

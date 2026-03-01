@@ -15,6 +15,13 @@ describe("VisionService", () => {
   let visionService: VisionService;
   const mockPost = jest.fn();
   const mockPath = jest.fn();
+  const mockContext = {
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+    info: jest.fn(),
+  } as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,7 +68,7 @@ describe("VisionService", () => {
         },
       });
 
-      const result = await visionService.analyzeImage(testBuffer);
+      const result = await visionService.analyzeImage(testBuffer, mockContext);
       expect(result.category).toBe("food");
       expect(result.confidence).toBe(0.9);
     });
@@ -83,7 +90,7 @@ describe("VisionService", () => {
         },
       });
 
-      const result = await visionService.analyzeImage(testBuffer);
+      const result = await visionService.analyzeImage(testBuffer, mockContext);
       expect(result.category).toBe("place");
       expect(result.confidence).toBe(0.95);
     });
@@ -105,13 +112,13 @@ describe("VisionService", () => {
         },
       });
 
-      const result = await visionService.analyzeImage(testBuffer);
+      const result = await visionService.analyzeImage(testBuffer, mockContext);
       expect(result.category).toBe("discard");
     });
 
     it("should use mock analysis in mock mode", async () => {
       visionService = new VisionService({ enableMockMode: true });
-      const result = await visionService.analyzeImage(testBuffer);
+      const result = await visionService.analyzeImage(testBuffer, mockContext);
       expect(result).toBeDefined();
       expect(createClient).not.toHaveBeenCalled();
     });
@@ -127,7 +134,7 @@ describe("VisionService", () => {
         body: { error: { message: "API Error" } },
       });
 
-      await expect(visionService.analyzeImage(testBuffer)).rejects.toThrow("API Error");
+      await expect(visionService.analyzeImage(testBuffer, mockContext)).rejects.toThrow("API Error");
     });
   });
 });

@@ -1,6 +1,7 @@
 import createClient, { ImageAnalysisClient, isUnexpected } from "@azure-rest/ai-vision-image-analysis";
 import { AzureKeyCredential } from "@azure/core-auth";
 import { DefaultAzureCredential } from "@azure/identity";
+import { InvocationContext } from "@azure/functions";
 
 export interface VisionAnalysisResult {
   category: "food" | "place" | "discard";
@@ -81,11 +82,11 @@ export class VisionService {
     }
   }
 
-  public async analyzeImage(buffer: Buffer): Promise<VisionAnalysisResult> {
+  public async analyzeImage(buffer: Buffer, context: InvocationContext): Promise<VisionAnalysisResult> {
     this.validateImageBuffer(buffer);
 
     if (this.isMockMode || !this.client) {
-      console.debug("VisionService: Using mock mode for image analysis");
+      context.debug("VisionService: Using mock mode for image analysis");
       return this.getMockAnalysis();
     }
 
@@ -107,7 +108,7 @@ export class VisionService {
       return this.mapResponseToResult(response.body as ImageAnalysisResult);
     } catch (error: unknown) {
       const errorMessage = `Vision analysis failed: ${error instanceof Error ? error.message : String(error)}`;
-      console.error("VisionService:", errorMessage);
+      context.error("VisionService:", errorMessage);
       throw new Error(errorMessage);
     }
   }
